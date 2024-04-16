@@ -1,12 +1,8 @@
 # drikkeleker
 
-> Webkom's mange morsomme drikkeleker, samlet på ett sted
+> "Webkom's mange morsomme drikkeleker, samlet på ett sted"
 
-[![last_commit](https://badgen.net/github/last-commit/webkom/drikkeleker)]
-
-> There are many things to do. I track the issues I want to fix.
-
-[![open_issues](https://badgen.net/github/open-issues/webkom/drikkeleker)]
+![last_commit](https://badgen.net/github/last-commit/webkom/drikkeleker) ![open_issues](https://badgen.net/github/open-issues/webkom/drikkeleker)
 
 ## Prerequisites
 
