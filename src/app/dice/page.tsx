@@ -1,16 +1,13 @@
 "use client";
+
 import { Canvas } from "@react-three/fiber";
-import Dice from "./Dice";
+import DiceScene from "./DiceScene";
 
 export default function Home() {
   return (
-    <main className="h-screen w-screen">
+    <main className="h-screen w-screen bg-gradient-to-b from-indigo-500 to-blue-500">
       <Canvas>
-        <ambientLight intensity={Math.PI / 2} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
-        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-
-        <Dice/>
+        <DiceScene />
       </Canvas>
     </main>
   );
