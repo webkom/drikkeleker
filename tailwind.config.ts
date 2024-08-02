@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       colors: {
-        lego: "#e21617",
-        "lego-muted": "#b21c17",
+        lego: "var(--lego)",
+        "lego-muted": "var(--lego-muted)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
