@@ -1,6 +1,14 @@
 import BeerContainer from "@/components/beer/beer-container";
 import { lilita } from "@/lib/fonts";
-import { ArrowDown } from "lucide-react";
+import {
+  ArrowDown,
+  Beer,
+  Dice6,
+  HeartCrack,
+  MessageCircleQuestion,
+  MicVocal,
+  Timer,
+} from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 
 export default function Home() {
@@ -15,12 +23,39 @@ export default function Home() {
         <ArrowDown className="animate-bounce" size={48} />
       </div>
       <BeerContainer>
-        <h4 className={lilita.className}>Sanger</h4>
-        <NavButton label="Lambo" href="/song/lambo" />
-        <NavButton label="Lambo" href="/lambo" />
-        <h4 className={`${lilita.className} pt-6`}>Leker</h4>
-        <NavButton label="Lambo" href="/lambo" />
-        <NavButton label="Lambo" href="/lambo" />
+        <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
+        <NavButton icon={<Beer />} color="red" label="Lambo" href="/song/lambo" />
+        <NavButton
+          icon={<MicVocal />}
+          color="blue"
+          label="Lay All Your Love on Me"
+          href="/lambo"
+        />
+        <NavButton
+          icon={<HeartCrack />}
+          color="green"
+          label="Forever Alone"
+          href="/lambo"
+        />
+        <h4 className={`${lilita.className} pt-6 text-gray-800`}>Leker</h4>
+        <NavButton
+          icon={<MessageCircleQuestion />}
+          color="fuchsia"
+          label="100 spørsmål"
+          href="/lambo"
+        />
+        <NavButton
+          icon={<Dice6 />}
+          color="teal"
+          label="Terningleken"
+          href="/dice"
+        />
+        <NavButton
+          icon={<Timer />}
+          color="orange"
+          label="6 minutes"
+          href="/dice"
+        />
       </BeerContainer>
     </main>
   );

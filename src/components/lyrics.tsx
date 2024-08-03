@@ -10,7 +10,7 @@ const Lyrics = ({ title, lyrics }: LyricsProps) => {
   return (
     <div className="w-full overflow-hidden">
       <BeerContainer>
-        <div className="w-full h-full flex flex-col space-y-8 max-w-2xl">
+        <div className="w-full h-full flex flex-col space-y-8 max-w-2xl text-center">
           <h1 className={`${lilita.className} text-5xl text-lego-muted`}>
             {title}
           </h1>
