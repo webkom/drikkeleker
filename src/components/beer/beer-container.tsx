@@ -7,8 +7,8 @@ interface BeerProps {
 
 const BeerContainer = ({ children }: BeerProps) => {
   return (
-    <div className="w-full">
-      <div className="bg-amber-200 w-full relative py-24 flex flex-col items-center h-dvh">
+    <div className="w-full h-full">
+      <div className="bg-amber-200 w-full h-full relative py-18 flex flex-col items-center">
         <div className={[styles.bubble, styles.x1].join(" ")}></div>
         <div className={[styles.bubble, styles.x2].join(" ")}></div>
         <div className={[styles.bubble, styles.x3].join(" ")}></div>
@@ -29,7 +29,7 @@ const BeerContainer = ({ children }: BeerProps) => {
         <div className={[styles.bubble, styles.x18].join(" ")}></div>
         <div className={[styles.bubble, styles.x19].join(" ")}></div>
         <div className={[styles.bubble, styles.x20].join(" ")}></div>
-        <div className="p-8 w-full h-full flex flex-col relative space-y-4 max-w-2xl">
+        <div className="p-8 pb-0 w-full h-full flex flex-col relative gap-4 max-w-2xl">
           {children}
         </div>
       </div>
