@@ -5,7 +5,7 @@ import Link from "next/link";
 interface NavButtonProps {
   label: string;
   href: string;
-  color?: string;
+  color?: "blue" | "red" | "green" | "fuchsia" | "teal" | "orange";
   icon?: React.ReactNode;
   children?: React.ReactNode;
 }
