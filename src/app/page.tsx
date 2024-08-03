@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 import styles from "@/components/beer/beer.module.css";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -61,6 +62,7 @@ export default function Home() {
           />
         </BeerContainer>
       </div>
+      <Footer className="snap-start" />
     </main>
   );
 }
