@@ -23,7 +23,7 @@ const NavButton = ({ label, href, color, icon, children }: NavButtonProps) => {
   return (
     <Link href={href} passHref>
       <Button className={`w-full group ${colorVariants[color!]}`} size="lg">
-        <div className="flex gap-1 items-center">
+        <div className="flex gap-4 items-center">
           {icon && icon}
           {label}
         </div>
