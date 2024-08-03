@@ -19,7 +19,7 @@ const getDiceRotationX = (face: number): number => {
     default:
       return 0;
   }
-}
+};
 
 const getDiceRotationY = (face: number): number => {
   switch (face) {
@@ -30,11 +30,17 @@ const getDiceRotationY = (face: number): number => {
     default:
       return 0;
   }
-}
+};
 
-const interpolateRotation = (elapsedTime: number, duration: number, targetRotation: number) => {
-  return elapsedTime >= duration ? targetRotation : 4 * Math.pow(elapsedTime - duration, 2) + targetRotation;
-}
+const interpolateRotation = (
+  elapsedTime: number,
+  duration: number,
+  targetRotation: number,
+) => {
+  return elapsedTime >= duration
+    ? targetRotation
+    : 4 * Math.pow(elapsedTime - duration, 2) + targetRotation;
+};
 
 const DiceScene = () => {
   const diceMeshRef = useRef<Mesh>(null);
@@ -42,7 +48,7 @@ const DiceScene = () => {
   const [rollStartTime, setRollStartTime] = useState(0);
   const [currentFace, setCurrentFace] = useState(3);
 
-  useFrame(({clock}) => {
+  useFrame(({ clock }) => {
     if (!diceMeshRef.current) return;
 
     const elapsedTimeSinceRoll = clock.elapsedTime - rollStartTime;
@@ -50,8 +56,16 @@ const DiceScene = () => {
     const targetDiceRotationX = getDiceRotationX(currentFace);
     const targetDiceRotationY = getDiceRotationY(currentFace);
 
-    diceMeshRef.current.rotation.x = interpolateRotation(elapsedTimeSinceRoll, DICE_ROLL_DURATION, targetDiceRotationX);
-    diceMeshRef.current.rotation.y = interpolateRotation(elapsedTimeSinceRoll, DICE_ROLL_DURATION, targetDiceRotationY);
+    diceMeshRef.current.rotation.x = interpolateRotation(
+      elapsedTimeSinceRoll,
+      DICE_ROLL_DURATION,
+      targetDiceRotationX,
+    );
+    diceMeshRef.current.rotation.y = interpolateRotation(
+      elapsedTimeSinceRoll,
+      DICE_ROLL_DURATION,
+      targetDiceRotationY,
+    );
   });
 
   const { clock } = useThree();
@@ -65,7 +79,7 @@ const DiceScene = () => {
 
     setRollStartTime(clock.elapsedTime);
     setCurrentFace(Math.floor(Math.random() * 6) + 1);
-  }
+  };
 
   useEffect(() => {
     rollDice();
@@ -74,12 +88,18 @@ const DiceScene = () => {
   return (
     <>
       <ambientLight intensity={Math.PI / 2} />
-      <spotLight position={[-3, 5, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
+      <spotLight
+        position={[-3, 5, 10]}
+        angle={0.15}
+        penumbra={1}
+        decay={0}
+        intensity={Math.PI}
+      />
       <pointLight position={[-3, 5, 10]} decay={0} intensity={Math.PI} />
 
       <Dice ref={diceMeshRef} onClick={rollDice} />
     </>
   );
-}
+};
 
 export default DiceScene;
