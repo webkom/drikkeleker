@@ -14,7 +14,7 @@ import NavButton from "@/components/ui/nav-button";
 export default function Home() {
   return (
     <main className="flex flex-col items-center overflow-hidden">
-      <div className="mt-12 p-8 flex flex-col items-center space-y-4 text-center">
+      <div className="mt-12 p-8 flex flex-col items-center space-y-4 text-center text-lego-muted">
         <h1 className={`${lilita.className} text-6xl leading-snug`}>
           Drikkeleker 🍻
         </h1>
@@ -24,7 +24,7 @@ export default function Home() {
       </div>
       <BeerContainer>
         <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
-        <NavButton icon={<Beer />} color="red" label="Lambo" href="/lambo" />
+        <NavButton icon={<Beer />} color="red" label="Lambo" href="/song/lambo" />
         <NavButton
           icon={<MicVocal />}
           color="blue"

@@ -8,7 +8,7 @@ interface BeerProps {
 const BeerContainer = ({ children }: BeerProps) => {
   return (
     <div className="w-full">
-      <div className="bg-amber-200 w-full relative mt-48 py-24 flex flex-col items-center">
+      <div className="bg-amber-200 w-full relative mt-48 py-16 flex flex-col items-center">
         <div className={styles.foamWaveTop} />
         <div className={[styles.bubble, styles.x1].join(" ")}></div>
         <div className={[styles.bubble, styles.x2].join(" ")}></div>
