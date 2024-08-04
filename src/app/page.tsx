@@ -59,7 +59,7 @@ export default function Home() {
             label="6 minutes"
             href="/dice"
           />
-          <Footer/>
+          <Footer />
         </BeerContainer>
       </div>
     </main>
