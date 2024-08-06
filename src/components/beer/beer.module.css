@@ -20,38 +20,6 @@
   }
 }
 
-@keyframes foamWave {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-1000px);
-  }
-}
-
-.foamWaveTop {
-  background-image: url("/images/wave.svg");
-  background-repeat: repeat-x;
-  position: absolute;
-  top: -124px;
-  margin: 0;
-  width: 6000px; /* Adjusted to ensure the wave does not show the end */
-  height: 124px; /* Adjusted height */
-  animation: foamWave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
-  transform: translate3d(0, 0, 0);
-}
-
-.foamWaveBottom {
-  background-image: url("/images/wave.svg");
-  background-repeat: repeat-x;
-
-  top: -124px;
-  width: 3000px; /* Adjusted to ensure the wave does not show the end */
-  height: 124px; /* Adjusted height */
-  transform: rotate(180deg);
-  background-color: var(--lego);
-}
-
 .x1 {
   animation:
     animateBubble 3s linear infinite,
