@@ -1,0 +1,43 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: setup
+    image: node:20-alpine
+    when:
+      event:
+        - push
+    commands:
+      - npm ci
+
+  - name: prettier
+    image: node:20-alpine
+    when:
+      event:
+        - push
+    depends_on:
+      - setup
+    commands:
+      - npm run prettier:check
+
+  - name: eslint
+    image: node:20-alpine
+    when:
+      event:
+        - push
+    depends_on:
+      - setup
+    commands:
+      - npm run lint
+
+  - name: build
+    image: node:20-alpine
+    when:
+      event:
+        - push
+    depends_on:
+      - setup
+    commands:
+      - npm run build
