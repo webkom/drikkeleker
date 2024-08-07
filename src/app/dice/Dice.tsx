@@ -28,4 +28,6 @@ const Dice = forwardRef(({ onClick }: DiceProps, ref: Ref<Mesh>) => {
   );
 });
 
+Dice.displayName = "Dice";
+
 export default Dice;

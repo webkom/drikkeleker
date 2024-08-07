@@ -27,7 +27,12 @@ export default function Home() {
       <div className="snap-start lg:grow max-md:h-dvh">
         <BeerContainer>
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
-          <NavButton icon={<Beer />} color="red" label="Lambo" href="/lambo" />
+          <NavButton
+            icon={<Beer />}
+            color="red"
+            label="Lambo"
+            href="/song/lambo"
+          />
           <NavButton
             icon={<MicVocal />}
             color="blue"
