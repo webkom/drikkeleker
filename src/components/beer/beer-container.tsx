@@ -9,7 +9,7 @@ interface BeerProps {
 
 const BeerContainer = ({ children, className }: BeerProps) => {
   return (
-    <div className="bg-amber-200 relative py-18 flex flex-col items-center">
+    <div className="bg-amber-200 relative py-18 flex flex-col items-center h-full">
       <div className={[styles.bubble, styles.x1].join(" ")}></div>
       <div className={[styles.bubble, styles.x2].join(" ")}></div>
       <div className={[styles.bubble, styles.x3].join(" ")}></div>
@@ -32,7 +32,7 @@ const BeerContainer = ({ children, className }: BeerProps) => {
       <div className={[styles.bubble, styles.x20].join(" ")}></div>
       <div
         className={cn(
-          "p-8 pb-0 w-full flex flex-col relative gap-4 max-w-2xl",
+          "p-8 pb-0 w-full flex flex-col relative gap-4 max-w-2xl h-full",
           className,
         )}
       >
