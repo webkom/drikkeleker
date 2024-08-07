@@ -25,7 +25,7 @@ export default function Home() {
         <FoamWave className="mt-auto" />
       </div>
       <div className="snap-start lg:grow max-md:h-dvh">
-        <BeerContainer>
+        <BeerContainer className="max-md:h-dvh">
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
           <NavButton
             icon={<Beer />}
