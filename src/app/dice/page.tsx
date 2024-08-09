@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main className="overflow-x-hidden">
       <BackButton className="absolute top-4 left-4 z-10" href="/" />
-      <BeerContainer className="h-screen w-screen">
+      <BeerContainer color="teal" className="h-screen w-screen">
         <Canvas>
           <DiceScene />
         </Canvas>
