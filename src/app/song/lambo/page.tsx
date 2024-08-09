@@ -1,5 +1,7 @@
 import Lyrics from "@/components/lyrics";
 import BackButton from "@/components/back-button";
+import Footer from "@/components/footer";
+import BeerContainer from "@/components/beer/beer-container";
 
 const lambo = [
   [
@@ -27,10 +29,13 @@ const lambo = [
 
 const LamboPage = () => {
   return (
-    <>
-      <BackButton className="absolute top-4 left-4" href="/" />
-      <Lyrics title="Lambo" lyrics={lambo} />
-    </>
+    <main className="overflow-x-hidden">
+      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BeerContainer className="min-h-dvh">
+        <Lyrics title="Lambo" lyrics={lambo} />
+        <Footer />
+      </BeerContainer>
+    </main>
   );
 };
 

@@ -15,7 +15,7 @@ import Footer from "@/components/footer";
 
 export default function Home() {
   return (
-    <main className="lg:flex lg:flex-col overflow-x-hidden overflow-y-scroll snap-y snap-mandatory h-dvh">
+    <main className="md:flex md:flex-col overflow-x-hidden overflow-y-scroll snap-y snap-mandatory h-dvh">
       <div className="relative p-8 pb-0 flex flex-col items-center gap-4 text-center snap-start max-md:h-dvh">
         <h1 className={`${lilita.className} text-6xl mt-12 leading-snug`}>
           Drikkeleker 🍻
@@ -24,8 +24,8 @@ export default function Home() {
         <ArrowDown className="animate-bounce" size={48} />
         <FoamWave className="mt-auto" />
       </div>
-      <div className="snap-start lg:grow max-md:h-dvh">
-        <BeerContainer>
+      <div className="snap-start md:grow max-md:h-dvh">
+        <BeerContainer className="max-md:h-dvh">
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
           <NavButton
             icon={<Beer />}

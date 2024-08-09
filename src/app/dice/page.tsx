@@ -2,13 +2,20 @@
 
 import { Canvas } from "@react-three/fiber";
 import DiceScene from "./DiceScene";
+import BeerContainer from "@/components/beer/beer-container";
+import BackButton from "@/components/back-button";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
-    <main className="h-screen w-screen bg-gradient-to-b from-indigo-500 to-blue-500">
-      <Canvas>
-        <DiceScene />
-      </Canvas>
+    <main className="overflow-x-hidden">
+      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BeerContainer className="h-screen w-screen">
+        <Canvas>
+          <DiceScene />
+        </Canvas>
+        <Footer />
+      </BeerContainer>
     </main>
   );
 }
