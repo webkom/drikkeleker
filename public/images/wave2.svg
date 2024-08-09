@@ -5,7 +5,7 @@
    viewBox="0 -60 1600 396"
    version="1.1"
    id="svg2"
-   sodipodi:docname="wave.svg"
+   sodipodi:docname="wave2.svg"
    inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -22,9 +22,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="2.676"
-     inkscape:cx="250"
-     inkscape:cy="62.032885"
+     inkscape:zoom="2.7962077"
+     inkscape:cx="-137.32885"
+     inkscape:cy="22.530515"
      inkscape:window-width="1861"
      inkscape:window-height="1131"
      inkscape:window-x="0"
@@ -34,15 +34,23 @@
   <path
      fill="rgb(253, 230, 138)"
      fill-rule="evenodd"
-     d="M.005 242C311 242 409.898-.5 811 0c400 0 500 242 789 242v154H0s.005-96 .005-154z"
-     transform="matrix(-1 0 0 1 1600 0)"
-     id="path1" />
+     d="M 0.005,242 C 311,242 409.898,-0.5 811,0 c 400,0 500,242 789,242 V 396 H 0 c 0,0 0.005,-96 0.005,-154 z"
+     id="path1"
+     style="display:inline;fill:#ffffbd;fill-opacity:1"
+     transform="matrix(-1,0,0,1,1600,0)" />
   <path
-     d="M.005 242C311 242 409.898-.5 811 0c400 0 500 242 789 242"
-     stroke="#fffbeb"
+     d="M 0.005,242 C 311,242 409.898,-0.5 811,0 c 400,0 500,242 789,242"
+     stroke="#ffffbb"
      stroke-width="30"
      fill="none"
-     transform="matrix(-1 0 0 1 1600 0)"
+     transform="matrix(-1,0,0,1,1600,0)"
      id="path2"
-     style="stroke:#fde68c;stroke-opacity:1" />
+     style="display:inline" />
+  <rect
+     style="fill:#fde68c;stroke:#fde78c;stroke-width:3.21722"
+     id="rect2"
+     width="1596.6594"
+     height="104.72842"
+     x="1.8856363"
+     y="289.75937" />
 </svg>

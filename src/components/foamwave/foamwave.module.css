@@ -1,17 +1,35 @@
 @keyframes foamWave {
   0% {
-    transform: translateX(0);
+    margin-left: 0;
   }
   100% {
-    transform: translateX(-1000px);
+    margin-left: -1000px;
+  }
+}
+
+@keyframes swell {
+  0%,
+  100% {
+    transform: translate3d(0, -10px, 0);
+  }
+  50% {
+    transform: translate3d(0, 5px, 0);
   }
 }
 
 .foamWave {
-  background-image: url("/images/wave.svg");
+  background-image: url("/images/wave2.svg");
   background-repeat: repeat-x;
   width: 6000px; /* Adjusted to ensure the wave does not show the end */
   height: 124px; /* Adjusted height */
-  animation: foamWave 4s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
-  transform: translate3d(0, 0, 0);
+  animation: foamWave 5s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+}
+
+.foamWave:nth-child(2) {
+  background-image: url("/images/wave.svg");
+  position: absolute;
+  bottom: -5px;
+  animation:
+    foamWave 5s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
+    swell 5s ease -1.25s infinite;
 }

@@ -5,7 +5,12 @@ type Props = {
 };
 
 const FoamWave = ({ className }: Props) => {
-  return <div className={`${styles.foamWave} ${className}`} />;
+  return (
+    <div className={`relative ${className}`}>
+      <div className={styles.foamWave} />
+      <div className={styles.foamWave} />
+    </div>
+  );
 };
 
 export default FoamWave;
