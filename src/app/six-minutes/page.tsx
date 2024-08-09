@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  CirclePause,
-  CirclePlay,
-  Pause,
-  Play,
-  RefreshCcw,
-  RotateCcw,
-  SkipForward,
-} from "lucide-react";
+import { CirclePause, CirclePlay, RotateCcw, SkipForward } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ReactCardFlip from "react-card-flip";
 import songs from "./songs.json";
@@ -19,8 +11,7 @@ import SongDetails from "./SongDetails";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import BackButton from "@/components/back-button";
 import { useTimer } from "react-timer-hook";
-
-const URL = "https://atlasimagesgallery.blob.core.windows.net/drikkelek";
+import { DRIKKELEK_URL } from "@/types/constants";
 
 type CardFaceProps = {
   songNumber: number;
@@ -57,7 +48,7 @@ export default function SixMinutes() {
     audioRef.current!.currentTime = 0;
     setIsPlaying(true);
     setTimeHasRunOut(true);
-  }
+  };
 
   const { start, isRunning } = useTimer({
     autoStart: false,
@@ -96,18 +87,24 @@ export default function SixMinutes() {
     <main className="relative w-screen h-screen">
       <audio
         ref={audioRef}
-        src={timeHasRunOut ? "https://www.myinstants.com/media/sounds/alarm_clock.mp3" : `${URL}/${songs[currentSong].filename}`}
+        src={
+          timeHasRunOut
+            ? "https://www.myinstants.com/media/sounds/alarm_clock.mp3"
+            : `${DRIKKELEK_URL}/${songs[currentSong].filename}`
+        }
         onTimeUpdate={onPlaying}
         onEnded={() => setIsPlaying(false)}
       />
-      {
-      timeHasRunOut && <div className="absolute w-screen z-10 h-screen backdrop-blur-sm animate-fade">
-        <Card className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <CardHeader><h2>🚨 Tiden har gått ut 🚨</h2></CardHeader>
-          <CardContent>Den gruppen som har tur nå må chugge 🍻</CardContent>
-        </Card>
-      </div>
-      }
+      {timeHasRunOut && (
+        <div className="absolute w-screen z-10 h-screen backdrop-blur-sm animate-fade">
+          <Card className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <CardHeader>
+              <h2>🚨 Tiden har gått ut 🚨</h2>
+            </CardHeader>
+            <CardContent>Den gruppen som har tur nå må chugge 🍻</CardContent>
+          </Card>
+        </div>
+      )}
       <BeerContainer>
         <BackButton href="/" />
         <ReactCardFlip isFlipped={isFlipped}>
@@ -130,10 +127,7 @@ export default function SixMinutes() {
             </div>
           </CardFace>
           <CardFace songNumber={currentSong + 1}>
-            <SongDetails
-              title={songs[currentSong].title}
-              artist={songs[currentSong].artist}
-            />
+            <SongDetails currentSong={currentSong} />
           </CardFace>
         </ReactCardFlip>
         <Button
