@@ -22,7 +22,7 @@ const questions = [
   "SKÅL!",
   "Hvem trenger en shot?",
   "Hvem er dårligst til å chugge?",
-  "Hvem hadde vunnet i ludo?",
+  "Hvem hadde vunnet i ludøl?",
   "Hvem drar på flest bedpresser?",
   "Hvem lever fremdeles i russetiden?",
   "Hvem passer best inn i Webkom?",
