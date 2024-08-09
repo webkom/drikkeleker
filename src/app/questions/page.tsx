@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 const questions = [
   "Hvem blir påspandert mest på byen?",
@@ -151,25 +153,37 @@ const QuestionsPage = () => {
     <main className="overflow-hidden h-screen">
       <BackButton href="/" className="absolute top-4 left-4 z-10" />
       <BeerContainer>
-        <div className="flex flex-col items-center text-center">
-          <h1 className={`${lilita.className} text-5xl mt-16`}>100 Spørsmål</h1>
-          <div className="relative w-full max-w-96 mt-12">
-            {cards.map((card, index) => (
-              <Card
-                key={card.id}
-                className="absolute cursor-pointer left-0 right-0 py-52 flex flex-col justify-center items-center"
-                style={{
-                  ...card.style,
-                  zIndex: -index + 5,
-                }}
-                onClick={() => setCurrentCard(card.id + 1)}
-              >
-                <CardHeader>
-                  <CardTitle>Spørsmål {card.id + 1}</CardTitle>
-                </CardHeader>
-                <CardContent>{card.content}</CardContent>
-              </Card>
-            ))}
+        <div className="flex flex-col items-center text-center h-full pt-12">
+          <h1 className={`${lilita.className} text-5xl`}>100 Spørsmål</h1>
+          <div className="w-full max-w-96 mt-16 flex flex-col grow">
+            <div className="relative grow">
+              {cards.map((card, index) => (
+                <Card
+                  key={card.id}
+                  className="absolute cursor-pointer left-0 right-0 flex flex-col justify-center h-full bottom-12"
+                  style={{
+                    ...card.style,
+                    zIndex: -index + 5,
+                  }}
+                  onClick={() => setCurrentCard(card.id + 1)}
+                >
+                  <CardHeader>
+                    <CardTitle>Spørsmål {card.id + 1}</CardTitle>
+                  </CardHeader>
+                  <CardContent>{card.content}</CardContent>
+                </Card>
+              ))}
+            </div>
+            <Button
+              onClick={() => setCurrentCard(currentCard + 1)}
+              className="bg-fuchsia-500 hover:bg-fuchsia-500/90 w-full group"
+            >
+              Neste spørsmål
+              <ArrowRight
+                size={20}
+                className="ml-1 transition-transform group-hover:translate-x-1"
+              />
+            </Button>
           </div>
         </div>
         <Footer />
