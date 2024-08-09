@@ -3,13 +3,26 @@ import styles from "./beer.module.css";
 import { cn } from "@/lib/utils";
 
 interface BeerProps {
+  color?: "amber" | "blue" | "red" | "green" | "fuchsia" | "teal" | "orange";
   children?: React.ReactNode;
   className?: string;
 }
 
-const BeerContainer = ({ children, className }: BeerProps) => {
+const BeerContainer = ({ children, className, color = "amber" }: BeerProps) => {
+  const colorVariants: { [id: string]: string } = {
+    amber: "bg-amber-200",
+    blue: "bg-blue-200",
+    red: "bg-red-200",
+    green: "bg-green-200",
+    fuchsia: "bg-fuchsia-200",
+    teal: "bg-teal-200",
+    orange: "bg-orange-200",
+  };
+
   return (
-    <div className="bg-amber-200 relative py-18 flex flex-col items-center h-full">
+    <div
+      className={`${colorVariants[color!]} relative py-18 flex flex-col items-center h-full`}
+    >
       <div className={[styles.bubble, styles.x1].join(" ")}></div>
       <div className={[styles.bubble, styles.x2].join(" ")}></div>
       <div className={[styles.bubble, styles.x3].join(" ")}></div>
