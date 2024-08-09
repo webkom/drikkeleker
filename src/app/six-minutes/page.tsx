@@ -7,6 +7,7 @@ import songs from './songs.json';
 import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgessBar";
+import SongDetails from "./SongDetails";
 
 const URL = "https://atlasimagesgallery.blob.core.windows.net/drikkelek";
 
@@ -61,8 +62,7 @@ export default function SixMinutes() {
           </Card>
           <Card>
             {(currentSong+1)}
-            {songs[currentSong].title}
-            {songs[currentSong].artist}
+            <SongDetails title={songs[currentSong].title} artist={songs[currentSong].artist} />
           </Card>
         </ReactCardFlip>
         <Button onClick={() => setIsFlipped(!isFlipped)} >Snu</Button>
