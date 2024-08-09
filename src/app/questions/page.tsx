@@ -155,8 +155,8 @@ const QuestionsPage = () => {
       <BeerContainer>
         <div className="flex flex-col items-center text-center h-full pt-12">
           <h1 className={`${lilita.className} text-5xl`}>100 Spørsmål</h1>
-          <div className="w-full max-w-96 mt-16 flex flex-col grow">
-            <div className="relative grow">
+          <div className="w-full max-w-96 flex flex-col grow justify-center">
+            <div className="relative h-96">
               {cards.map((card, index) => (
                 <Card
                   key={card.id}
