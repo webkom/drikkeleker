@@ -50,7 +50,7 @@ export default function Home() {
             icon={<MessageCircleQuestion />}
             color="fuchsia"
             label="100 spørsmål"
-            href="/lambo"
+            href="/questions  "
           />
           <NavButton
             icon={<Dice6 />}
