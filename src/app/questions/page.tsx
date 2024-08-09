@@ -157,7 +157,7 @@ const QuestionsPage = () => {
             {cards.map((card, index) => (
               <Card
                 key={card.id}
-                className="absolute cursor-pointer left-0 right-0"
+                className="absolute cursor-pointer left-0 right-0 h-40"
                 style={{
                   ...card.style,
                   zIndex: -index + 5,
