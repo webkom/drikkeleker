@@ -14,8 +14,44 @@ import { useTimer } from "react-timer-hook";
 
 const URL = "https://atlasimagesgallery.blob.core.windows.net/drikkelek";
 
+function shuffle(array: any[]) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+}
+
+const PlayingCard = ({currentSong, children}) => {
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <span className="text-lg">{(currentSong+1)}</span>
+      </CardHeader>
+      <CardContent className="flex flex-col w-full h-[400px]" >
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function SixMinutes() {
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const [shuffledSongs, setShuffledSongs] = useState(songs);
+
+  useEffect(() => {
+    shuffle(shuffledSongs);
+    setShuffledSongs(shuffledSongs);
+  }, [shuffledSongs]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -57,19 +93,15 @@ export default function SixMinutes() {
       <BeerContainer>
         <BackButton href="/"/>
         <ReactCardFlip isFlipped={isFlipped}>
-          <Card className="flex flex-col items-center h-100" >
-            <CardHeader>
-            {(currentSong+1)}
-            </CardHeader>
-            <div className="flex flex-col gap-5">
+          <PlayingCard currentSong={currentSong}>
+            <div className="my-auto w-full gap-5 flex flex-col items-center" >
               {isPlaying ? <CirclePause className="text-orange-500" size={125} onClick={() => setIsPlaying(false)} />  : <CirclePlay className="text-orange-500" size={125} onClick={() => setIsPlaying(true) } />}
               <ProgressBar value={currentPlayTime} maxValue={20} />
             </div>
-          </Card>
-          <Card className="flex flex-col items-center" >
-            {(currentSong+1)}
+          </PlayingCard>
+          <PlayingCard currentSong={currentSong}>
             <SongDetails title={songs[currentSong].title} artist={songs[currentSong].artist} />
-          </Card>
+          </PlayingCard>
         </ReactCardFlip>
         <Button className="bg-orange-500" onClick={() => setIsFlipped(!isFlipped)} >Snu</Button>
         <Button className="bg-orange-500" onClick={nextSong} >Neste sang</Button>
