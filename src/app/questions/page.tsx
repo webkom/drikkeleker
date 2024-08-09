@@ -148,16 +148,16 @@ const QuestionsPage = () => {
   }, [currentCard]);
 
   return (
-    <div className="overflow-hidden text-center">
+    <main className="overflow-hidden h-screen">
+      <BackButton href="/" className="absolute top-4 left-4 z-10" />
       <BeerContainer>
-        <div className="h-screen flex flex-col items-center">
-          <BackButton href="/" className="absolute top-4 left-4" />
+        <div className="flex flex-col items-center text-center">
           <h1 className={`${lilita.className} text-5xl mt-16`}>100 Spørsmål</h1>
-          <div className="relative w-96 mt-72">
+          <div className="relative w-full max-w-96 mt-12">
             {cards.map((card, index) => (
               <Card
                 key={card.id}
-                className="absolute cursor-pointer left-0 right-0 h-40"
+                className="absolute cursor-pointer left-0 right-0 py-52 flex flex-col justify-center items-center"
                 style={{
                   ...card.style,
                   zIndex: -index + 5,
@@ -174,7 +174,7 @@ const QuestionsPage = () => {
         </div>
         <Footer />
       </BeerContainer>
-    </div>
+    </main>
   );
 };
 
