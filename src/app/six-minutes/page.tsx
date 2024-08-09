@@ -51,11 +51,18 @@ export default function SixMinutes() {
 
   const [currentSong, setCurrentSong] = useState(0);
   const [currentPlayTime, setCurrentPlayTime] = useState(0);
+  const [timeHasRunOut, setTimeHasRunOut] = useState(false);
+
+  const endGame = () => {
+    audioRef.current!.currentTime = 0;
+    setIsPlaying(true);
+    setTimeHasRunOut(true);
+  }
 
   const { start, isRunning } = useTimer({
     autoStart: false,
-    expiryTimestamp: new Date(Date.now() + 20 * 1000),
-    onExpire: () => console.warn("onExpire called"),
+    expiryTimestamp: new Date(Date.now() + 6 * 60000),
+    onExpire: endGame,
   });
 
   useEffect(() => {
@@ -86,13 +93,21 @@ export default function SixMinutes() {
   };
 
   return (
-    <main className="w-screen h-screen">
+    <main className="relative w-screen h-screen">
       <audio
         ref={audioRef}
-        src={`${URL}/${songs[currentSong].filename}`}
+        src={timeHasRunOut ? "https://www.myinstants.com/media/sounds/alarm_clock.mp3" : `${URL}/${songs[currentSong].filename}`}
         onTimeUpdate={onPlaying}
         onEnded={() => setIsPlaying(false)}
       />
+      {
+      timeHasRunOut && <div className="absolute w-screen z-10 h-screen backdrop-blur-sm animate-fade">
+        <Card className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <CardHeader><h2>🚨 Tiden har gått ut 🚨</h2></CardHeader>
+          <CardContent>Den gruppen som har tur nå må chugge 🍻</CardContent>
+        </Card>
+      </div>
+      }
       <BeerContainer>
         <BackButton href="/" />
         <ReactCardFlip isFlipped={isFlipped}>
