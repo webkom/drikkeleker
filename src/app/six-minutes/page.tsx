@@ -1,7 +1,7 @@
 "use client";
 
-import { CirclePause, CirclePlay, Pause, Play, RefreshCcw, SkipForward } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { CirclePause, CirclePlay, Pause, Play, RefreshCcw, RotateCcw, SkipForward } from "lucide-react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import ReactCardFlip from "react-card-flip";
 import songs from './songs.json';
 import BeerContainer from "@/components/beer/beer-container";
@@ -14,27 +14,15 @@ import { useTimer } from "react-timer-hook";
 
 const URL = "https://atlasimagesgallery.blob.core.windows.net/drikkelek";
 
-function shuffle(array: any[]) {
-  let currentIndex = array.length;
-
-  // While there remain elements to shuffle...
-  while (currentIndex != 0) {
-
-    // Pick a remaining element...
-    let randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
-  }
+type CardFaceProps = {
+  songNumber: number;
+  children: ReactNode[] | ReactNode;
 }
-
-const PlayingCard = ({currentSong, children}) => {
+const CardFace = ({songNumber, children} : CardFaceProps) => {
   return (
     <Card>
       <CardHeader className="text-center">
-        <span className="text-lg">{(currentSong+1)}</span>
+        <span className="text-xl">{songNumber}</span>
       </CardHeader>
       <CardContent className="flex flex-col w-full h-[400px]" >
         {children}
@@ -46,12 +34,9 @@ const PlayingCard = ({currentSong, children}) => {
 export default function SixMinutes() {
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const [shuffledSongs, setShuffledSongs] = useState(songs);
-
   useEffect(() => {
-    shuffle(shuffledSongs);
-    setShuffledSongs(shuffledSongs);
-  }, [shuffledSongs]);
+    shuffle(songs);
+  }, []);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -82,9 +67,9 @@ export default function SixMinutes() {
   }
 
   const nextSong = () => {
-    setCurrentSong(current => (current + 1) % songs.length);
     setIsPlaying(false);
     setIsFlipped(false);
+    setTimeout(() => setCurrentSong(current => (current + 1) % songs.length), 300);
   }
 
   return (
@@ -93,19 +78,35 @@ export default function SixMinutes() {
       <BeerContainer>
         <BackButton href="/"/>
         <ReactCardFlip isFlipped={isFlipped}>
-          <PlayingCard currentSong={currentSong}>
+          <CardFace songNumber={currentSong+1}>
             <div className="my-auto w-full gap-5 flex flex-col items-center" >
               {isPlaying ? <CirclePause className="text-orange-500" size={125} onClick={() => setIsPlaying(false)} />  : <CirclePlay className="text-orange-500" size={125} onClick={() => setIsPlaying(true) } />}
               <ProgressBar value={currentPlayTime} maxValue={20} />
             </div>
-          </PlayingCard>
-          <PlayingCard currentSong={currentSong}>
+          </CardFace>
+          <CardFace songNumber={currentSong+1}>
             <SongDetails title={songs[currentSong].title} artist={songs[currentSong].artist} />
-          </PlayingCard>
+          </CardFace>
         </ReactCardFlip>
-        <Button className="bg-orange-500" onClick={() => setIsFlipped(!isFlipped)} >Snu</Button>
-        <Button className="bg-orange-500" onClick={nextSong} >Neste sang</Button>
+        <Button className="bg-orange-500 hover:bg-orange-500/90 flex gap-1" onClick={() => setIsFlipped(!isFlipped)} ><RotateCcw/> Snu</Button>
+        <Button className="bg-orange-500 hover:bg-orange-500/90 flex gap-1" onClick={nextSong} ><SkipForward/> Neste sang</Button>
       </BeerContainer>
     </main>
   );
+}
+
+function shuffle(array: any[]) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
 }
