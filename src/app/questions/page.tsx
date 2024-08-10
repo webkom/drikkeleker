@@ -153,8 +153,8 @@ const QuestionsPage = () => {
     <main className="overflow-hidden h-screen">
       <BackButton href="/" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="fuchsia">
-        <div className="flex flex-col items-center text-center h-full pt-12">
-          <h1 className={`${lilita.className} text-5xl`}>100 Spørsmål</h1>
+        <div className="flex flex-col items-center text-center h-full">
+          <h1 className={`${lilita.className} text-5xl pt-12`}>100 Spørsmål</h1>
           <div className="w-full max-w-96 flex flex-col grow justify-center">
             <div className="relative h-96">
               {cards.map((card, index) => (
