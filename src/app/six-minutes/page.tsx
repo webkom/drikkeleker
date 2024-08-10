@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import BackButton from "@/components/back-button";
 import { useTimer } from "react-timer-hook";
 import { DRIKKELEK_URL } from "@/types/constants";
+import GameOverModal from "./GameOverModal";
 
 type CardFaceProps = {
   songNumber: number;
@@ -42,12 +43,12 @@ export default function SixMinutes() {
 
   const [currentSong, setCurrentSong] = useState(0);
   const [currentPlayTime, setCurrentPlayTime] = useState(0);
-  const [timeHasRunOut, setTimeHasRunOut] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const endGame = () => {
     audioRef.current!.currentTime = 0;
     setIsPlaying(true);
-    setTimeHasRunOut(true);
+    setIsGameOver(true);
   };
 
   const { start, isRunning } = useTimer({
@@ -88,23 +89,14 @@ export default function SixMinutes() {
       <audio
         ref={audioRef}
         src={
-          timeHasRunOut
+          isGameOver
             ? "https://www.myinstants.com/media/sounds/alarm_clock.mp3"
             : `${DRIKKELEK_URL}/${songs[currentSong].filename}`
         }
         onTimeUpdate={onPlaying}
         onEnded={() => setIsPlaying(false)}
       />
-      {timeHasRunOut && (
-        <div className="absolute w-screen z-10 h-screen backdrop-blur-sm animate-fade">
-          <Card className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <CardHeader>
-              <h2>🚨 Tiden har gått ut 🚨</h2>
-            </CardHeader>
-            <CardContent>Den gruppen som har tur nå må chugge 🍻</CardContent>
-          </Card>
-        </div>
-      )}
+      {isGameOver && <GameOverModal />}
       <BeerContainer>
         <BackButton href="/" />
         <ReactCardFlip isFlipped={isFlipped}>
