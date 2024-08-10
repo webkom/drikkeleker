@@ -127,11 +127,11 @@ interface StoredCard {
 }
 
 const getStoredCard = (): number | undefined => {
-  if (typeof window === "undefined") return 0;
+  if (typeof window === "undefined") return;
 
   try {
     const storedData = localStorage.getItem("current_card");
-    if (!storedData) return 0;
+    if (!storedData) return;
 
     const { card, updatedAt }: StoredCard = JSON.parse(storedData);
 
@@ -141,7 +141,6 @@ const getStoredCard = (): number | undefined => {
 
     if (isRecent) return card;
   } catch {}
-  return 0;
 };
 
 const QuestionsPage = () => {
