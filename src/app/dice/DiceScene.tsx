@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Dice from "./Dice";
 import { Mesh } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 
-const DICE_ROLL_DURATION = 1.2;
-const DICE_ROLL_COOLDOWN = 1.1;
+const DICE_ROLL_SPEED = 12;
+const DICE_ROLL_DURATION = 0.7;
+const DICE_ROLL_COOLDOWN = 0.7;
 
 const getDiceRotationX = (face: number): number => {
   switch (face) {
@@ -39,13 +40,13 @@ const interpolateRotation = (
 ) => {
   return elapsedTime >= duration
     ? targetRotation
-    : 4 * Math.pow(elapsedTime - duration, 2) + targetRotation;
+    : DICE_ROLL_SPEED * Math.pow(elapsedTime - duration, 2) + targetRotation;
 };
 
 const DiceScene = () => {
   const diceMeshRef = useRef<Mesh>(null);
 
-  const [rollStartTime, setRollStartTime] = useState(0);
+  const [rollStartTime, setRollStartTime] = useState(-DICE_ROLL_DURATION);
   const [currentFace, setCurrentFace] = useState(3);
 
   useFrame(({ clock }) => {
@@ -66,6 +67,10 @@ const DiceScene = () => {
       DICE_ROLL_DURATION,
       targetDiceRotationY,
     );
+
+    if (rollStartTime === -DICE_ROLL_DURATION) {
+      diceMeshRef.current.position.y = 0.2 * Math.sin(clock.elapsedTime);
+    }
   });
 
   const { clock } = useThree();
@@ -80,10 +85,6 @@ const DiceScene = () => {
     setRollStartTime(clock.elapsedTime);
     setCurrentFace(Math.floor(Math.random() * 6) + 1);
   };
-
-  useEffect(() => {
-    rollDice();
-  }, []);
 
   return (
     <>
