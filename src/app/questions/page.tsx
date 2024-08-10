@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const questions = [
   "Hvem blir påspandert mest på byen?",
@@ -127,11 +127,11 @@ interface StoredQuestion {
 }
 
 const getStoredQuestion = (): number | undefined => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return 0;
 
   try {
     const storedData = localStorage.getItem("current_question");
-    if (!storedData) return;
+    if (!storedData) return 0;
 
     const { question, updatedAt }: StoredQuestion = JSON.parse(storedData);
 
@@ -141,13 +141,19 @@ const getStoredQuestion = (): number | undefined => {
 
     if (isRecent) return question;
   } catch {}
+  return 0;
 };
 
 const QuestionsPage = () => {
   const [currentCard, setCurrentCard] = useState(getStoredQuestion() || 0);
   const [cards, setCards] = useState<Card[]>([]);
+  const [prevDisabled, setPrevDisabled] = useState(false);
+  const [nextDisabled, setNextDisabled] = useState(false);
 
   useEffect(() => {
+    setPrevDisabled(currentCard <= 0)
+    setNextDisabled(currentCard >= questions.length - 1)
+    
     const updatedCards: Card[] = questions.map((content, index) => {
       const relativeIndex = index - currentCard;
       const transform =
@@ -169,13 +175,15 @@ const QuestionsPage = () => {
         currentCard + 5,
       ),
     );
-    localStorage.setItem(
-      "current_question",
-      JSON.stringify({
-        question: currentCard,
-        updatedAt: new Date(),
-      }),
-    );
+    if (currentCard >= 0 && currentCard <= questions.length - 1) {
+      localStorage.setItem(
+        "current_question",
+        JSON.stringify({
+          question: currentCard,
+          updatedAt: new Date(),
+        }),
+      );
+    }
   }, [currentCard]);
 
   return (
@@ -203,16 +211,30 @@ const QuestionsPage = () => {
                 </Card>
               ))}
             </div>
-            <Button
-              onClick={() => setCurrentCard(currentCard + 1)}
-              className="bg-fuchsia-500 hover:bg-fuchsia-500/90 w-full group"
-            >
-              Neste spørsmål
-              <ArrowRight
-                size={20}
-                className="ml-1 transition-transform group-hover:translate-x-1"
-              />
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setCurrentCard(currentCard - 1)}
+                className="bg-fuchsia-500 hover:bg-fuchsia-500/90 w-full group"
+                disabled={prevDisabled}
+              >
+                <ArrowLeft
+                  size={20}
+                  className="mr-1 transition-transform group-hover:-translate-x-1"
+                />
+                Forrige spørsmål
+              </Button>
+              <Button
+                onClick={() => setCurrentCard(currentCard + 1)}
+                className="bg-fuchsia-500 hover:bg-fuchsia-500/90 w-full group"
+                disabled={nextDisabled}
+              >
+                Neste spørsmål
+                <ArrowRight
+                  size={20}
+                  className="ml-1 transition-transform group-hover:translate-x-1"
+                />
+              </Button>
+            </div>
           </div>
         </div>
         <Footer />
