@@ -151,9 +151,9 @@ const QuestionsPage = () => {
   const [nextDisabled, setNextDisabled] = useState(false);
 
   useEffect(() => {
-    setPrevDisabled(currentCard <= 0)
-    setNextDisabled(currentCard >= questions.length - 1)
-    
+    setPrevDisabled(currentCard <= 0);
+    setNextDisabled(currentCard >= questions.length - 1);
+
     const updatedCards: Card[] = questions.map((content, index) => {
       const relativeIndex = index - currentCard;
       const transform =
