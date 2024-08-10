@@ -62,7 +62,7 @@ export default function Home() {
             icon={<Timer />}
             color="orange"
             label="6 minutes"
-            href="/dice"
+            href="/six-minutes"
           />
           <Footer />
         </BeerContainer>
