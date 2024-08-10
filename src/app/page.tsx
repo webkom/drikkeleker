@@ -24,7 +24,7 @@ export default function Home() {
         <ArrowDown className="animate-bounce" size={48} />
         <FoamWave className="mt-auto" />
       </div>
-      <div className="snap-start md:grow max-md:h-dvh">
+      <div className="snap-start md:grow max-md:h-dvh" id="games">
         <BeerContainer className="max-md:h-dvh">
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
           <NavButton

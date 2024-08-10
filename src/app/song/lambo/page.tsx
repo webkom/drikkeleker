@@ -30,7 +30,7 @@ const lambo = [
 const LamboPage = () => {
   return (
     <main className="overflow-x-hidden">
-      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BackButton className="absolute top-4 left-4 z-10" href="/#games" />
       <BeerContainer color="red" className="min-h-dvh">
         <Lyrics title="Lambo" lyrics={lambo} />
         <Footer />

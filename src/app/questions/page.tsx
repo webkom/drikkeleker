@@ -151,7 +151,7 @@ const QuestionsPage = () => {
 
   return (
     <main className="overflow-hidden h-screen">
-      <BackButton href="/" className="absolute top-4 left-4 z-10" />
+      <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="fuchsia">
         <div className="flex flex-col items-center text-center h-full">
           <h1 className={`${lilita.className} text-5xl pt-12`}>100 Spørsmål</h1>

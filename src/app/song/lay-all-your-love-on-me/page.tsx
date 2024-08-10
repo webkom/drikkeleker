@@ -55,7 +55,7 @@ const layAllYourLoveOnMe = [
 const LayAllYourLoveOnMePage = () => {
   return (
     <main className="overflow-x-hidden">
-      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BackButton className="absolute top-4 left-4 z-10" href="/#games" />
       <BeerContainer color="blue" className="min-h-dvh">
         <Lyrics title="Lay All Your Love On Me" lyrics={layAllYourLoveOnMe} />
         <Footer />

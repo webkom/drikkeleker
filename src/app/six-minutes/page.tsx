@@ -116,7 +116,7 @@ const SixMinutes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <BackButton href="/" className="absolute top-4 left-4 z-10" />
+      <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="orange">
         <div className="text-center pt-12 flex flex-col h-full">
           <h1 className={`${lilita.className} text-5xl`}>6 Minutes</h1>
