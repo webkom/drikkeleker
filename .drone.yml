@@ -10,7 +10,7 @@ steps:
       event:
         - push
     commands:
-      - npm ci
+      - yarn install --frozen-lockfile
 
   - name: prettier
     image: node:20-alpine
@@ -20,7 +20,7 @@ steps:
     depends_on:
       - setup
     commands:
-      - npm run prettier:check
+      - yarn run prettier:check
 
   - name: eslint
     image: node:20-alpine
@@ -30,7 +30,7 @@ steps:
     depends_on:
       - setup
     commands:
-      - npm run lint
+      - yarn lint
 
   - name: build
     image: node:20-alpine
@@ -40,4 +40,4 @@ steps:
     depends_on:
       - setup
     commands:
-      - npm run build
+      - yarn build
