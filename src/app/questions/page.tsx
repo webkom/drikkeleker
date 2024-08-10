@@ -127,21 +127,21 @@ interface StoredQuestion {
 }
 
 const getStoredQuestion = (): number | undefined => {
-  if (typeof window === "undefined") return
-  
+  if (typeof window === "undefined") return;
+
   try {
     const storedData = localStorage.getItem("current_question");
     if (!storedData) return;
-    
+
     const { question, updatedAt }: StoredQuestion = JSON.parse(storedData);
-    
+
     const storedTime = new Date(updatedAt).getTime();
     const now = new Date().getTime();
-    const isRecent = now - storedTime < 30_000
-    
-    if (isRecent) return question
+    const isRecent = now - storedTime < 30_000;
+
+    if (isRecent) return question;
   } catch {}
-}
+};
 
 const QuestionsPage = () => {
   const [currentCard, setCurrentCard] = useState(getStoredQuestion() || 0);
@@ -169,11 +169,13 @@ const QuestionsPage = () => {
         currentCard + 5,
       ),
     );
-    localStorage.setItem("current_question", JSON.stringify({ 
-        question: currentCard, 
-        updatedAt: new Date() 
-      })
-    )
+    localStorage.setItem(
+      "current_question",
+      JSON.stringify({
+        question: currentCard,
+        updatedAt: new Date(),
+      }),
+    );
   }, [currentCard]);
 
   return (
