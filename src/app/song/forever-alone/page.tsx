@@ -117,7 +117,7 @@ const foreverAlone = [
 const ForeverAlonePage = () => {
   return (
     <main className="overflow-x-hidden">
-      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BackButton className="absolute top-4 left-4 z-10" href="/#games" />
       <BeerContainer color="green" className="min-h-dvh">
         <Lyrics title="Forever Alone" lyrics={foreverAlone} />
         <Footer />

@@ -10,7 +10,7 @@ import { lilita } from "@/lib/fonts";
 export default function Home() {
   return (
     <main className="overflow-x-hidden">
-      <BackButton className="absolute top-4 left-4 z-10" href="/" />
+      <BackButton className="absolute top-4 left-4 z-10" href="/#games" />
       <BeerContainer color="teal" className="h-screen w-screen">
         <h1 className={`${lilita.className} text-5xl text-center mt-12`}>
           Terningleken
