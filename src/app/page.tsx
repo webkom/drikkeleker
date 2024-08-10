@@ -37,13 +37,13 @@ export default function Home() {
             icon={<MicVocal />}
             color="blue"
             label="Lay All Your Love on Me"
-            href="/lambo"
+            href="/song/lay-all-your-love-on-me"
           />
           <NavButton
             icon={<HeartCrack />}
             color="green"
             label="Forever Alone"
-            href="/lambo"
+            href="/song/forever-alone"
           />
           <h4 className={`${lilita.className} pt-6 text-gray-800`}>Leker</h4>
           <NavButton
