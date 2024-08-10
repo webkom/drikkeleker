@@ -6,18 +6,18 @@ type ProgressBarProps = {
 const ProgressBar = ({ value, maxValue }: ProgressBarProps) => {
   return (
     <div className="w-full text-center flex flex-col gap-1">
-      <div className="w-full h-6 rounded-full bg-gray-200">
-        <div
-          className="h-6 rounded-full bg-orange-500"
-          style={{ width: `${100 * (1 - value / maxValue)}%` }}
-        ></div>
-      </div>
-      <span className="text-2xl">
+      <span className="text-xl font-normal text-gray-500">
         00:
         {Math.ceil(maxValue - value)
           .toString()
           .padStart(2, "0")}
       </span>
+      <div className="w-full h-6 rounded-md bg-white overflow-clip">
+        <div
+          className="h-6 rounded-md bg-orange-200 transition-all"
+          style={{ width: `${100 * (1 - value / maxValue)}%` }}
+        ></div>
+      </div>
     </div>
   );
 };
