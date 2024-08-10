@@ -98,7 +98,7 @@ export default function SixMinutes() {
       />
       {isGameOver && <GameOverModal />}
       <BackButton href="/" className="absolute top-4 left-4 z-10" />
-      <BeerContainer color="orange" >
+      <BeerContainer color="orange">
         <ReactCardFlip containerClassName="mt-7" isFlipped={isFlipped}>
           <CardFace songNumber={currentSong + 1}>
             <div className="my-auto w-full gap-5 flex flex-col items-center">
