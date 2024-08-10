@@ -6,7 +6,7 @@ import ReactCardFlip from "react-card-flip";
 import songs from "./songs.json";
 import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
-import ProgressBar from "./ProgessBar";
+import ProgressBar from "./ProgressBar";
 import SongDetails from "./SongDetails";
 import BackButton from "@/components/back-button";
 import { useTimer } from "react-timer-hook";

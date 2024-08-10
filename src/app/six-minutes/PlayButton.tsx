@@ -13,7 +13,7 @@ const PlayButton = ({ onClick, isPlaying }: PlayButtonProps) => {
 
   return (
     <button
-      className="bg-orange-50 p-6 rounded-full active:scale-90 transition-transform shadow-md"
+      className="bg-white p-6 rounded-full active:scale-90 transition-transform shadow-md"
       onClick={handleClick}
     >
       {isPlaying ? (
