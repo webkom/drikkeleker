@@ -1,8 +1,9 @@
 import { lilita } from "@/lib/fonts";
+import { ReactNode } from "react";
 
 interface LyricsProps {
   title: string;
-  lyrics: string[][];
+  lyrics: ReactNode[][];
 }
 
 const Lyrics = ({ title, lyrics }: LyricsProps) => {
