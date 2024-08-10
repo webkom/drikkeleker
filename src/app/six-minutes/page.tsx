@@ -11,11 +11,18 @@ import SongDetails from "./SongDetails";
 import BackButton from "@/components/back-button";
 import { useTimer } from "react-timer-hook";
 import { DRIKKELEK_URL } from "@/types/constants";
-import GameOverModal from "./GameOverModal";
 import PlayButton from "@/app/six-minutes/PlayButton";
 import Footer from "@/components/footer";
 import { lilita } from "@/lib/fonts";
 import CardFace from "@/app/six-minutes/CardFace";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const SixMinutes = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -34,15 +41,23 @@ const SixMinutes = () => {
 
   const endGame = () => {
     audioRef.current!.currentTime = 0;
-    setIsPlaying(true);
     setIsGameOver(true);
   };
 
-  const { start, isRunning } = useTimer({
+  const { start, restart, pause, isRunning } = useTimer({
     autoStart: false,
-    expiryTimestamp: new Date(Date.now() + 6 * 60000),
+    expiryTimestamp: new Date(Date.now() + 6 * 60 * 1000),
     onExpire: endGame,
   });
+
+  const restartGame = () => {
+    restart(new Date(Date.now() + 6 * 60 * 1000));
+    pause();
+    setIsPlaying(false);
+    setIsGameOver(false);
+    shuffle(songs);
+    setCurrentSong(0);
+  };
 
   useEffect(() => {
     if (!audioRef.current) return;
@@ -84,7 +99,23 @@ const SixMinutes = () => {
         onTimeUpdate={onPlaying}
         onEnded={() => setIsPlaying(false)}
       />
-      {isGameOver && <GameOverModal />}
+      <AlertDialog open={isGameOver}>
+        <AlertDialogContent>
+          <AlertDialogHeader className="text-center">
+            <AlertDialogTitle className="text-center">
+              🚨 Tiden har gått ut 🚨
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Den gruppen som har tur nå må chugge 🍻
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button className="w-full" onClick={restartGame}>
+              Start på nytt
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <BackButton href="/" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="orange">
         <div className="text-center pt-12 flex flex-col h-full">
