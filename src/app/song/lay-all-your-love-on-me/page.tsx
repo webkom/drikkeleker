@@ -5,25 +5,25 @@ import BeerContainer from "@/components/beer/beer-container";
 
 const layAllYourLoveOnMe = [
   [
-    <b key="Alle">Alle</b>,
-    "I wasn't jealous before we met. Now every woman I see is a potential threat",
     <b key="Fadderbarn">Fadderbarn</b>,
-    "And I'm possessive, it isnt nice. You've heard me saying that smoking was my only vice",
+    "I wasn't jealous before we met. Now every woman I see is a potential threat",
     <b key="Faddere">Faddere</b>,
+    "And I'm possessive, it isnt nice. You've heard me saying that smoking was my only vice",
+    <b key="Alle">Alle</b>,
     "But now it isn't true. Now everything is new",
-    <b key="Har kjæreste">Har kjæreste</b>,
+    <b key="Blir full av en øl">Blir full av en øl</b>,
     "And all I've learned has overturned I beg of you",
     <b key="Har gått på en smell">Har gått på en smell</b>,
     "Don't go wasting your emotion. Lay all your love on me",
-    <b key="Gutter">Gutter</b>,
+    <b key="Har brunt hår">Har brunt hår</b>,
     "It was like shooting a sitting duck. A little small talk, a smile, and baby, I was stuck",
-    <b key="Jenter">Jenter</b>,
+    <b key="Er blond">Er blond</b>,
     "I still don't know what you've done with me. A grown-up woman should never fall so easily",
     <b key="Fra Bærum">Fra Bærum</b>,
     "I feel a kind of fear. When I don't have you near",
     <b key="Fra vestlandet">Fra vestlandet</b>,
     "Unsatisfied, I skip my pride. I beg you, dear",
-    <b key="Blir full av en øl">Blir full av en øl</b>,
+    <b key="Er singel">Er singel</b>,
     "Don't go wasting your emotion. Lay all your love on me",
     <b key="Har blitt kastet ut av et utested">
       Har blitt kastet ut av et utested
@@ -41,7 +41,7 @@ const layAllYourLoveOnMe = [
     "Don't go wasting your emotion. Lay all your love on me",
     <b key="Har hatt friår">Har hatt friår</b>,
     "Don't go sharing your devotion. Lay all your love on me",
-    <b key="Har sendt nudes">Har sendt nudes</b>,
+    <b key="Fra Trøndelag">Fra Trøndelag</b>,
     "Don't go wasting your emotion. Lay all your love on me",
     <b key="Har blitt tatt på fersken av foreldrene sine">
       Har blitt tatt på fersken av foreldrene sine
