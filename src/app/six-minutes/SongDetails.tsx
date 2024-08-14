@@ -10,7 +10,9 @@ const SongDetails = ({ currentSong }: SongDetailsProps) => {
   return (
     <div className="m-auto text-center flex flex-col items-center justify-center">
       <Image
-        src={`${DRIKKELEK_URL}/${songs[currentSong].filename.split(".")[0]}.jpg`}
+        src={`${DRIKKELEK_URL}/${
+          songs[currentSong].filename.split(".")[0]
+        }.jpg`}
         alt="Album cover"
         className="rounded-md"
         width={250}

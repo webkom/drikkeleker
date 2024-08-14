@@ -20,7 +20,7 @@ export default function Home() {
         <h1 className={`${lilita.className} text-6xl mt-12 leading-snug`}>
           Drikkeleker 🍻
         </h1>
-        <div className="lg:hidden flex flex-col items-center gap-8 mt-auto" >
+        <div className="lg:hidden flex flex-col items-center gap-8 mt-auto">
           <span>Dykk ned for å se Abakus sine sanger og drikkeleker!</span>
           <ArrowDown className="animate-bounce" size={48} />
         </div>

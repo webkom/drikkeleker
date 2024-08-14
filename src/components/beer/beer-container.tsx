@@ -21,7 +21,9 @@ const BeerContainer = ({ children, className, color = "amber" }: BeerProps) => {
 
   return (
     <div
-      className={`${colorVariants[color!]} relative py-18 flex flex-col items-center h-full`}
+      className={`${
+        colorVariants[color!]
+      } relative py-18 flex flex-col items-center h-full`}
     >
       <div className={[styles.bubble, styles.x1].join(" ")}></div>
       <div className={[styles.bubble, styles.x2].join(" ")}></div>
