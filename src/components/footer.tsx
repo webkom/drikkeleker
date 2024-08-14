@@ -4,7 +4,7 @@ type Props = {
 
 const Footer = ({ className }: Props) => {
   return (
-    <div className={`w-full ${className} py-1 text-black text-center mt-auto`}>
+    <div className={`w-full ${className} py-2 text-black text-center mt-auto`}>
       <span>
         Laget med 🍺 av{" "}
         <a className="text-lego underline" href="https://github.com/webkom/">
