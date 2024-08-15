@@ -16,6 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.className}>
+      <head>
+        <script
+          defer
+          data-domain="drikkeleker.abakus.no"
+          src="https://analytics.webkom.dev/js/plausible.js"
+        />
+      </head>
       <body className="bg-white">{children}</body>
     </html>
   );
