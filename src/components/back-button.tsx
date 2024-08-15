@@ -12,7 +12,7 @@ const BackButton = ({ className, href }: BackButtonProps) => {
     <Link href={href} passHref>
       <Button variant="link" className={`${className} group`}>
         <ArrowLeft
-          size={32}
+          size={20}
           className="transition-transform group-hover:-translate-x-1"
         />
         <span className="text-lg ml-1">Tilbake</span>

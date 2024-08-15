@@ -16,13 +16,15 @@ import Footer from "@/components/footer";
 export default function Home() {
   return (
     <main className="md:flex md:flex-col overflow-x-hidden overflow-y-scroll snap-y snap-mandatory h-dvh">
-      <div className="relative p-8 pb-0 flex flex-col items-center gap-4 text-center snap-start max-md:h-dvh">
+      <div className="relative p-8 pb-0 flex flex-col items-center gap-8 text-center snap-start max-md:h-dvh">
         <h1 className={`${lilita.className} text-6xl mt-12 leading-snug`}>
           Drikkeleker 🍻
         </h1>
-        <span>Dykk ned for å se Abakus sine sanger og drikkeleker!</span>
-        <ArrowDown className="animate-bounce" size={48} />
-        <FoamWave className="mt-auto" />
+        <div className="lg:hidden flex flex-col items-center gap-8 mt-auto">
+          <span>Dykk ned for å se Abakus sine sanger og drikkeleker!</span>
+          <ArrowDown className="animate-bounce" size={48} />
+        </div>
+        <FoamWave />
       </div>
       <div className="snap-start md:grow max-md:h-dvh" id="games">
         <BeerContainer className="max-md:h-dvh">
@@ -49,7 +51,7 @@ export default function Home() {
           <NavButton
             icon={<MessageCircleQuestion />}
             color="fuchsia"
-            label="100 spørsmål"
+            label="100 Spørsmål"
             href="/questions  "
           />
           <NavButton
@@ -61,7 +63,7 @@ export default function Home() {
           <NavButton
             icon={<Timer />}
             color="orange"
-            label="6 minutes"
+            label="6 Minutes"
             href="/six-minutes"
           />
           <Footer />
