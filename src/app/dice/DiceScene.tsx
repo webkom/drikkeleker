@@ -6,8 +6,8 @@ import { Mesh } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 
 const DICE_ROLL_SPEED = 12;
-const DICE_ROLL_DURATION = 0.7;
-const DICE_ROLL_COOLDOWN = 0.7;
+const DICE_ROLL_DURATION = 0.4;
+const DICE_ROLL_COOLDOWN = 0.4;
 
 const getDiceRotationX = (face: number): number => {
   switch (face) {
