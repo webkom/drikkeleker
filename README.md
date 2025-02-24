@@ -20,4 +20,4 @@ The site should now be running at [http://localhost:3000](http://localhost:3000)
 
 ## Contributing
 
-We would love your contributions. To find out how to, read our [CONTRIBUTING.md](./CONTRIBUTING.md)
+We would love your contributions. To find out how to, read our [CONTRIBUTING.md](./CONTRIBUTING.md).
