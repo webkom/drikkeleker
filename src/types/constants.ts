@@ -1,4 +1,5 @@
 const DRIKKELEK_URL =
-  "https://atlasimagesgallery.blob.core.windows.net/drikkelek";
+  process.env.content_url ||
+  "https://webkom-drikkeleker.s3.eu-west-2.amazonaws.com";
 
 export { DRIKKELEK_URL };
