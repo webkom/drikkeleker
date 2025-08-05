@@ -25,7 +25,7 @@ const foreverAlone = [
     "I am forever alone",
     <b key="Har vært i milla">Har vært i milla</b>,
     "Home alone eating sushi for two",
-    <b key="Har grått i 2024">Har grått i 2024</b>,
+    <b key="Har grått i 2025">Har grått i 2025</b>,
     "Home alone and I'm waiting for someone who never shows up",
     <b key="Er hyped for i dag">Er hyped for i dag</b>,
     "Ooh, and I'm lonely, I'm angry I'm tired",
