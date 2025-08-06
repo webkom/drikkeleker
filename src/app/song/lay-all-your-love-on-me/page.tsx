@@ -31,7 +31,7 @@ const layAllYourLoveOnMe = [
     "Don't go sharing your devotion. Lay all your love on me",
     <b key="Alle som snuser">Alle som snuser</b>,
     "I've had a few little love affairs. They didn't last very long and they've been pretty scarce",
-    <b key="Alle 03 og 02">Alle 03 og 02</b>,
+    <b key="Alle 05 og 04">Alle 05 og 04</b>,
     "I used to think that was sensible. It makes the truth even more incomprehensible",
     <b key="Har tatt en powerpuke">Har tatt en powerpuke</b>,
     "'Cause everything is new. And everything is you",

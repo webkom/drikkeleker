@@ -1,6 +1,5 @@
 import { DRIKKELEK_URL } from "@/types/constants";
 import songs from "./songs.json";
-import Image from "next/image";
 
 type SongDetailsProps = {
   currentSong: number;
@@ -9,7 +8,7 @@ type SongDetailsProps = {
 const SongDetails = ({ currentSong }: SongDetailsProps) => {
   return (
     <div className="m-auto text-center flex flex-col items-center justify-center">
-      <Image
+      <img
         src={`${DRIKKELEK_URL}/${
           songs[currentSong].filename.split(".")[0]
         }.jpg`}
