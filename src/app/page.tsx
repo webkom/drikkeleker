@@ -7,6 +7,7 @@ import {
   HeartCrack,
   MessageCircleQuestion,
   MicVocal,
+  ScrollText,
   Timer,
 } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
@@ -65,6 +66,12 @@ export default function Home() {
             color="orange"
             label="6 Minutes"
             href="/six-minutes"
+          />
+          <NavButton
+            icon={<ScrollText />}
+            color="violet"
+            label="Grupperom"
+            href="/game-room/lobby"
           />
           <Footer />
         </BeerContainer>
