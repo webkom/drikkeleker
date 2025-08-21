@@ -3,7 +3,15 @@ import styles from "./beer.module.css";
 import { cn } from "@/lib/utils";
 
 interface BeerProps {
-  color?: "amber" | "blue" | "red" | "green" | "fuchsia" | "teal" | "orange" | "indigo";
+  color?:
+    | "amber"
+    | "blue"
+    | "red"
+    | "green"
+    | "fuchsia"
+    | "teal"
+    | "orange"
+    | "violet";
   children?: React.ReactNode;
   className?: string;
 }
@@ -17,7 +25,7 @@ const BeerContainer = ({ children, className, color = "amber" }: BeerProps) => {
     fuchsia: "bg-fuchsia-200",
     teal: "bg-teal-200",
     orange: "bg-orange-200",
-    indigo: "bg-indigo-200",
+    violet: "bg-violet-200",
   };
 
   return (

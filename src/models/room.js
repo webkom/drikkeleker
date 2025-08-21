@@ -5,7 +5,9 @@ const RoomSchema = new mongoose.Schema({
   hostId: { type: String, required: true },
   gameStarted: { type: Boolean, default: false },
   challenges: [{ type: String }],
-  createdAt: { type: Date, default: Date.now, expires: 3600 }, // Slettar rommet etter 1 time
+  shuffledChallenges: [{ type: String }],
+  currentChallengeIndex: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now, expires: 3600 },
 });
 
 module.exports = mongoose.model("Room", RoomSchema);

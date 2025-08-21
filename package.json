@@ -13,20 +13,26 @@
   "dependencies": {
     "@next/font": "^14.2.5",
     "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@react-three/fiber": "^8.16.8",
     "@types/three": "^0.167.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "express": "^5.1.0",
+    "firebase": "^12.1.0",
     "lucide-react": "^0.417.0",
-    "next": "14.2.5",
+    "mongoose": "^8.18.3",
+    "next": "^15.4.7",
     "prettier": "^3.3.3",
-    "react": "^18",
+    "react": "^18.2.0",
     "react-card-flip": "^1.2.3",
-    "react-dom": "^18",
+    "react-dom": "^18.2.0",
     "react-h5-audio-player": "^3.9.3",
     "react-timer-hook": "^3.0.7",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.167.1"
@@ -40,5 +46,19 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "description": "> A collection of drinking games from the Abakus student association.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webkom/drikkeleker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/webkom/drikkeleker/issues"
+  },
+  "homepage": "https://github.com/webkom/drikkeleker#readme"
 }
