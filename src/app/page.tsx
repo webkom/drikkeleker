@@ -73,12 +73,7 @@ export default function Home() {
             label="Abakul Drikkelek"
             href="/game-room/lobby"
           />
-            <NavButton
-            icon={<ScrollText />}
-            color="violet"
-            label="Swipe"
-            href="/swipe-test"
-          />
+
           <Footer />
         </BeerContainer>
       </div>

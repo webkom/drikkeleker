@@ -22,6 +22,7 @@ const roomSchema = new mongoose.Schema({
   roomCode: { type: String, required: true, unique: true },
   createdAt: { type: Date, default: Date.now },
   expiresAt: { type: Date, required: true },
+  gameStarted: { type: Boolean, default: false },
 });
 
 const challengeSchema = new mongoose.Schema({
@@ -32,12 +33,22 @@ const challengeSchema = new mongoose.Schema({
 const Room = mongoose.model("Room", roomSchema);
 const Challenge = mongoose.model("Challenge", challengeSchema);
 
+const shuffle = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
   socket.on("create_room", async (data) => {
     const { roomCode } = data;
     console.log("Create room request:", roomCode);
+
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 2);
 
@@ -98,18 +109,28 @@ io.on("connection", (socket) => {
         success: true,
         roomCode,
         challengeCount,
+        gameStarted: room.gameStarted,
       });
 
-      existingChallenges.forEach((challenge) => {
-        socket.emit("challenge_added", {
-          challenge: {
-            _id: challenge._id,
-            text: challenge.text,
-            revealed: challenge.revealed,
-          },
-          challengeCount,
+      if (room.gameStarted) {
+        socket.emit("game_started", {
+          gameStarted: true,
+          challenges: existingChallenges.map((c) => ({
+            _id: c._id,
+            text: c.text,
+          })),
         });
-      });
+      } else {
+        existingChallenges.forEach((challenge) => {
+          socket.emit("challenge_added", {
+            challenge: {
+              _id: challenge._id,
+              text: challenge.text,
+            },
+            challengeCount,
+          });
+        });
+      }
 
       console.log(
         "User joined room:",
@@ -117,6 +138,8 @@ io.on("connection", (socket) => {
         "with",
         challengeCount,
         "challenges",
+        "Game started:",
+        room.gameStarted,
       );
     } catch (error) {
       console.error("Error joining room:", error);
@@ -137,6 +160,14 @@ io.on("connection", (socket) => {
       if (!room) {
         socket.emit("error", {
           message: "Fant ikke rommet, dobbelsjekk koden",
+        });
+        return;
+      }
+
+      if (room.gameStarted) {
+        socket.emit("error", {
+          message:
+            "Spillet har allerede startet. Kan ikke legge til flere utfordringer.",
         });
         return;
       }
@@ -162,6 +193,38 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error("Error adding challenge:", error);
       socket.emit("error", { message: "Failed to add challenge" });
+    }
+  });
+
+  socket.on("start_game", async (data) => {
+    const { roomCode } = data;
+
+    try {
+      const room = await Room.findOne({ roomCode });
+
+      if (!room) {
+        socket.emit("error", { message: "Room not found" });
+        return;
+      }
+
+      room.gameStarted = true;
+      await room.save();
+
+      const challenges = await Challenge.find({ roomCode });
+      const shuffledChallenges = shuffle(challenges);
+
+      io.to(roomCode).emit("game_started", {
+        gameStarted: true,
+        challenges: shuffledChallenges.map((c) => ({
+          _id: c._id,
+          text: c.text,
+        })),
+      });
+
+      console.log(`Game started in room: ${roomCode}`);
+    } catch (error) {
+      console.error("Error starting game:", error);
+      socket.emit("error", { message: "Failed to start game" });
     }
   });
 
