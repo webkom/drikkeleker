@@ -9,6 +9,8 @@ import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plus, Users } from "lucide-react";
 import { io, Socket } from "socket.io-client";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 const generateRoomCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -19,17 +21,18 @@ const Lobby = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3001");
+    const newSocket = io(
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
+    );
 
-    newSocket.on("connect", () => {
-      console.log("Connected to Socket.IO server");
-    });
+    newSocket.on("connect", () => {});
 
     newSocket.on("room_created", (data) => {
       if (data.success) {
-        window.location.href = `/game-room/${data.roomCode}`;
+        router.push(`/game-room/${data.roomCode}`);
       } else {
         setError(data.error);
         setIsLoading(false);
@@ -38,7 +41,7 @@ const Lobby = () => {
 
     newSocket.on("room_joined", (data) => {
       if (data.success) {
-        window.location.href = `/game-room/${data.roomCode}`;
+        router.push(`/game-room/${data.roomCode}`);
       } else {
         setError(data.error || "Failed to join room");
         setIsLoading(false);
@@ -105,6 +108,7 @@ const Lobby = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-center gap-2">
+                  <Plus size={24} />
                   Lag nytt rom
                 </CardTitle>
               </CardHeader>
@@ -112,9 +116,9 @@ const Lobby = () => {
                 <Button
                   onClick={handleCreateRoom}
                   disabled={isLoading}
-                  className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg"
+                  className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
                 >
-                  {isLoading ? "Oppretter..." : <Plus />}
+                  {isLoading ? "Oppretter..." : <ArrowRight size={24} />}
                 </Button>
               </CardContent>
             </Card>
@@ -126,32 +130,22 @@ const Lobby = () => {
                   Bli med
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <input
+              <CardContent className="flex flex-row items-center gap-3">
+                <Input
                   type="number"
                   placeholder="123456"
                   value={roomCode}
                   onChange={handleInputCode}
                   onKeyPress={handleKeyPress}
                   maxLength={6}
-                  className="text-center text-2xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                  style={{
-                    WebkitAppearance: "none",
-                    appearance: "none",
-                    MozAppearance: "textfield",
-                    margin: 0,
-                  }}
+                  className="flex-grow text-center text-3xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
                 />
                 <Button
                   onClick={handleJoinRoom}
                   disabled={isLoading || roomCode.length !== 6}
-                  className="bg-violet-500 hover:bg-violet-600 w-full h-16 text-lg"
+                  className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
                 >
-                  {isLoading ? "Finner rom..." : "Bli med i rom"}
-                  <ArrowRight
-                    size={20}
-                    className="ml-1 transition-transform group-hover:translate-x-1"
-                  />
+                  {isLoading ? "..." : <ArrowRight size={24} />}
                 </Button>
               </CardContent>
             </Card>

@@ -9,14 +9,19 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://drikkeleker.coolify.webkom.dev",
+      "https://drikkeleker.abakus.no",
+    ],
     methods: ["GET", "POST"],
   },
 });
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => {})
+  .catch((err) => {});
 
 const roomSchema = new mongoose.Schema({
   roomCode: { type: String, required: true, unique: true },
@@ -43,11 +48,8 @@ const shuffle = (array) => {
 };
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
   socket.on("create_room", async (data) => {
     const { roomCode } = data;
-    console.log("Create room request:", roomCode);
 
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 2);
@@ -74,10 +76,7 @@ io.on("connection", (socket) => {
         success: true,
         roomCode,
       });
-
-      console.log("Room created:", roomCode);
     } catch (error) {
-      console.error("Error creating room:", error);
       socket.emit("room_created", {
         success: false,
         error: "Failed to create room",
@@ -87,7 +86,6 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", async (data) => {
     const { roomCode } = data;
-    console.log("Join room request:", roomCode);
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -131,18 +129,7 @@ io.on("connection", (socket) => {
           });
         });
       }
-
-      console.log(
-        "User joined room:",
-        roomCode,
-        "with",
-        challengeCount,
-        "challenges",
-        "Game started:",
-        room.gameStarted,
-      );
     } catch (error) {
-      console.error("Error joining room:", error);
       socket.emit("room_joined", {
         success: false,
         error: "Failed to join room",
@@ -152,7 +139,6 @@ io.on("connection", (socket) => {
 
   socket.on("add_challenge", async (data) => {
     const { roomCode, challenge } = data;
-    console.log("Add challenge to room:", roomCode, challenge);
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -188,10 +174,7 @@ io.on("connection", (socket) => {
         },
         challengeCount,
       });
-
-      console.log("Challenge added successfully, total:", challengeCount);
     } catch (error) {
-      console.error("Error adding challenge:", error);
       socket.emit("error", { message: "Failed to add challenge" });
     }
   });
@@ -220,20 +203,13 @@ io.on("connection", (socket) => {
           text: c.text,
         })),
       });
-
-      console.log(`Game started in room: ${roomCode}`);
     } catch (error) {
-      console.error("Error starting game:", error);
       socket.emit("error", { message: "Failed to start game" });
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+  socket.on("disconnect", () => {});
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT, () => {});

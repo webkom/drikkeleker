@@ -13,7 +13,6 @@ import {
 import type { SwiperProps } from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-creative";
-import "./styles.css";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface SlideContent {
@@ -91,10 +90,7 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
           effect === "creative" ? creativeEffectConfig : undefined
         }
         modules={effectModules[effect] ? [effectModules[effect]] : []}
-        style={{
-          width: "100%",
-          height: "300px",
-        }}
+        className="w-full h-[300px]"
         onSlideChange={(swiper) => onNavigate && onNavigate(swiper.activeIndex)}
         initialSlide={currentIndex}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
