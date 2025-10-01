@@ -1,0 +1,19 @@
+{
+  "name": "gameroom-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "16.3.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.3",
+    "socket.io": "^4.8.1"
+  },
+  "scripts": {
+    "start": "NODE_OPTIONS=\"--no-warnings\" node server.js",
+    "dev": "NODE_OPTIONS=\"--no-warnings\" nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
