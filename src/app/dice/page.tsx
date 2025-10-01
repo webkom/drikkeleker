@@ -1,7 +1,16 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import DiceScene from "./DiceScene";
+import dyn from "next/dynamic";
+
+const Canvas = dyn(
+  () => import("@react-three/fiber").then((mod) => mod.Canvas),
+  { ssr: false },
+);
+
+const DiceScene = dyn(() => import("./DiceScene"), { ssr: false });
+
+export const dynamic = "force-dynamic";
+
 import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
