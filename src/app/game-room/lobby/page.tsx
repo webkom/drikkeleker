@@ -101,7 +101,7 @@ const Lobby = () => {
       <BeerContainer color="violet" className="h-screen w-screen">
         <div className="flex flex-col items-center text-center h-full">
           <h1 className={`${lilita.className} text-5xl pt-12`}>
-            Abakul Drikkelek
+              Viljens Drikkelek
           </h1>
 
           <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
