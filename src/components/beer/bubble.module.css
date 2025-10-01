@@ -1,0 +1,126 @@
+@keyframes float-0 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(2px, -3px) scale(1.05);
+  }
+  66% {
+    transform: translate(-2px, 2px) scale(0.95);
+  }
+}
+
+@keyframes float-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(-3px, -2px) scale(0.98);
+  }
+  50% {
+    transform: translate(2px, 3px) scale(1.02);
+  }
+  75% {
+    transform: translate(-1px, -3px) scale(1.03);
+  }
+}
+
+@keyframes float-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(3px, 2px) scale(1.04);
+  }
+  40% {
+    transform: translate(-2px, -3px) scale(0.96);
+  }
+  60% {
+    transform: translate(1px, -2px) scale(1.01);
+  }
+  80% {
+    transform: translate(-3px, 3px) scale(0.99);
+  }
+}
+
+@keyframes float-3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-2px, 4px) scale(1.03);
+  }
+}
+
+.float-0 {
+  animation: float-0 3s ease-in-out infinite;
+}
+
+.float-1 {
+  animation: float-1 3.5s ease-in-out infinite;
+}
+
+.float-2 {
+  animation: float-2 4s ease-in-out infinite;
+}
+
+.float-3 {
+  animation: float-3 2.5s ease-in-out infinite;
+}
+
+.digit-bubble.pop-out {
+  animation: bubblePop 0.6s ease-out forwards !important;
+}
+
+.digit-bubble.pop-in {
+  animation: bubbleForm 0.6s ease-out forwards !important;
+}
+.digit-bubble {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes bubblePop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes bubbleForm {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pop-out {
+  animation: bubblePop 0.6s ease-out forwards;
+}
+
+.pop-in {
+  animation: bubbleForm 0.6s ease-out forwards;
+}

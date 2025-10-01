@@ -5,7 +5,7 @@ import Link from "next/link";
 interface NavButtonProps {
   label: string;
   href: string;
-  color?: "blue" | "red" | "green" | "fuchsia" | "teal" | "orange";
+  color?: "blue" | "red" | "green" | "fuchsia" | "teal" | "orange" | "violet";
   icon?: React.ReactNode;
   children?: React.ReactNode;
 }
@@ -18,6 +18,7 @@ const NavButton = ({ label, href, color, icon, children }: NavButtonProps) => {
     fuchsia: "bg-fuchsia-500 hover:bg-fuchsia-500/90",
     teal: "bg-teal-500 hover:bg-teal-500/90",
     orange: "bg-orange-500 hover:bg-orange-500/90",
+    violet: "bg-violet-500 hover:bg-violet-500/90",
   };
 
   return (
