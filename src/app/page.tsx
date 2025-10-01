@@ -70,7 +70,7 @@ export default function Home() {
           <NavButton
             icon={<ScrollText />}
             color="violet"
-            label="Abakul Drikkelek"
+            label="Viljens Drikkelek"
             href="/game-room/lobby"
           />
 
