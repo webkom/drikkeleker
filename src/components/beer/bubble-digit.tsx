@@ -1,6 +1,6 @@
 import styles from "./bubble.module.css";
 
-const digitPatterns = {
+const digitPatterns: Record<string, number[][]> = {
   "0": [
     [1, 1, 1],
     [1, 0, 1],
