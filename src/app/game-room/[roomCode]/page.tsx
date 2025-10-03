@@ -6,7 +6,7 @@ import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import CustomSwiper from "@/components/page";
+import CustomSwiper from "@/components/custom-swiper";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
 import { ArrowRight, Play, ArrowLeft, ArrowUp } from "lucide-react";
@@ -52,7 +52,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     const initSocket = async () => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
-        process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
+        process.env.NEXT_PUBLIC_SOCKET_URL || "localhost:3001",
       );
 
       newSocket.on("connect", () => {
