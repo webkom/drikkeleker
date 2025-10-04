@@ -23,6 +23,10 @@ RUN \
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+ARG NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -61,7 +65,6 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT=3000
-ARG NEXT_PUBLIC_SOCKET_URL
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
