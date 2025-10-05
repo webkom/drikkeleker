@@ -11,6 +11,7 @@ import { ArrowRight, Plus, Users } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import Popup from "@/app/game-room/lobby/Popup";
 
 const generateRoomCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -24,9 +25,7 @@ const Lobby = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
-    );
+    const newSocket = io("https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev");
 
     newSocket.on("connect", () => {});
 
@@ -43,7 +42,7 @@ const Lobby = () => {
       if (data.success) {
         router.push(`/game-room/${data.roomCode}`);
       } else {
-        setError(data.error || "Failed to join room");
+        setError(data.error || "Kunne ikke finne rom");
         setIsLoading(false);
       }
     });
@@ -53,7 +52,7 @@ const Lobby = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [router]);
 
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const code = e.target.value.slice(0, 6);
@@ -62,7 +61,7 @@ const Lobby = () => {
 
   const handleCreateRoom = () => {
     if (!socket) {
-      setError("Socket connection not established");
+      setError("Kunne ikke koble til server");
       return;
     }
 
@@ -75,12 +74,12 @@ const Lobby = () => {
 
   const handleJoinRoom = () => {
     if (!roomCode.trim() || roomCode.length !== 6) {
-      setError("Enter a valid 6-digit room code");
+      setError("Kunne ikke koble til server");
       return;
     }
 
     if (!socket) {
-      setError("Socket connection not established");
+      setError("Skriv inn en gyldig kode");
       return;
     }
 
@@ -100,10 +99,12 @@ const Lobby = () => {
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="violet" className="h-screen w-screen">
         <div className="flex flex-col items-center text-center h-full">
-          <h1 className={`${lilita.className} text-5xl pt-12`}>
-            Viljens Drikkelek
-          </h1>
-
+          <div className="flex items-center justify-center gap-4 pt-12">
+            <h1 className={`${lilita.className} text-5xl leading-tight`}>
+              Viljens Drikkelek
+            </h1>
+            <Popup />
+          </div>
           <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
             <Card>
               <CardHeader>
