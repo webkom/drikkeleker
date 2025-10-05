@@ -1,16 +1,16 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const mongoose = require("mongoose");
-require("dotenv").config();
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: '*',
+    methods: ['GET', 'POST'],
   },
 });
 
@@ -31,8 +31,8 @@ const challengeSchema = new mongoose.Schema({
   text: { type: String, required: true },
 });
 
-const Room = mongoose.model("Room", roomSchema);
-const Challenge = mongoose.model("Challenge", challengeSchema);
+const Room = mongoose.model('Room', roomSchema);
+const Challenge = mongoose.model('Challenge', challengeSchema);
 
 const shuffle = (array) => {
   const newArray = [...array];
@@ -43,8 +43,8 @@ const shuffle = (array) => {
   return newArray;
 };
 
-io.on("connection", (socket) => {
-  socket.on("create_room", async (data) => {
+io.on('connection', (socket) => {
+  socket.on('create_room', async (data) => {
     const { roomCode } = data;
 
     const expiresAt = new Date();
@@ -54,9 +54,9 @@ io.on("connection", (socket) => {
       const existingRoom = await Room.findOne({ roomCode });
 
       if (existingRoom) {
-        socket.emit("room_created", {
+        socket.emit('room_created', {
           success: false,
-          error: "Room already exists",
+          error: 'Rom eksisterer allerde',
         });
         return;
       }
@@ -68,28 +68,28 @@ io.on("connection", (socket) => {
 
       await newRoom.save();
 
-      socket.emit("room_created", {
+      socket.emit('room_created', {
         success: true,
         roomCode,
       });
     } catch (error) {
-      socket.emit("room_created", {
+      socket.emit('room_created', {
         success: false,
-        error: "Failed to create room",
+        error: 'Kunne ikke lage rom',
       });
     }
   });
 
-  socket.on("join_room", async (data) => {
+  socket.on('join_room', async (data) => {
     const { roomCode } = data;
 
     try {
       const room = await Room.findOne({ roomCode });
 
       if (!room) {
-        socket.emit("room_joined", {
+        socket.emit('room_joined', {
           success: false,
-          error: "Fant ikke rommet, dobbelsjekk koden",
+          error: 'Fant ikke rommet, dobbelsjekk koden',
         });
         return;
       }
@@ -99,7 +99,7 @@ io.on("connection", (socket) => {
       const existingChallenges = await Challenge.find({ roomCode });
       const challengeCount = existingChallenges.length;
 
-      socket.emit("room_joined", {
+      socket.emit('room_joined', {
         success: true,
         roomCode,
         challengeCount,
@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
       });
 
       if (room.gameStarted) {
-        socket.emit("game_started", {
+        socket.emit('game_started', {
           gameStarted: true,
           challenges: existingChallenges.map((c) => ({
             _id: c._id,
@@ -116,7 +116,7 @@ io.on("connection", (socket) => {
         });
       } else {
         existingChallenges.forEach((challenge) => {
-          socket.emit("challenge_added", {
+          socket.emit('challenge_added', {
             challenge: {
               _id: challenge._id,
               text: challenge.text,
@@ -126,30 +126,30 @@ io.on("connection", (socket) => {
         });
       }
     } catch (error) {
-      socket.emit("room_joined", {
+      socket.emit('room_joined', {
         success: false,
-        error: "Failed to join room",
+        error: 'Klarte ikke å bli med i rom',
       });
     }
   });
 
-  socket.on("add_challenge", async (data) => {
+  socket.on('add_challenge', async (data) => {
     const { roomCode, challenge } = data;
 
     try {
       const room = await Room.findOne({ roomCode });
 
       if (!room) {
-        socket.emit("error", {
-          message: "Fant ikke rommet, dobbelsjekk koden",
+        socket.emit('error', {
+          message: 'Fant ikke rommet, dobbelsjekk koden',
         });
         return;
       }
 
       if (room.gameStarted) {
-        socket.emit("error", {
+        socket.emit('error', {
           message:
-            "Spillet har allerede startet. Kan ikke legge til flere utfordringer.",
+            'Spillet har allerede startet. Kan ikke legge til flere utfordringer.',
         });
         return;
       }
@@ -163,7 +163,7 @@ io.on("connection", (socket) => {
 
       const challengeCount = await Challenge.countDocuments({ roomCode });
 
-      io.to(roomCode).emit("challenge_added", {
+      io.to(roomCode).emit('challenge_added', {
         challenge: {
           _id: newChallenge._id,
           text: newChallenge.text,
@@ -171,18 +171,18 @@ io.on("connection", (socket) => {
         challengeCount,
       });
     } catch (error) {
-      socket.emit("error", { message: "Failed to add challenge" });
+      socket.emit('error', { message: 'Klarte ikke å legge til utfordring' });
     }
   });
 
-  socket.on("start_game", async (data) => {
+  socket.on('start_game', async (data) => {
     const { roomCode } = data;
 
     try {
       const room = await Room.findOne({ roomCode });
 
       if (!room) {
-        socket.emit("error", { message: "Room not found" });
+        socket.emit('error', { message: 'Room not found' });
         return;
       }
 
@@ -192,7 +192,7 @@ io.on("connection", (socket) => {
       const challenges = await Challenge.find({ roomCode });
       const shuffledChallenges = shuffle(challenges);
 
-      io.to(roomCode).emit("game_started", {
+      io.to(roomCode).emit('game_started', {
         gameStarted: true,
         challenges: shuffledChallenges.map((c) => ({
           _id: c._id,
@@ -200,11 +200,11 @@ io.on("connection", (socket) => {
         })),
       });
     } catch (error) {
-      socket.emit("error", { message: "Failed to start game" });
+      socket.emit('error', { message: 'Kunne ikke starte spillet' });
     }
   });
 
-  socket.on("disconnect", () => {});
+  socket.on('disconnect', () => {});
 });
 
 const PORT = process.env.PORT || 3001;

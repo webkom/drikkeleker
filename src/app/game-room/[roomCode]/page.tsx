@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, use } from "react";
-import { Socket } from "socket.io-client";
-import { lilita } from "@/lib/fonts";
-import BeerContainer from "@/components/beer/beer-container";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import CustomSwiper from "@/components/custom-swiper";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
-import { ArrowRight, Play, ArrowLeft, ArrowUp } from "lucide-react";
-import BubbleDigit from "@/components/beer/bubble-digit";
-import { Input } from "@/components/ui/input";
-import "./room.css";
+import React, { useEffect, useState, use } from 'react';
+import { Socket } from 'socket.io-client';
+import { lilita } from '@/lib/fonts';
+import BeerContainer from '@/components/beer/beer-container';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import CustomSwiper from '@/components/custom-swiper';
+import BackButton from '@/components/back-button';
+import Footer from '@/components/footer';
+import { ArrowRight, Play, ArrowLeft, ArrowUp } from 'lucide-react';
+import BubbleDigit from '@/components/beer/bubble-digit';
+import { Input } from '@/components/ui/input';
+import './room.css';
 
 interface Challenge {
   _id: string;
@@ -33,7 +33,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [currentCard, setCurrentCard] = useState(0);
-  const [newChallenge, setNewChallenge] = useState("");
+  const [newChallenge, setNewChallenge] = useState('');
   const [oldNumber, setOldNumber] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [handledEvents, setHandledEvents] = useState<Set<string>>(new Set());
@@ -50,25 +50,25 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
 
   useEffect(() => {
     const initSocket = async () => {
-      const { io } = await import("socket.io-client");
+      const { io } = await import('socket.io-client');
       const newSocket = io(
-        process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
+        'https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev',
       );
 
-      newSocket.on("connect", () => {
+      newSocket.on('connect', () => {
         setConnected(true);
-        newSocket.emit("join_room", { roomCode });
+        newSocket.emit('join_room', { roomCode });
       });
 
-      newSocket.on("disconnect", () => {
+      newSocket.on('disconnect', () => {
         setConnected(false);
       });
 
-      newSocket.on("room_joined", (data) => {
+      newSocket.on('room_joined', (data) => {
         setGameStarted(data.gameStarted || false);
       });
 
-      newSocket.on("challenge_added", (data) => {
+      newSocket.on('challenge_added', (data) => {
         setChallenges((prev) => {
           if (prev.some((c) => c._id === data.challenge._id)) {
             return prev;
@@ -77,7 +77,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
         });
       });
 
-      newSocket.on("game_started", (data) => {
+      newSocket.on('game_started', (data) => {
         setGameStarted(true);
         setChallenges(data.challenges);
         setCurrentCard(0);
@@ -96,21 +96,21 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   const handleAddChallenge = () => {
     if (!newChallenge.trim() || !socket) return;
 
-    socket.emit("add_challenge", {
+    socket.emit('add_challenge', {
       roomCode,
       challenge: newChallenge.trim(),
     });
 
-    setNewChallenge("");
+    setNewChallenge('');
   };
 
   const handleStartGame = () => {
     if (!socket || challenges.length === 0) return;
-    socket.emit("start_game", { roomCode });
+    socket.emit('start_game', { roomCode });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleAddChallenge();
     }
   };
@@ -158,13 +158,13 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                     <div
                       className="relative flex items-center justify-center"
                       style={{
-                        minHeight: "200px",
+                        minHeight: '200px',
                         minWidth: `${getDigitContainerWidth(Math.max(challengeCount, oldNumber))}px`,
                       }}
                     >
                       <div className="flex gap-12">
                         {String(challengeCount)
-                          .split("")
+                          .split('')
                           .map((digit, index) => (
                             <BubbleDigit
                               key={`new-${index}`}
@@ -178,7 +178,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                       {isAnimating && oldNumber !== challengeCount && (
                         <div className="absolute flex gap-12">
                           {String(oldNumber)
-                            .split("")
+                            .split('')
                             .map((digit, index) => (
                               <BubbleDigit
                                 key={`old-${index}`}
@@ -222,7 +222,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
               </div>
             ) : (
               <div
-                className={`rounded-sm ${gameStarted ? "game-started" : ""}`}
+                className={`rounded-sm ${gameStarted ? 'game-started' : ''}`}
               >
                 <CustomSwiper
                   slides={challenges.map((challenge, index) => ({

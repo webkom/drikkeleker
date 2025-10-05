@@ -1,36 +1,35 @@
-"use client";
+'use client';
 
-import { lilita } from "@/lib/fonts";
-import BeerContainer from "@/components/beer/beer-container";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users } from "lucide-react";
-import { io, Socket } from "socket.io-client";
-import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { lilita } from '@/lib/fonts';
+import BeerContainer from '@/components/beer/beer-container';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import BackButton from '@/components/back-button';
+import Footer from '@/components/footer';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Plus, Users, HelpCircle } from 'lucide-react';
+import { io, Socket } from 'socket.io-client';
+import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import Popup from '@/app/game-room/lobby/Popup';
 
 const generateRoomCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 const Lobby = () => {
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
-    );
+    const newSocket = io('https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev');
 
-    newSocket.on("connect", () => {});
+    newSocket.on('connect', () => {});
 
-    newSocket.on("room_created", (data) => {
+    newSocket.on('room_created', (data) => {
       if (data.success) {
         router.push(`/game-room/${data.roomCode}`);
       } else {
@@ -39,11 +38,11 @@ const Lobby = () => {
       }
     });
 
-    newSocket.on("room_joined", (data) => {
+    newSocket.on('room_joined', (data) => {
       if (data.success) {
         router.push(`/game-room/${data.roomCode}`);
       } else {
-        setError(data.error || "Failed to join room");
+        setError(data.error || 'Kunne ikke finne rom');
         setIsLoading(false);
       }
     });
@@ -62,35 +61,35 @@ const Lobby = () => {
 
   const handleCreateRoom = () => {
     if (!socket) {
-      setError("Socket connection not established");
+      setError('Kunne ikke koble til server');
       return;
     }
 
     setIsLoading(true);
-    setError("");
+    setError('');
 
     const newRoomCode = generateRoomCode();
-    socket.emit("create_room", { roomCode: newRoomCode });
+    socket.emit('create_room', { roomCode: newRoomCode });
   };
 
   const handleJoinRoom = () => {
     if (!roomCode.trim() || roomCode.length !== 6) {
-      setError("Enter a valid 6-digit room code");
+      setError('Kunne ikke koble til server');
       return;
     }
 
     if (!socket) {
-      setError("Socket connection not established");
+      setError('Skriv inn en gyldig kode');
       return;
     }
 
     setIsLoading(true);
-    setError("");
-    socket.emit("join_room", { roomCode: roomCode.trim() });
+    setError('');
+    socket.emit('join_room', { roomCode: roomCode.trim() });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleJoinRoom();
     }
   };
@@ -100,10 +99,12 @@ const Lobby = () => {
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="violet" className="h-screen w-screen">
         <div className="flex flex-col items-center text-center h-full">
-          <h1 className={`${lilita.className} text-5xl pt-12`}>
-            Viljens Drikkelek
-          </h1>
-
+          <div className="flex items-center justify-center gap-4 pt-12">
+            <h1 className={`${lilita.className} text-5xl leading-tight`}>
+              Viljens Drikkelek
+            </h1>
+            <Popup />
+          </div>
           <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
             <Card>
               <CardHeader>
@@ -118,7 +119,7 @@ const Lobby = () => {
                   disabled={isLoading}
                   className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
                 >
-                  {isLoading ? "Oppretter..." : <ArrowRight size={24} />}
+                  {isLoading ? 'Oppretter...' : <ArrowRight size={24} />}
                 </Button>
               </CardContent>
             </Card>
@@ -145,7 +146,7 @@ const Lobby = () => {
                   disabled={isLoading || roomCode.length !== 6}
                   className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
                 >
-                  {isLoading ? "..." : <ArrowRight size={24} />}
+                  {isLoading ? '...' : <ArrowRight size={24} />}
                 </Button>
               </CardContent>
             </Card>
