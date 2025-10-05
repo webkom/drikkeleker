@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, use, useCallback } from "react";
 import { Socket } from "socket.io-client";
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
@@ -36,7 +36,6 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   const [newChallenge, setNewChallenge] = useState("");
   const [oldNumber, setOldNumber] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [handledEvents, setHandledEvents] = useState<Set<string>>(new Set());
 
   const challengeCount = challenges.length;
 
@@ -89,11 +88,14 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     initSocket();
 
     return () => {
-      socket?.disconnect();
+      if (socket) {
+        socket.disconnect();
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomCode]);
 
-  const handleAddChallenge = () => {
+  const handleAddChallenge = useCallback(() => {
     if (!newChallenge.trim() || !socket) return;
 
     socket.emit("add_challenge", {
@@ -102,12 +104,12 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     });
 
     setNewChallenge("");
-  };
+  }, [newChallenge, socket, roomCode]);
 
-  const handleStartGame = () => {
+  const handleStartGame = useCallback(() => {
     if (!socket || challenges.length === 0) return;
     socket.emit("start_game", { roomCode });
-  };
+  }, [socket, challenges.length, roomCode]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

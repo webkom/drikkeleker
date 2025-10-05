@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users, HelpCircle } from "lucide-react";
+import { ArrowRight, Plus, Users } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -52,7 +52,7 @@ const Lobby = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [router]);
 
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const code = e.target.value.slice(0, 6);

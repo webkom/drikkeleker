@@ -74,8 +74,9 @@ const Popup = () => {
                         Opprett eller bli med i rom
                       </h3>
                       <p className="text-sm text-gray-600">
-                        En spiller trykker "Lag nytt rom" og deler romkoden med
-                        de andre. Resten blir med ved å skrive inn koden.
+                        En spiller trykker &ldquo;Lag nytt rom&rdquo; og deler
+                        romkoden med de andre. Resten blir med ved å skrive inn
+                        koden.
                       </p>
                     </Step>
                     <Step>
@@ -85,8 +86,8 @@ const Popup = () => {
                         utfordringer, jo morsommere!
                       </p>
                       <p className="text-xs text-gray-500 mt-2 italic">
-                        Eksempel: "Del ut 3 slurker til den du synes ser best ut
-                        i dag"
+                        Eksempel: &ldquo;Del ut 3 slurker til den du synes ser
+                        best ut i dag&rdquo;
                       </p>
                     </Step>
                     <Step>
@@ -94,7 +95,7 @@ const Popup = () => {
                       <p className="text-sm text-gray-600">
                         Velg en telefon som går på rundgang. Hver spiller leser
                         og utfører utfordringen på kortet sitt. Kan godt
-                        kombineres med "try not to laugh"
+                        kombineres med &ldquo;try not to laugh&rdquo;
                       </p>
                     </Step>
                   </Stepper>
