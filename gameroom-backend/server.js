@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
       if (existingRoom) {
         socket.emit("room_created", {
           success: false,
-          error: "Room already exists",
+          error: "Rom eksisterer allerde",
         });
         return;
       }
@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
     } catch (error) {
       socket.emit("room_created", {
         success: false,
-        error: "Failed to create room",
+        error: "Kunne ikke lage rom",
       });
     }
   });
@@ -128,7 +128,7 @@ io.on("connection", (socket) => {
     } catch (error) {
       socket.emit("room_joined", {
         success: false,
-        error: "Failed to join room",
+        error: "Klarte ikke å bli med i rom",
       });
     }
   });
@@ -171,7 +171,7 @@ io.on("connection", (socket) => {
         challengeCount,
       });
     } catch (error) {
-      socket.emit("error", { message: "Failed to add challenge" });
+      socket.emit("error", { message: "Klarte ikke å legge til utfordring" });
     }
   });
 
@@ -200,7 +200,7 @@ io.on("connection", (socket) => {
         })),
       });
     } catch (error) {
-      socket.emit("error", { message: "Failed to start game" });
+      socket.emit("error", { message: "Kunne ikke starte spillet" });
     }
   });
 

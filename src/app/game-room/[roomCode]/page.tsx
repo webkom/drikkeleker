@@ -52,7 +52,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     const initSocket = async () => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
-        process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001",
+        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
       );
 
       newSocket.on("connect", () => {
