@@ -94,7 +94,7 @@ const Popup = () => {
                       <p className="text-sm text-gray-600">
                         Velg en telefon som går på rundgang. Hver spiller leser
                         og utfører utfordringen på kortet sitt. Kan godt
-                        kombineres med "try not to laugh"!
+                        kombineres med "try not to laugh"
                       </p>
                     </Step>
                   </Stepper>
