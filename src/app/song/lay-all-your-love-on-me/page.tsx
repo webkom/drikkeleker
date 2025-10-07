@@ -11,7 +11,7 @@ const layAllYourLoveOnMe = [
     "And I'm possessive, it isnt nice. You've heard me saying that smoking was my only vice",
     <b key="Alle">Alle</b>,
     "But now it isn't true. Now everything is new",
-    <b key="Blir full av en øl">Blir full av en øl</b>,
+    <b key="Blir full av én øl">Blir full av én øl</b>,
     "And all I've learned has overturned I beg of you",
     <b key="Har gått på en smell">Har gått på en smell</b>,
     "Don't go wasting your emotion. Lay all your love on me",
