@@ -1,105 +1,97 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import Dice from "./Dice";
-import { Mesh } from "three";
-import { useFrame, useThree } from "@react-three/fiber";
 
-const DICE_ROLL_SPEED = 20;
-const DICE_ROLL_DURATION = 0.7;
-const DICE_ROLL_COOLDOWN = 0.7;
+const DICE_ROLL_COOLDOWN = 500; // milliseconds
 
-const getDiceRotationX = (face: number): number => {
-  switch (face) {
-    case 3:
-      return Math.PI / 2;
-    case 4:
-      return (3 / 2) * Math.PI;
-    case 6:
-      return Math.PI;
-    default:
-      return 0;
-  }
-};
-
-const getDiceRotationY = (face: number): number => {
+const getFaceRotation = (face: number): { x: number; y: number } => {
   switch (face) {
     case 1:
-      return (3 / 2) * Math.PI;
+      return { x: 0, y: 270 }; // Right
     case 2:
-      return Math.PI / 2;
+      return { x: 0, y: 90 }; // Left
+    case 3:
+      return { x: 90, y: 0 }; // Top
+    case 4:
+      return { x: 270, y: 0 }; // Bottom
+    case 5:
+      return { x: 0, y: 0 }; // Front
+    case 6:
+      return { x: 180, y: 0 }; // Back
     default:
-      return 0;
+      return { x: 0, y: 0 };
   }
-};
-
-const interpolateRotation = (
-  elapsedTime: number,
-  duration: number,
-  targetRotation: number,
-) => {
-  return elapsedTime >= duration
-    ? targetRotation
-    : DICE_ROLL_SPEED * Math.pow(elapsedTime - duration, 2) + targetRotation;
 };
 
 const DiceScene = () => {
-  const diceMeshRef = useRef<Mesh>(null);
-
-  const [rollStartTime, setRollStartTime] = useState(-DICE_ROLL_DURATION);
-  const [currentFace, setCurrentFace] = useState(3);
-
-  useFrame(({ clock }) => {
-    if (!diceMeshRef.current) return;
-
-    const elapsedTimeSinceRoll = clock.elapsedTime - rollStartTime;
-
-    const targetDiceRotationX = getDiceRotationX(currentFace);
-    const targetDiceRotationY = getDiceRotationY(currentFace);
-
-    diceMeshRef.current.rotation.x = interpolateRotation(
-      elapsedTimeSinceRoll,
-      DICE_ROLL_DURATION,
-      targetDiceRotationX,
-    );
-    diceMeshRef.current.rotation.y = interpolateRotation(
-      elapsedTimeSinceRoll,
-      DICE_ROLL_DURATION,
-      targetDiceRotationY,
-    );
-
-    if (rollStartTime === -DICE_ROLL_DURATION) {
-      diceMeshRef.current.position.y = 0.2 * Math.sin(clock.elapsedTime);
-    }
-  });
-
-  const { clock } = useThree();
+  const [currentFace, setCurrentFace] = useState(5);
+  const [isRolling, setIsRolling] = useState(false);
+  const [rotationX, setRotationX] = useState(0);
+  const [rotationY, setRotationY] = useState(0);
+  const lastRollTime = useRef(0);
+  const diceRef = useRef<HTMLDivElement>(null);
 
   const rollDice = () => {
-    const elapsedTimeSinceRoll = clock.elapsedTime - rollStartTime;
+    const now = Date.now();
+    const timeSinceLastRoll = now - lastRollTime.current;
 
-    if (elapsedTimeSinceRoll < DICE_ROLL_COOLDOWN) {
+    if (timeSinceLastRoll < DICE_ROLL_COOLDOWN) {
       return;
     }
 
-    setRollStartTime(clock.elapsedTime);
-    setCurrentFace(Math.floor(Math.random() * 6) + 1);
+    lastRollTime.current = now;
+    setIsRolling(true);
+
+    const newFace = Math.floor(Math.random() * 6) + 1;
+    setCurrentFace(newFace);
+
+    const targetRotation = getFaceRotation(newFace);
+
+    const extraSpinsX = (Math.floor(Math.random() * 3) + 2) * 360;
+    const extraSpinsY = (Math.floor(Math.random() * 3) + 2) * 360;
+
+    const currentNormalizedX = rotationX % 360;
+    const currentNormalizedY = rotationY % 360;
+
+    let deltaX = targetRotation.x - currentNormalizedX;
+    let deltaY = targetRotation.y - currentNormalizedY;
+
+    if (deltaX > 180) deltaX -= 360;
+    if (deltaX < -180) deltaX += 360;
+    if (deltaY > 180) deltaY -= 360;
+    if (deltaY < -180) deltaY += 360;
+
+    const newRotationX = rotationX + extraSpinsX + deltaX;
+    const newRotationY = rotationY + extraSpinsY + deltaY;
+
+    setRotationX(newRotationX);
+    setRotationY(newRotationY);
+
+    setTimeout(() => {
+      setIsRolling(false);
+    }, 500);
   };
 
   return (
-    <>
-      <ambientLight intensity={Math.PI / 2} />
-      <spotLight
-        position={[-3, 5, 10]}
-        angle={0.15}
-        penumbra={1}
-        decay={0}
-        intensity={Math.PI}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <Dice
+        ref={diceRef}
+        currentFace={currentFace}
+        isRolling={isRolling}
+        onClick={rollDice}
+        rotationX={rotationX}
+        rotationY={rotationY}
       />
-      <pointLight position={[-3, 5, 10]} decay={0} intensity={Math.PI} />
-
-      <Dice ref={diceMeshRef} onClick={rollDice} />
-    </>
+    </div>
   );
 };
 

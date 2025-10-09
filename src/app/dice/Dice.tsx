@@ -1,32 +1,58 @@
 "use client";
-import { useLoader } from "@react-three/fiber";
-import { forwardRef, Ref } from "react";
-import { Mesh, TextureLoader } from "three";
+
+import {forwardRef} from "react";
+import styles from "./Dice.module.css";
 
 type DiceProps = {
-  onClick?: () => void;
+    currentFace: number;
+    isRolling: boolean;
+    onClick: () => void;
+    rotationX: number;
+    rotationY: number;
 };
 
-const Dice = forwardRef(({ onClick }: DiceProps, ref: Ref<Mesh>) => {
-  const texture1 = useLoader(TextureLoader, "images/one.png");
-  const texture2 = useLoader(TextureLoader, "images/two.png");
-  const texture3 = useLoader(TextureLoader, "images/three.png");
-  const texture4 = useLoader(TextureLoader, "images/four.png");
-  const texture5 = useLoader(TextureLoader, "images/five.png");
-  const texture6 = useLoader(TextureLoader, "images/six.png");
+const Dice = forwardRef<HTMLDivElement, DiceProps>(
+    ({currentFace, isRolling, onClick, rotationX, rotationY}, ref) => {
+        return (
+            <div className={styles.scene} onClick={onClick}>
+                <div
+                    ref={ref}
+                    className={`${styles.cube} ${isRolling ? styles.rolling : ""}`}
+                    data-face={currentFace}
+                    style={{
+                        transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
+                    }}
+                >
 
-  return (
-    <mesh ref={ref} scale={2} onClick={onClick}>
-      <boxGeometry attach="geometry" args={[1, 1, 1]} />
-      <meshStandardMaterial map={texture1} attach="material-0" />
-      <meshStandardMaterial map={texture2} attach="material-1" />
-      <meshStandardMaterial map={texture3} attach="material-2" />
-      <meshStandardMaterial map={texture4} attach="material-3" />
-      <meshStandardMaterial map={texture5} attach="material-4" />
-      <meshStandardMaterial map={texture6} attach="material-5" />
-    </mesh>
-  );
-});
+                    <div className={`${styles.face} ${styles.back}`}>
+                        <img src="/images/six.png" alt="6" draggable="false"/>
+                    </div>
+                    {/* Right  (1) */}
+                    <div className={`${styles.face} ${styles.right}`}>
+                        <img src="/images/one.png" alt="1" draggable="false"/>
+                    </div>
+                    {/* Left (2) */}
+                    <div className={`${styles.face} ${styles.left}`}>
+                        <img src="/images/two.png" alt="2" draggable="false"/>
+                    </div>
+                    {/* Top  (3) */}
+                    <div className={`${styles.face} ${styles.top}`}>
+                        <img src="/images/three.png" alt="3" draggable="false"/>
+                    </div>
+                    {/* Bottom  (4) */}
+                    <div className={`${styles.face} ${styles.bottom}`}>
+                        <img src="/images/four.png" alt="4" draggable="false"/>
+                    </div>
+                    {/* Front  (5) */}
+                    <div className={`${styles.face} ${styles.front}`}>
+                        <img src="/images/five.png" alt="5" draggable="false"/>
+                    </div>
+                    {/* Back  (6) */}
+                </div>
+            </div>
+        );
+    }
+);
 
 Dice.displayName = "Dice";
 

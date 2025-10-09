@@ -1,16 +1,6 @@
 "use client";
 
-import dyn from "next/dynamic";
-
-const Canvas = dyn(
-  () => import("@react-three/fiber").then((mod) => mod.Canvas),
-  { ssr: false },
-);
-
-const DiceScene = dyn(() => import("./DiceScene"), { ssr: false });
-
-export const dynamic = "force-dynamic";
-
+import DiceScene from "./DiceScene";
 import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
@@ -24,9 +14,9 @@ export default function Home() {
         <h1 className={`${lilita.className} text-5xl text-center mt-12`}>
           Terningleken
         </h1>
-        <Canvas>
+        <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
           <DiceScene />
-        </Canvas>
+        </div>
         <Footer />
       </BeerContainer>
     </main>
