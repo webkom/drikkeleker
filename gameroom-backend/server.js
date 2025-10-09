@@ -146,14 +146,6 @@ io.on("connection", (socket) => {
         return;
       }
 
-      if (room.gameStarted) {
-        socket.emit("error", {
-          message:
-            "Spillet har allerede startet. Kan ikke legge til flere utfordringer.",
-        });
-        return;
-      }
-
       const newChallenge = new Challenge({
         roomCode,
         text: challenge,
@@ -163,13 +155,23 @@ io.on("connection", (socket) => {
 
       const challengeCount = await Challenge.countDocuments({ roomCode });
 
-      io.to(roomCode).emit("challenge_added", {
-        challenge: {
-          _id: newChallenge._id,
-          text: newChallenge.text,
-        },
-        challengeCount,
-      });
+      if (room.gameStarted) {
+        io.to(roomCode).emit("challenge_added_mid_game", {
+          challenge: {
+            _id: newChallenge._id,
+            text: newChallenge.text,
+          },
+          challengeCount,
+        });
+      } else {
+        io.to(roomCode).emit("challenge_added", {
+          challenge: {
+            _id: newChallenge._id,
+            text: newChallenge.text,
+          },
+          challengeCount,
+        });
+      }
     } catch (error) {
       socket.emit("error", { message: "Klarte ikke å legge til utfordring" });
     }

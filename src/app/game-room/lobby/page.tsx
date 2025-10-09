@@ -25,7 +25,10 @@ const Lobby = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io("https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev");
+    const newSocket = io(
+      "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
+      // "http://localhost:3001",
+    );
 
     newSocket.on("connect", () => {});
 

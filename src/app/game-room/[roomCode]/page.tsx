@@ -4,12 +4,11 @@ import React, { useEffect, useState, use, useCallback } from "react";
 import { Socket } from "socket.io-client";
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CustomSwiper from "@/components/custom-swiper";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
-import { ArrowRight, Play, ArrowLeft, ArrowUp } from "lucide-react";
+import { ArrowRight, Play, ArrowLeft, ArrowUp, Plus } from "lucide-react";
 import BubbleDigit from "@/components/beer/bubble-digit";
 import { Input } from "@/components/ui/input";
 import "./room.css";
@@ -36,6 +35,8 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   const [newChallenge, setNewChallenge] = useState("");
   const [oldNumber, setOldNumber] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isAddingChallenges, setIsAddingChallenges] = useState(false);
+  const [viewTransition, setViewTransition] = useState(false);
 
   const challengeCount = challenges.length;
 
@@ -51,6 +52,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     const initSocket = async () => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
+        // "http://localhost:3001",
         "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
       );
 
@@ -67,7 +69,18 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
         setGameStarted(data.gameStarted || false);
       });
 
+      newSocket.on("error", (data) => {});
+
       newSocket.on("challenge_added", (data) => {
+        setChallenges((prev) => {
+          if (prev.some((c) => c._id === data.challenge._id)) {
+            return prev;
+          }
+          return [...prev, data.challenge];
+        });
+      });
+
+      newSocket.on("challenge_added_mid_game", (data) => {
         setChallenges((prev) => {
           if (prev.some((c) => c._id === data.challenge._id)) {
             return prev;
@@ -92,11 +105,12 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
         socket.disconnect();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomCode]);
 
   const handleAddChallenge = useCallback(() => {
-    if (!newChallenge.trim() || !socket) return;
+    if (!newChallenge.trim() || !socket) {
+      return;
+    }
 
     socket.emit("add_challenge", {
       roomCode,
@@ -112,9 +126,18 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   }, [socket, challenges.length, roomCode]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleAddChallenge();
     }
+  };
+
+  const toggleView = () => {
+    setViewTransition(true);
+    setTimeout(() => {
+      setIsAddingChallenges(!isAddingChallenges);
+      setViewTransition(false);
+    }, 150);
   };
 
   const setValidCurrentCard = (card: number) =>
@@ -147,14 +170,47 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
       />
       <BeerContainer color="violet">
         <div className="flex flex-col items-center text-center h-full">
-          <h1
-            className={`${lilita.className} text-5xl pt-12 text-center room-code`}
-          >
-            Kode: {roomCode}
-          </h1>
-          <div className="w-full max-w-2xl flex flex-col grow justify-center gap-6">
+          <div className="flex flex-col items-between pt-12 w-full gap-6">
+            <h1
+              className={`${lilita.className} text-5xl pt text-center room-code`}
+            >
+              Kode: {roomCode}
+            </h1>
             {!gameStarted ? (
-              <div className="flex flex-col items-center text-center h-full">
+              <Button
+                onClick={handleStartGame}
+                className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300"
+                disabled={challenges.length === 0}
+              >
+                <Play size={22} className="mr-2" />
+                Start
+              </Button>
+            ) : (
+              <Button
+                onClick={toggleView}
+                className="bg-violet-500 hover:bg-violet-600 w-full h-12 rounded-xl transition-all duration-300"
+              >
+                {isAddingChallenges ? (
+                  <>
+                    <ArrowLeft size={22} className="mr-2" />
+                    Tilbake til spillet
+                  </>
+                ) : (
+                  <>
+                    Legg til spørsmål
+                    <Plus size={22} className="ml-2" />
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+          <div className="w-full max-w-2xl flex flex-col grow justify-center gap-6">
+            {!gameStarted || isAddingChallenges ? (
+              <div
+                className={`flex flex-col items-center text-center h-full transition-opacity duration-300 ${
+                  viewTransition ? "opacity-0" : "opacity-100"
+                }`}
+              >
                 <div className="w-full max-w-2xl flex flex-col grow justify-center">
                   <div className="challenge-counter relative h-96 flex items-center justify-center">
                     <div
@@ -195,36 +251,29 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                   </div>
                 </div>
                 <div className="w-full space-y-4">
-                  <div className="flex flex-row items-center gap-3">
+                  <div className="flex flex-row justify-items-stretch gap-2 align-middle">
                     <Input
+                      placeholder="Del ut 3 slurker til de som..."
                       value={newChallenge}
                       onChange={(e) => setNewChallenge(e.target.value)}
+                      className="flex-1 text-xl rounded-xl px-4 py-6 focus:outline-none"
                       onKeyPress={handleKeyPress}
-                      placeholder="Del ut 3 slurker til de som..."
-                      className="flex text-center text-xl  rounded-xl px-4 py-6 focus:outline-none"
                     />
                     <Button
                       onClick={handleAddChallenge}
                       disabled={!newChallenge.trim()}
-                      className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
+                      className="bg-violet-500 hover:bg-violet-600 rounded-xl self-center h-12"
                     >
                       <ArrowUp size={22} />
                     </Button>
                   </div>
-
-                  <Button
-                    onClick={handleStartGame}
-                    className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300"
-                    disabled={challenges.length === 0}
-                  >
-                    <Play size={22} className="mr-2" />
-                    Start
-                  </Button>
                 </div>
               </div>
             ) : (
               <div
-                className={`rounded-sm ${gameStarted ? "game-started" : ""}`}
+                className={`rounded-sm transition-opacity duration-300 ${
+                  viewTransition ? "opacity-0" : "opacity-100"
+                } ${gameStarted ? "game-started" : ""}`}
               >
                 <CustomSwiper
                   slides={challenges.map((challenge, index) => ({
@@ -279,5 +328,4 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
     </main>
   );
 };
-
 export default RoomPage;
