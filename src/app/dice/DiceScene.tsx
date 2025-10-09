@@ -3,7 +3,8 @@
 import { useState, useRef } from "react";
 import Dice from "./Dice";
 
-const DICE_ROLL_COOLDOWN = 500; // milliseconds
+const DICE_ROLL_COOLDOWN = 750; // milliseconds
+const DICE_ROLL_DURATION = 700; // milliseconds
 
 const getFaceRotation = (face: number): { x: number; y: number } => {
   switch (face) {
@@ -70,7 +71,7 @@ const DiceScene = () => {
 
     setTimeout(() => {
       setIsRolling(false);
-    }, 500);
+    }, DICE_ROLL_DURATION);
   };
 
   return (
