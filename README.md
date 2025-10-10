@@ -43,7 +43,7 @@ change the fetch URL to your local backend, e.g. `http://localhost:3001` (the sa
 then in the root folder run:
 
 ```bash
-yarn 
+yarn
 yarn dev
 ```
 
