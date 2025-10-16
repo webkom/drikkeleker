@@ -8,10 +8,22 @@ import { Button } from "@/components/ui/button";
 import CustomSwiper from "@/components/custom-swiper";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
-import { ArrowRight, Play, ArrowLeft, ArrowUp, Plus } from "lucide-react";
+import { ArrowRight, Play, ArrowLeft, Plus, Send } from "lucide-react";
 import BubbleDigit from "@/components/beer/bubble-digit";
-import { Input } from "@/components/ui/input";
 import "./room.css";
+import QuestionInput from "@/components/question-input";
+import { Card } from "@/components/ui/card";
+
+const suggestions = [
+  "Peikeleik: Pek på personen som {{cursor}}",
+  "Kiss/Marry/Kill: {{cursor}}",
+  "Alle som har {{cursor}} må ta 5 slurker",
+  "Hvis du har {{cursor}}, del ut 3 slurker",
+  "Kategori: {{cursor}}",
+  "Never have I ever {{cursor}}",
+  "Redflag, dealbreaker eller okay: {{cursor}}",
+  "Ny regel resten av runden: {{cursor}}",
+];
 
 interface Challenge {
   _id: string;
@@ -69,7 +81,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
         setGameStarted(data.gameStarted || false);
       });
 
-      newSocket.on("error", (data) => {});
+      newSocket.on("error", () => {});
 
       newSocket.on("challenge_added", (data) => {
         setChallenges((prev) => {
@@ -179,16 +191,16 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
             {!gameStarted ? (
               <Button
                 onClick={handleStartGame}
-                className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300"
+                className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
                 disabled={challenges.length === 0}
               >
                 <Play size={22} className="mr-2" />
-                Start
+                Start spillet
               </Button>
             ) : (
               <Button
                 onClick={toggleView}
-                className="bg-violet-500 hover:bg-violet-600 w-full h-12 rounded-xl transition-all duration-300"
+                className="bg-violet-500 hover:bg-violet-600 w-full h-12 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 {isAddingChallenges ? (
                   <>
@@ -250,24 +262,27 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full space-y-4">
-                  <div className="flex flex-row justify-items-stretch gap-2 align-middle">
-                    <Input
-                      placeholder="Del ut 3 slurker til de som..."
-                      value={newChallenge}
-                      onChange={(e) => setNewChallenge(e.target.value)}
-                      className="flex-1 text-xl rounded-xl px-4 py-6 focus:outline-none"
-                      onKeyPress={handleKeyPress}
-                    />
-                    <Button
-                      onClick={handleAddChallenge}
-                      disabled={!newChallenge.trim()}
-                      className="bg-violet-500 hover:bg-violet-600 rounded-xl self-center h-12"
-                    >
-                      <ArrowUp size={22} />
-                    </Button>
+                <Card className="w-full bg-white/80 backdrop-blur-sm border-violet-200 shadow-xl">
+                  <div className="p-4">
+                    <div className="flex flex-col gap-3">
+                      <QuestionInput
+                        value={newChallenge}
+                        onChange={setNewChallenge}
+                        suggestions={suggestions}
+                        placeholder="Skriv din utfordring her..."
+                      />
+                      <Button
+                        onClick={handleAddChallenge}
+                        disabled={!newChallenge.trim()}
+                        onKeyDown={handleKeyPress}
+                        className="w-full bg-violet-500 hover:bg-violet-600 text-white rounded-xl h-12 font-semibold shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Send size={20} className="mr-2" />
+                        Send inn utfordring
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </div>
             ) : (
               <div
@@ -295,10 +310,10 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                     },
                   }}
                 />
-                <div className="flex gap-2 max-w-2xl mx-auto">
+                <div className="flex gap-2 max-w-2xl mx-auto mt-4">
                   <Button
                     onClick={() => setValidCurrentCard(currentCard - 1)}
-                    className="bg-violet-500 hover:bg-violet-500/90 w-full group"
+                    className="bg-violet-500 hover:bg-violet-600 w-full group shadow-md hover:shadow-lg transition-all duration-200"
                     disabled={currentCard === 0}
                   >
                     <ArrowLeft
@@ -309,7 +324,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                   </Button>
                   <Button
                     onClick={() => setValidCurrentCard(currentCard + 1)}
-                    className="bg-violet-500 hover:bg-violet-500/90 w-full group"
+                    className="bg-violet-500 hover:bg-violet-600 w-full group shadow-md hover:shadow-lg transition-all duration-200"
                     disabled={currentCard === challenges.length - 1}
                   >
                     Neste
