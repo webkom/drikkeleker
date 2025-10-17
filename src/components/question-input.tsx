@@ -1,16 +1,17 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import SuggestionDropdown from "./suggestion-dropdown";
 import { Textarea } from "@/components/ui/textarea";
 
-type QuestionInputProps = {
+t
+const CURSOR_TOKEN = "{{cursor}}";
+
+interface QuestionInputProps {
   value: string;
-  onChange: (v: string) => void;
+  onChange: (value: string) => void;
   suggestions?: string[];
   placeholder?: string;
   className?: string;
-};
-
-const CURSOR_TOKEN = "{{cursor}}";
+}
 
 export default function QuestionInput({
   value,
@@ -20,6 +21,43 @@ export default function QuestionInput({
   className,
 }: QuestionInputProps) {
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (taRef.current) {
+        setTimeout(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest'
+            });
+          }
+        }, 300);
+      }
+    };
+
+    const textarea = taRef.current;
+    if (textarea) {
+      textarea.addEventListener('focus', handleFocus);
+      return () => {
+        textarea.removeEventListener('focus', handleFocus);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleTouchEnd = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    return () => document.removeEventListener('touchend', handleTouchEnd);
+  }, []);
 
   const insertTemplate = (template: string) => {
     const tokenIndex = template.indexOf(CURSOR_TOKEN);
@@ -39,7 +77,10 @@ export default function QuestionInput({
   };
 
   return (
-    <div className={`w-full flex flex-col gap-3 ${className || ""}`}>
+    <div
+      ref={containerRef}
+      className={`w-full flex flex-col gap-3 pb-12 question-input-container ${className || ""}`}
+    >
       {suggestions.length > 0 && (
         <div className="flex items-center">
           <SuggestionDropdown
@@ -55,8 +96,15 @@ export default function QuestionInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        rows={4}
-        className="resize-none bg-white/90 backdrop-blur-sm border-violet-200 focus:border-violet-400 placeholder:text-gray-400 text-gray-700 shadow-sm transition-all duration-200 focus:shadow-md focus:ring-2 focus:ring-violet-500/20"
+        rows={3}
+        className="question-input-textarea resize-none !overflow-y-auto bg-white/90 backdrop-blur-sm border-violet-200 focus:border-violet-400 placeholder:text-gray-400 text-gray-700 shadow-sm transition-all duration-200 focus:shadow-md focus:ring-2 focus:ring-violet-500/20"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'manipulation',
+          fontSize: '16px',
+          marginBottom: '1rem',
+        }}
       />
     </div>
   );

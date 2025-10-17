@@ -33,11 +33,13 @@ export default function SuggestionDropdown({
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="w-72 bg-white/95 backdrop-blur-sm border-violet-200 shadow-xl"
-        align="start"
-        sideOffset={5}
-      >
+    <DropdownMenuContent
+      className="w-full max-w-[300px] md:w-72 bg-white/95 backdrop-blur-sm border-violet-200 shadow-xl max-h-[25vh] sm:max-h-[35vh] overflow-y-auto z-50"
+      align="start"
+      side="bottom"
+      sideOffset={5}
+      avoidCollisions={true}
+    >
         <DropdownMenuLabel className="text-violet-700 font-semibold flex items-center gap-2">
           <Sparkles className="h-3 w-3" />
           Velg ett forslag:
