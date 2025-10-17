@@ -157,7 +157,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
 
   if (!connected) {
     return (
-      <main className="overflow-hidden h-screen">
+      <main className="h-screen overflow-hidden">
         <BeerContainer color="violet">
           <div className="flex flex-col items-center justify-center h-full">
             <div className="relative w-32 h-32 mb-8 loading-container">
@@ -175,14 +175,11 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   }
 
   return (
-    <main className="overflow-hidden h-screen">
-      <BackButton
-        href="/game-room/lobby"
-        className="absolute top-4 left-4 z-10"
-      />
+    <main className="h-screen overflow-y-auto overflow-x-hidden">
+      <BackButton href="/game-room/lobby" className="fixed top-4 left-4 z-10" />
       <BeerContainer color="violet">
-        <div className="flex flex-col items-center text-center h-full">
-          <div className="flex flex-col items-between pt-12 w-full gap-6">
+        <div className="flex flex-col items-center text-center flex-1 w-full">
+          <div className="flex flex-col items-between pt-12 w-full gap-6 px-4">
             <h1
               className={`${lilita.className} text-5xl pt text-center room-code`}
             >
@@ -216,19 +213,19 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
               </Button>
             )}
           </div>
-          <div className="w-full max-w-2xl flex flex-col grow justify-center gap-6">
+          <div className="w-full max-w-2xl flex flex-col flex-grow justify-center gap-6 px-4">
             {!gameStarted || isAddingChallenges ? (
               <div
-                className={`flex flex-col items-center text-center h-full transition-opacity duration-300 ${
+                className={`flex flex-col items-center text-center transition-opacity duration-300 ${
                   viewTransition ? "opacity-0" : "opacity-100"
                 }`}
               >
-                <div className="w-full max-w-2xl flex flex-col grow justify-center">
-                  <div className="challenge-counter relative h-96 flex items-center justify-center">
+                <div className="w-full max-w-2xl flex flex-col">
+                  <div className="challenge-counter relative h-64 sm:h-96 flex items-center justify-center">
                     <div
                       className="relative flex items-center justify-center"
                       style={{
-                        minHeight: "200px",
+                        minHeight: "150px",
                         minWidth: `${getDigitContainerWidth(Math.max(challengeCount, oldNumber))}px`,
                       }}
                     >
@@ -262,7 +259,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
                     </div>
                   </div>
                 </div>
-                <Card className="w-full bg-white/80 backdrop-blur-sm border-violet-200 shadow-xl">
+                <Card className="w-full backdrop-blur-sm border-violet-200 shadow-xl">
                   <div className="p-4">
                     <div className="flex flex-col gap-3">
                       <QuestionInput
