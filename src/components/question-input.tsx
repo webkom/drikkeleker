@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from "react";
 import SuggestionDropdown from "./suggestion-dropdown";
 import { Textarea } from "@/components/ui/textarea";
 
-t
 const CURSOR_TOKEN = "{{cursor}}";
 
 interface QuestionInputProps {
