@@ -28,9 +28,9 @@ export default function QuestionInput({
         setTimeout(() => {
           if (containerRef.current) {
             containerRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-              inline: 'nearest'
+              behavior: "smooth",
+              block: "center",
+              inline: "nearest",
             });
           }
         }, 300);
@@ -39,9 +39,9 @@ export default function QuestionInput({
 
     const textarea = taRef.current;
     if (textarea) {
-      textarea.addEventListener('focus', handleFocus);
+      textarea.addEventListener("focus", handleFocus);
       return () => {
-        textarea.removeEventListener('focus', handleFocus);
+        textarea.removeEventListener("focus", handleFocus);
       };
     }
   }, []);
@@ -49,13 +49,13 @@ export default function QuestionInput({
   useEffect(() => {
     const handleTouchEnd = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
+      if (target.tagName === "TEXTAREA" || target.tagName === "INPUT") {
         e.preventDefault();
       }
     };
 
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
-    return () => document.removeEventListener('touchend', handleTouchEnd);
+    document.addEventListener("touchend", handleTouchEnd, { passive: false });
+    return () => document.removeEventListener("touchend", handleTouchEnd);
   }, []);
 
   const insertTemplate = (template: string) => {
@@ -98,11 +98,11 @@ export default function QuestionInput({
         rows={3}
         className="question-input-textarea resize-none !overflow-y-auto bg-white/90 backdrop-blur-sm border-violet-200 focus:border-violet-400 placeholder:text-gray-400 text-gray-700 shadow-sm transition-all duration-200 focus:shadow-md focus:ring-2 focus:ring-violet-500/20"
         style={{
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'manipulation',
-          fontSize: '16px',
-          marginBottom: '1rem',
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain",
+          touchAction: "manipulation",
+          fontSize: "16px",
+          marginBottom: "1rem",
         }}
       />
     </div>

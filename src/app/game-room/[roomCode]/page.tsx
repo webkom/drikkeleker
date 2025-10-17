@@ -176,10 +176,7 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
 
   return (
     <main className="h-screen overflow-y-auto overflow-x-hidden">
-      <BackButton
-        href="/game-room/lobby"
-        className="fixed top-4 left-4 z-10"
-      />
+      <BackButton href="/game-room/lobby" className="fixed top-4 left-4 z-10" />
       <BeerContainer color="violet">
         <div className="flex flex-col items-center text-center flex-1 w-full">
           <div className="flex flex-col items-between pt-12 w-full gap-6 px-4">
