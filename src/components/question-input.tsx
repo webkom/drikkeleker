@@ -47,10 +47,16 @@ export default function QuestionInput({
   }, []);
 
   useEffect(() => {
+    let lastTap = 0;
     const handleTouchEnd = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === "TEXTAREA" || target.tagName === "INPUT") {
-        e.preventDefault();
+        const now = Date.now();
+        const timeDiff = now - lastTap;
+        if (timeDiff < 300) {
+          e.preventDefault();
+        }
+        lastTap = now;
       }
     };
 
