@@ -1,6 +1,9 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ReactCardFlip from "react-card-flip";
+import songs from "./songs.json";
 import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
@@ -11,6 +14,7 @@ import { DRIKKELEK_URL } from "@/types/constants";
 import PlayButton from "@/app/six-minutes/PlayButton";
 import Footer from "@/components/footer";
 import { lilita } from "@/lib/fonts";
+import CardFace from "@/app/six-minutes/CardFace";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -19,19 +23,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useSongs } from "./SongsProvider";
-import SkipButton from "./SkipButton";
 
 const SixMinutes = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  useEffect(() => {
+    shuffle(songs);
+  }, []);
+
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+
   const [currentSong, setCurrentSong] = useState(0);
   const [currentPlayTime, setCurrentPlayTime] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [animationClass, setAnimationClass] = useState("");
-
-  const { songs, shuffle } = useSongs();
 
   const endGame = () => {
     audioRef.current!.currentTime = 0;
@@ -49,7 +55,7 @@ const SixMinutes = () => {
     pause();
     setIsPlaying(false);
     setIsGameOver(false);
-    shuffle();
+    shuffle(songs);
     setCurrentSong(0);
   };
 
@@ -74,20 +80,10 @@ const SixMinutes = () => {
   const nextSong = () => {
     setAnimationClass("animate-slide-out");
     setTimeout(() => {
-      setIsPlaying(true);
+      setIsPlaying(false);
+      setIsFlipped(false);
       setCurrentSong((current) => (current + 1) % songs.length);
       setAnimationClass("animate-slide-in");
-    }, 200);
-  };
-  const prevSong = () => {
-    if (currentSong === 0) {
-      return;
-    }
-    setAnimationClass("animate-slide-out-reverse");
-    setTimeout(() => {
-      setIsPlaying(true);
-      setCurrentSong((current) => current - 1);
-      setAnimationClass("animate-slide-in-reverse");
     }, 200);
   };
 
@@ -120,31 +116,44 @@ const SixMinutes = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <BackButton
-        href="/#games"
-        className="absolute top-4 left-4 z-10 animate-"
-      />
+      <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="orange">
-        <div className="grow text-center pt-12 flex flex-col gap-2">
+        <div className="text-center pt-12 flex flex-col h-full">
           <h1 className={`${lilita.className} text-5xl`}>6 Minutes</h1>
-          <div className="grow flex flex-col justify-between pt-10 pb-10">
-            <div className={animationClass}>
-              <SongDetails currentSong={currentSong} />
-            </div>
-            <div className="flex flex-col gap-5">
-              <ProgressBar value={currentPlayTime} maxValue={20} />
-              <div className="flex justify-between">
-                <SkipButton.Back
-                  onClick={prevSong}
-                  disabled={currentSong === 0}
-                />
-                <PlayButton
-                  isPlaying={isPlaying}
-                  onClick={() => setIsPlaying(!isPlaying)}
-                />
-                <SkipButton.Forward onClick={nextSong} />
-              </div>
-            </div>
+          <div className="grow flex flex-col justify-center gap-2">
+            <ReactCardFlip
+              containerClassName={`items-center transition-transform ${animationClass}`}
+              isFlipped={isFlipped}
+            >
+              <CardFace
+                songNumber={currentSong + 1}
+                onFlip={() => setIsFlipped(true)}
+              >
+                <div className="my-auto w-full gap-5 flex flex-col items-center justify-between">
+                  <PlayButton
+                    isPlaying={isPlaying}
+                    onClick={() => setIsPlaying(!isPlaying)}
+                  />
+                </div>
+                <ProgressBar value={currentPlayTime} maxValue={20} />
+              </CardFace>
+              <CardFace
+                songNumber={currentSong + 1}
+                onFlip={() => setIsFlipped(false)}
+              >
+                <SongDetails currentSong={currentSong} />
+              </CardFace>
+            </ReactCardFlip>
+            <Button
+              className="bg-orange-500 hover:bg-orange-500/90 group"
+              onClick={nextSong}
+            >
+              Neste sang
+              <ArrowRight
+                size={20}
+                className="ml-1 transition-transform group-hover:translate-x-1"
+              />
+            </Button>
           </div>
         </div>
         <Footer />
@@ -154,3 +163,20 @@ const SixMinutes = () => {
 };
 
 export default SixMinutes;
+
+function shuffle(array: any[]) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+}

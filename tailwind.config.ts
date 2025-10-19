@@ -81,14 +81,6 @@ const config = {
           from: { transform: "translateX(100vw)" },
           to: { transform: "translateX(0)" },
         },
-        "slide-out-reverse": {
-          from: { transform: "translateX(0)" },
-          to: { transform: "translateX(100vw)" },
-        },
-        "slide-in-reverse": {
-          from: { transform: "translateX(-100vw)" },
-          to: { transform: "translateX(0)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -96,8 +88,6 @@ const config = {
         fade: "fadeIn .5s ease-in-out",
         "slide-out": "slide-out 0.3s forwards",
         "slide-in": "slide-in 0.3s forwards",
-        "slide-out-reverse": "slide-out-reverse 0.3s forwards",
-        "slide-in-reverse": "slide-in-reverse 0.3s forwards",
       },
     },
   },

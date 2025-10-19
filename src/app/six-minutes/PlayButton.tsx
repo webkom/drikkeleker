@@ -1,4 +1,5 @@
 import { Pause, Play } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface PlayButtonProps {
   onClick: () => void;
@@ -16,9 +17,9 @@ const PlayButton = ({ onClick, isPlaying }: PlayButtonProps) => {
       onClick={handleClick}
     >
       {isPlaying ? (
-        <Pause fill="rgb(254 215 170)" className="text-orange-200" size={48} />
+        <Pause fill="rgb(254 215 170)" className="text-orange-200" size={72} />
       ) : (
-        <Play fill="rgb(254 215 170)" className="text-orange-200" size={48} />
+        <Play fill="rgb(254 215 170)" className="text-orange-200" size={72} />
       )}
     </button>
   );
