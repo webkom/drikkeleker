@@ -12,9 +12,9 @@ const ProgressBar = ({ value, maxValue }: ProgressBarProps) => {
           .toString()
           .padStart(2, "0")}
       </span>
-      <div className="w-full h-6 rounded-md bg-white overflow-clip">
+      <div className="w-full h-2 rounded-sm bg-white bg-opacity-50 overflow-clip">
         <div
-          className="h-6 rounded-md bg-orange-200 transition-all"
+          className="h-2 rounded-sm bg-orange-500 transition-all"
           style={{ width: `${100 * (1 - value / maxValue)}%` }}
         ></div>
       </div>
