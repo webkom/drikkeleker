@@ -81,6 +81,10 @@ const config = {
           from: { transform: "translateX(100vw)" },
           to: { transform: "translateX(0)" },
         },
+        shine: {
+          "0%": { "background-position": "100%" },
+          "100%": { "background-position": "-100%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -88,6 +92,7 @@ const config = {
         fade: "fadeIn .5s ease-in-out",
         "slide-out": "slide-out 0.3s forwards",
         "slide-in": "slide-in 0.3s forwards",
+        shine: "shine 5s linear infinite",
       },
     },
   },

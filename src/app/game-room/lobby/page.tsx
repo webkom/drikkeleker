@@ -1,170 +1,64 @@
 "use client";
 
-import { lilita } from "@/lib/fonts";
+import { useState } from "react";
 import BeerContainer from "@/components/beer/beer-container";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
 import BackButton from "@/components/back-button";
 import Footer from "@/components/footer";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users } from "lucide-react";
-import { io, Socket } from "socket.io-client";
-import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import Popup from "@/app/game-room/lobby/Popup";
+import { AnimatePresence } from "framer-motion";
 
-const generateRoomCode = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
+// Import all the necessary components
+import BubbleTransition from "@/components/beer/BubbleTransition";
+import LobbyPro from "@/app/game-room/lobby/LobbyPro";
+import LobbyRegular from "@/components/lobby/LobbyDefault";
 
-const Lobby = () => {
-  const [roomCode, setRoomCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const router = useRouter();
+type LobbyMode = "default" | "pro";
 
-  useEffect(() => {
-    const newSocket = io(
-      "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
-      // "http://localhost:3001",
-    );
+const LobbyPageController = () => {
+  const [lobbyMode, setLobbyMode] = useState<LobbyMode>("default");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-    newSocket.on("connect", () => {});
+  // This function is the key to the whole process
+  const startTransitionToPro = () => {
+    // 1. Start rendering the bubble animation immediately
+    setIsTransitioning(true);
 
-    newSocket.on("room_created", (data) => {
-      if (data.success) {
-        router.push(`/game-room/${data.roomCode}`);
-      } else {
-        setError(data.error);
-        setIsLoading(false);
-      }
-    });
+    // 2. Schedule the content swap to happen when the animation is at its peak
+    //    The timeout duration is crucial. It should be less than the animation's total duration.
+    //    800ms is a sweet spot: the screen is fully covered, but the animation hasn't finished.
+    setTimeout(() => {
+      setLobbyMode("pro"); // 3. The content swaps instantly, "in the background"
 
-    newSocket.on("room_joined", (data) => {
-      if (data.success) {
-        router.push(`/game-room/${data.roomCode}`);
-      } else {
-        setError(data.error || "Kunne ikke finne rom");
-        setIsLoading(false);
-      }
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [router]);
-
-  const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const code = e.target.value.slice(0, 6);
-    setRoomCode(code);
-  };
-
-  const handleCreateRoom = () => {
-    if (!socket) {
-      setError("Kunne ikke koble til server");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-
-    const newRoomCode = generateRoomCode();
-    socket.emit("create_room", { roomCode: newRoomCode });
-  };
-
-  const handleJoinRoom = () => {
-    if (!roomCode.trim() || roomCode.length !== 6) {
-      setError("Kunne ikke koble til server");
-      return;
-    }
-
-    if (!socket) {
-      setError("Skriv inn en gyldig kode");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-    socket.emit("join_room", { roomCode: roomCode.trim() });
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleJoinRoom();
-    }
+      // 4. After the swap, tell the bubble animation to start its exit phase.
+      //    The AnimatePresence component will handle the exit animation automatically.
+      setIsTransitioning(false);
+    }, 1200);
   };
 
   return (
     <main className="overflow-hidden h-screen">
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
-      <BeerContainer color="violet" className="h-screen w-screen">
-        <div className="flex flex-col items-center text-center h-full">
-          <div className="flex items-center justify-center gap-4 pt-12">
-            <h1 className={`${lilita.className} text-5xl leading-tight`}>
-              Viljens Drikkelek
-            </h1>
-            <Popup />
-          </div>
-          <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Plus size={24} />
-                  Lag nytt rom
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  onClick={handleCreateRoom}
-                  disabled={isLoading}
-                  className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
-                >
-                  {isLoading ? "Oppretter..." : <ArrowRight size={24} />}
-                </Button>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Users size={24} />
-                  Bli med
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-row items-center gap-3">
-                <Input
-                  type="number"
-                  placeholder="123456"
-                  value={roomCode}
-                  onChange={handleInputCode}
-                  onKeyPress={handleKeyPress}
-                  maxLength={6}
-                  className="flex-grow text-center text-3xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                />
-                <Button
-                  onClick={handleJoinRoom}
-                  disabled={isLoading || roomCode.length !== 6}
-                  className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
-                >
-                  {isLoading ? "..." : <ArrowRight size={24} />}
-                </Button>
-              </CardContent>
-            </Card>
+      <BeerContainer
+        color={lobbyMode === "default" ? "violet" : "slate"}
+        className="h-screen w-screen"
+      >
+        {/* The BubbleTransition component lives here, ready to be activated */}
+        <BubbleTransition isAnimating={isTransitioning} color="bg-white" />
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                <p className="text-red-600 text-sm">{error}</p>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* AnimatePresence handles the component swapping */}
+        <AnimatePresence mode="wait" initial={false}>
+          {lobbyMode === "default" ? (
+            // Pass the trigger function down to the regular lobby
+            <LobbyRegular onStartProTransition={startTransitionToPro} />
+          ) : (
+            <LobbyPro />
+          )}
+        </AnimatePresence>
+
         <Footer />
       </BeerContainer>
     </main>
   );
 };
 
-export default Lobby;
+export default LobbyPageController;
