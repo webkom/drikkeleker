@@ -5,15 +5,12 @@ import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Popup from "@/app/game-room/lobby/Popup";
-import ShinyText from "@/components/ShinyText";
+import Popup from "@/components/lobby/Popup";
+import ShinyText from "@/components/shared/shiny-text";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { io, Socket } from "socket.io-client";
+import { useSocket } from "@/context/SocketContext";
 import { Plus, Users, Loader2, ArrowRight, UserCog } from "lucide-react";
-
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
 const generateRoomCode = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
@@ -24,26 +21,51 @@ const LobbyPro = () => {
   const [showNameInput, setShowNameInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [socket, setSocket] = useState<Socket | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const newSocket = io(BACKEND_URL);
-    setSocket(newSocket);
+  const { socket } = useSocket();
 
-    newSocket.on("room_created", (data) => {
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleRoomCreated = (data: any) => {
       setIsLoading(false);
       if (data.success) {
         router.push(`/game-room/${data.roomCode}`);
       } else {
-        setError(data.error || "Kunne ikke lage rom");
+        setError(data.error || "Could not create room");
       }
-    });
+    };
+
+    const handleRoomExists = (data: any) => {
+      setIsLoading(false);
+      if (data.roomExists) {
+        setShowNameInput(true);
+      } else {
+        setError("Room not found");
+      }
+    };
+
+    const handleRoomJoined = (data: any) => {
+      setIsLoading(false);
+      if (data.success && data.playerName) {
+        sessionStorage.setItem(`playerName_${roomCode}`, data.playerName);
+        router.push(`/game-room/${roomCode}`);
+      } else if (!data.success) {
+        setError(data.error || "Could not join room");
+      }
+    };
+
+    socket.on("room_created", handleRoomCreated);
+    socket.on("room_exists", handleRoomExists);
+    socket.on("room_joined", handleRoomJoined);
 
     return () => {
-      newSocket.disconnect();
+      socket.off("room_created", handleRoomCreated);
+      socket.off("room_exists", handleRoomExists);
+      socket.off("room_joined", handleRoomJoined);
     };
-  }, [router]);
+  }, [socket, router, roomCode]);
 
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomCode(e.target.value.slice(0, 6));
@@ -60,43 +82,23 @@ const LobbyPro = () => {
 
   const handleVerifyCode = () => {
     if (!roomCode.trim() || roomCode.length !== 6) {
-      return setError("Skriv inn en gyldig kode");
+      return setError("Enter a valid code");
     }
     if (!socket) return;
 
     setIsLoading(true);
     setError("");
-
-    socket.once("room_joined", (data) => {
-      setIsLoading(false);
-      if (data.success) {
-        setShowNameInput(true);
-      } else {
-        setError(data.error || "Kunne ikke finne rom");
-      }
-    });
-
     socket.emit("join_room", { roomCode: roomCode.trim() });
   };
 
   const handleJoinWithName = () => {
     if (!playerName.trim()) {
-      return setError("Skriv inn ditt navn");
+      return setError("Enter your name");
     }
     if (!socket) return;
 
     setIsLoading(true);
     setError("");
-
-    socket.once("room_joined", (data) => {
-      if (data.success) {
-        router.push(`/game-room/${roomCode}`);
-      } else {
-        setIsLoading(false);
-        setError(data.error || "Kunne ikke bli med i rom");
-      }
-    });
-
     socket.emit("join_room", {
       roomCode: roomCode.trim(),
       playerName: playerName.trim(),
@@ -133,7 +135,7 @@ const LobbyPro = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
-              <UserCog size={24} /> Spill som host
+              <UserCog size={24} /> Play as host
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -142,7 +144,7 @@ const LobbyPro = () => {
               disabled={isLoading}
               className="bg-yellow-500 hover:bg-yellow-600 w-full h-12 text-lg rounded-xl shine-container"
             >
-              {isLoading ? "Oppretter..." : <ArrowRight size={24} />}
+              {isLoading ? "Creating..." : <ArrowRight size={24} />}
             </Button>
           </CardContent>
         </Card>
@@ -150,7 +152,7 @@ const LobbyPro = () => {
         <Card style={{ perspective: "1200px" }}>
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
-              <Users size={24} /> Bli med
+              <Users size={24} /> Join as player
             </CardTitle>
           </CardHeader>
           <CardContent className="min-h-[80px]">
@@ -172,7 +174,7 @@ const LobbyPro = () => {
                     onChange={handleInputCode}
                     onKeyPress={handleKeyPress}
                     maxLength={6}
-                    className="flex-grow text-center text-3xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 "
+                    className="flex-grow text-center text-3xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                   />
                   <Button
                     onClick={handleVerifyCode}
@@ -198,7 +200,7 @@ const LobbyPro = () => {
                 >
                   <Input
                     type="text"
-                    placeholder="Ditt navn"
+                    placeholder="Your name"
                     value={playerName}
                     onChange={(e) => {
                       setPlayerName(e.target.value);
@@ -214,7 +216,7 @@ const LobbyPro = () => {
                       variant="outline"
                       className="flex-1 h-12 rounded-xl"
                     >
-                      Tilbake
+                      Back
                     </Button>
                     <Button
                       onClick={handleJoinWithName}

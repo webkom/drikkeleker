@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import QuestionManager from "./QuestionManager";
 import PlayersList from "./PlayersList";
+import { motion, AnimatePresence } from "framer-motion";
+import { Copy, Check } from "lucide-react";
 
 interface Room {
   roomCode: string;
@@ -41,6 +43,7 @@ export default function RoomLobby({
   error,
 }: RoomLobbyProps) {
   const [showWarning, setShowWarning] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const canStartGame =
     room.players.length >= 2 && (room.questions?.length || 0) >= 1;
@@ -54,31 +57,44 @@ export default function RoomLobby({
     onStartGame();
   };
 
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(room.roomCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="flex flex-col items-center text-center h-full px-4 py-12 overflow-y-auto">
-      <div className="flex items-center justify-center gap-4 mb-8">
-        <h1 className={`${lilita.className} text-5xl leading-tight text-white`}>
-          Guessing Game
-        </h1>
-      </div>
+    <div className="flex flex-col items-center text-center h-full w-full px-4 py-12">
+      <h1
+        className={`${lilita.className} text-5xl leading-tight text-white mb-8`}
+      >
+        Game Lobby
+      </h1>
 
       <div className="w-full max-w-4xl space-y-6">
-        {/* Room Code Display */}
         <Card className="bg-white/95">
           <CardHeader>
-            <CardTitle className="text-3xl">Room Code</CardTitle>
+            <CardTitle className="text-2xl">Room Code</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-6xl font-mono font-bold text-violet-600">
+          <CardContent className="flex items-center justify-center gap-4">
+            <div className="text-6xl font-mono font-bold text-violet-600 tracking-widest">
               {room.roomCode}
             </div>
-            <p className="text-gray-600 mt-2">
-              Share this code with others to join!
-            </p>
+            <Button
+              onClick={handleCopyCode}
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 rounded-lg"
+            >
+              {copied ? (
+                <Check className="text-green-500" />
+              ) : (
+                <Copy className="text-gray-600" />
+              )}
+            </Button>
           </CardContent>
         </Card>
 
-        {/* Players List */}
         <Card className="bg-white/95">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -98,7 +114,6 @@ export default function RoomLobby({
           </CardContent>
         </Card>
 
-        {/* Question Manager - Only for Host */}
         {isHost && (
           <QuestionManager
             questions={room.questions || []}
@@ -107,66 +122,52 @@ export default function RoomLobby({
           />
         )}
 
-        {/* Questions Display - For Non-Host */}
         {!isHost && (
           <Card className="bg-white/95">
             <CardHeader>
               <CardTitle>Questions ({room.questions?.length || 0})</CardTitle>
             </CardHeader>
             <CardContent>
-              {!room.questions || room.questions.length === 0 ? (
-                <p className="text-gray-600">
-                  Waiting for host to add questions...
-                </p>
-              ) : (
-                <div className="text-left space-y-2">
-                  {room.questions.map((q, idx) => (
-                    <div key={idx} className="p-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium">{q.text}</p>
-                      <p className="text-sm text-gray-600">
-                        Range: {q.rangeMin} - {q.rangeMax}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-gray-600">
+                Waiting for host to add questions...
+              </p>
             </CardContent>
           </Card>
         )}
 
-        {/* Start Game Button - Only for Host */}
         {isHost && (
           <Card className="bg-white/95">
             <CardContent className="pt-6">
               <Button
                 onClick={handleStartGame}
                 disabled={!canStartGame}
-                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-4 text-xl rounded-xl"
+                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-4 h-16 text-xl rounded-xl"
               >
                 Start Game
               </Button>
-              {showWarning && !canStartGame && (
-                <div className="mt-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded">
-                  {room.players.length < 2
-                    ? "Need at least 2 players to start"
-                    : "Need at least 1 question to start"}
-                </div>
-              )}
-              {error && (
-                <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {error}
-                </div>
-              )}
+              <AnimatePresence>
+                {showWarning && !canStartGame && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 text-sm rounded"
+                  >
+                    {room.players.length < 2
+                      ? "You need at least 2 players to start."
+                      : "You need to add at least 1 question to start."}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </CardContent>
           </Card>
         )}
 
-        {/* Waiting Message - For Non-Host */}
         {!isHost && (
           <Card className="bg-white/95">
             <CardContent className="pt-6">
               <p className="text-gray-600 text-lg">
-                Waiting for host to start the game...
+                Waiting for the host to start the game...
               </p>
             </CardContent>
           </Card>

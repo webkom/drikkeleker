@@ -18,19 +18,18 @@ const io = new Server(server, {
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
-
-// Special admin room code
-const ADMIN_ROOM_CODE = "676767";
+  .then(() => console.log("âœ… MongoDB connected"))
+  .catch((err) => console.error("âŒ MongoDB error:", err));
 
 // Socket.io connection handler
 io.on("connection", (socket) => {
-  console.log("👤 User connected:", socket.id);
+  console.log("ðŸ‘¤ User connected:", socket.id);
 
   // ==================== EVENT 1: CREATE ROOM ====================
   socket.on("create_room", async ({ roomCode, gameType }) => {
-    console.log(`📝 Creating room: ${roomCode} (${gameType})`);
+    console.log(
+      `ðŸ“ Creating room: ${roomCode} (${gameType}) for host ${socket.id}`,
+    );
 
     try {
       const existingRoom = await Room.findOne({ roomCode });
@@ -45,11 +44,11 @@ io.on("connection", (socket) => {
 
       const newRoom = new Room({
         roomCode,
-        gameType, // 'challenges' or 'guessing'
+        gameType,
         host: socket.id,
         players: [],
         gameStarted: false,
-        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+        expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
         questions: [],
         currentQuestionIndex: 0,
         phase: 0,
@@ -65,9 +64,9 @@ io.on("connection", (socket) => {
         isHost: true,
       });
 
-      console.log(`✅ Room created: ${roomCode}`);
+      console.log(`âœ… Room ${roomCode} created by host ${socket.id}`);
     } catch (error) {
-      console.error("❌ Error creating room:", error);
+      console.error("âŒ Error creating room:", error);
       socket.emit("room_created", {
         success: false,
         error: "Failed to create room",
@@ -78,70 +77,10 @@ io.on("connection", (socket) => {
   // ==================== EVENT 2: JOIN ROOM ====================
   socket.on("join_room", async ({ roomCode, playerName }) => {
     console.log(
-      `🚪 User joining room: ${roomCode}${playerName ? ` as ${playerName}` : ""}`,
+      `ðŸšª Socket ${socket.id} joining room ${roomCode}${playerName ? ` as player "${playerName}"` : " (checking)"}`,
     );
 
     try {
-      // Special handling for admin code
-      if (roomCode === ADMIN_ROOM_CODE) {
-        let room = await Room.findOne({ roomCode: ADMIN_ROOM_CODE });
-
-        // If admin room doesn't exist, create it as a guessing game
-        if (!room) {
-          console.log("🔑 Creating admin guessing game room");
-          room = new Room({
-            roomCode: ADMIN_ROOM_CODE,
-            gameType: "guessing",
-            host: socket.id,
-            players: [],
-            gameStarted: false,
-            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours for admin room
-            questions: [],
-            currentQuestionIndex: 0,
-            phase: 0,
-            answers: new Map(),
-          });
-          await room.save();
-        }
-
-        socket.join(roomCode);
-
-        // Add player if they provided a name
-        if (playerName) {
-          const playerExists = room.players.find((p) => p.name === playerName);
-
-          if (playerExists) {
-            socket.emit("room_joined", {
-              success: false,
-              error: "Player name already taken",
-            });
-            return;
-          }
-
-          room.players.push({ name: playerName, score: 0 });
-          await room.save();
-
-          // Notify all users in room about new player
-          io.to(roomCode).emit("room_updated", room);
-          console.log(`✅ Player ${playerName} joined admin room`);
-        }
-
-        socket.emit("room_joined", {
-          success: true,
-          room,
-          roomCode: ADMIN_ROOM_CODE, // Add roomCode at top level
-          isHost: room.host === socket.id,
-        });
-
-        // Send initial room state
-        socket.emit("room_updated", room);
-        console.log(
-          `✅ User joined admin room as ${room.host === socket.id ? "HOST" : "PLAYER"}`,
-        );
-        return;
-      }
-
-      // Regular room handling
       const room = await Room.findOne({ roomCode });
 
       if (!room) {
@@ -154,8 +93,24 @@ io.on("connection", (socket) => {
 
       socket.join(roomCode);
 
-      // Add player if they provided a name
-      if (playerName) {
+      // Check if this socket is the host
+      const isHost = room.host === socket.id;
+
+      if (isHost) {
+        // Host is accessing their room
+        console.log(`âœ… Host ${socket.id} accessed room ${roomCode}`);
+
+        socket.emit("room_joined", {
+          success: true,
+          room,
+          roomCode: room.roomCode,
+          isHost: true,
+        });
+
+        // Send room update
+        socket.emit("room_updated", room);
+      } else if (playerName) {
+        // Player joining with name
         const playerExists = room.players.find((p) => p.name === playerName);
 
         if (playerExists) {
@@ -166,32 +121,54 @@ io.on("connection", (socket) => {
           return;
         }
 
+        // Add player to room
         room.players.push({ name: playerName, score: 0 });
         await room.save();
 
-        // Notify all users in room about new player
+        console.log(`âœ… Player "${playerName}" joined room ${roomCode}`);
+
+        // Notify all users in room
         io.to(roomCode).emit("room_updated", room);
-        console.log(`✅ Player ${playerName} joined room ${roomCode}`);
+
+        // Send success response
+        socket.emit("room_joined", {
+          success: true,
+          room,
+          roomCode: room.roomCode,
+          isHost: false,
+          playerName: playerName,
+        });
+      } else {
+        // Just checking if room exists (player hasn't provided name yet)
+        console.log(
+          `â„¹ï¸ Room ${roomCode} exists, waiting for player name from ${socket.id}`,
+        );
+
+        socket.emit("room_exists", {
+          roomExists: true,
+          roomCode: room.roomCode,
+        });
+
+        // Also send basic room info
+        socket.emit("room_joined", {
+          success: true,
+          room,
+          roomCode: room.roomCode,
+          isHost: false,
+        });
       }
-
-      socket.emit("room_joined", {
-        success: true,
-        room,
-        roomCode: room.roomCode, // Add roomCode at top level
-        isHost: room.host === socket.id,
-      });
-
-      // Send initial room state
-      socket.emit("room_updated", room);
     } catch (error) {
-      console.error("❌ Error joining room:", error);
-      socket.emit("error", { message: "Failed to join room" });
+      console.error("âŒ Error joining room:", error);
+      socket.emit("room_joined", {
+        success: false,
+        error: "Failed to join room",
+      });
     }
   });
 
   // ==================== EVENT 3: ADD QUESTION ====================
   socket.on("add_question", async ({ roomCode, question }) => {
-    console.log(`➕ Adding question to room ${roomCode}:`, question.text);
+    console.log(`âž• Host ${socket.id} adding question to room ${roomCode}`);
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -210,16 +187,18 @@ io.on("connection", (socket) => {
       await room.save();
 
       io.to(roomCode).emit("room_updated", room);
-      console.log(`✅ Question added to room ${roomCode}`);
+      console.log(`âœ… Question added to room ${roomCode}`);
     } catch (error) {
-      console.error("❌ Error adding question:", error);
+      console.error("âŒ Error adding question:", error);
       socket.emit("error", { message: "Failed to add question" });
     }
   });
 
   // ==================== EVENT 4: UPDATE QUESTION ====================
   socket.on("update_question", async ({ roomCode, index, question }) => {
-    console.log(`✏️ Updating question ${index} in room ${roomCode}`);
+    console.log(
+      `âœï¸ Host ${socket.id} updating question ${index} in room ${roomCode}`,
+    );
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -238,19 +217,19 @@ io.on("connection", (socket) => {
         room.questions[index] = question;
         await room.save();
         io.to(roomCode).emit("room_updated", room);
-        console.log(`✅ Question ${index} updated in room ${roomCode}`);
+        console.log(`âœ… Question ${index} updated in room ${roomCode}`);
       } else {
         socket.emit("error", { message: "Invalid question index" });
       }
     } catch (error) {
-      console.error("❌ Error updating question:", error);
+      console.error("âŒ Error updating question:", error);
       socket.emit("error", { message: "Failed to update question" });
     }
   });
 
   // ==================== EVENT 5: START GAME ====================
   socket.on("start_game", async ({ roomCode }) => {
-    console.log(`🎮 Starting game in room ${roomCode}`);
+    console.log(`ðŸŽ® Host ${socket.id} starting game in room ${roomCode}`);
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -276,20 +255,22 @@ io.on("connection", (socket) => {
       }
 
       room.gameStarted = true;
-      room.phase = 1; // Move to phase 1 (present question)
+      room.phase = 1;
       await room.save();
 
       io.to(roomCode).emit("room_updated", room);
-      console.log(`✅ Game started in room ${roomCode}`);
+      console.log(`âœ… Game started in room ${roomCode}`);
     } catch (error) {
-      console.error("❌ Error starting game:", error);
+      console.error("âŒ Error starting game:", error);
       socket.emit("error", { message: "Failed to start game" });
     }
   });
 
-  // ==================== EVENT 6: START PHASE (Change Phase) ====================
+  // ==================== EVENT 6: START PHASE ====================
   socket.on("start_phase", async ({ roomCode, phase }) => {
-    console.log(`🔄 Changing to phase ${phase} in room ${roomCode}`);
+    console.log(
+      `ðŸ”„ Host ${socket.id} changing to phase ${phase} in room ${roomCode}`,
+    );
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -306,18 +287,17 @@ io.on("connection", (socket) => {
 
       room.phase = phase;
 
-      // If starting guessing phase (2), set timer and clear answers
       if (phase === 2) {
         room.roundStartedAt = Date.now();
-        room.answers = new Map(); // Clear previous answers
-        console.log(`⏱️ Starting 30-second timer for room ${roomCode}`);
+        room.answers = new Map();
+        console.log(`â±ï¸ Starting 30-second timer for room ${roomCode}`);
       }
 
       await room.save();
       io.to(roomCode).emit("room_updated", room);
-      console.log(`✅ Phase changed to ${phase} in room ${roomCode}`);
+      console.log(`âœ… Phase changed to ${phase} in room ${roomCode}`);
     } catch (error) {
-      console.error("❌ Error changing phase:", error);
+      console.error("âŒ Error changing phase:", error);
       socket.emit("error", { message: "Failed to change phase" });
     }
   });
@@ -325,7 +305,7 @@ io.on("connection", (socket) => {
   // ==================== EVENT 7: SUBMIT GUESS ====================
   socket.on("submit_guess", async ({ roomCode, playerName, guess }) => {
     console.log(
-      `🎯 Player ${playerName} submitted guess: ${guess} in room ${roomCode}`,
+      `ðŸŽ¯ Player "${playerName}" submitted guess: ${guess} in room ${roomCode}`,
     );
 
     try {
@@ -347,39 +327,34 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Check if player already submitted
       if (room.answers.has(playerName)) {
         socket.emit("error", { message: "You have already submitted a guess" });
         return;
       }
 
-      // Store answer
       room.answers.set(playerName, guess);
       await room.save();
 
-      // Check if all players answered
       const allAnswered = room.players.every((p) => room.answers.has(p.name));
 
       if (allAnswered) {
-        console.log(
-          `✅ All players answered in room ${roomCode}, auto-advancing to phase 3`,
-        );
-        room.phase = 3; // Auto-advance to set answer phase
+        console.log(`âœ… All players answered in room ${roomCode}`);
+        room.phase = 3;
         await room.save();
       }
 
       io.to(roomCode).emit("room_updated", room);
-      console.log(`✅ Guess submitted by ${playerName} in room ${roomCode}`);
+      console.log(`âœ… Guess submitted by "${playerName}" in room ${roomCode}`);
     } catch (error) {
-      console.error("❌ Error submitting guess:", error);
+      console.error("âŒ Error submitting guess:", error);
       socket.emit("error", { message: "Failed to submit guess" });
     }
   });
 
-  // ==================== EVENT 8: SET ANSWER (Calculate Scores) ====================
+  // ==================== EVENT 8: SET ANSWER ====================
   socket.on("set_answer", async ({ roomCode, correctAnswer }) => {
     console.log(
-      `✅ Setting correct answer: ${correctAnswer} in room ${roomCode}`,
+      `ðŸ“Š Host ${socket.id} setting answer: ${correctAnswer} in room ${roomCode}`,
     );
 
     try {
@@ -397,7 +372,7 @@ io.on("connection", (socket) => {
 
       room.correctAnswer = correctAnswer;
 
-      // ========== SCORE CALCULATION ==========
+      // Score calculation
       const currentQuestion = room.questions[room.currentQuestionIndex];
       const maxPoints = 1000;
       const sigma = 0.2;
@@ -405,7 +380,7 @@ io.on("connection", (socket) => {
       const rangeMax = currentQuestion.rangeMax;
       const maxDistance = rangeMax - rangeMin;
 
-      console.log(`📊 Calculating scores for room ${roomCode}...`);
+      console.log(`ðŸ“Š Calculating scores for room ${roomCode}...`);
 
       for (const player of room.players) {
         const guess = room.answers.get(player.name);
@@ -413,34 +388,33 @@ io.on("connection", (socket) => {
         if (guess !== undefined) {
           const distance = Math.abs(correctAnswer - guess);
           const normalizedDistance = distance / maxDistance;
-
-          // Gaussian scoring formula
           const points =
             maxPoints * Math.exp(-(normalizedDistance ** 2) / (2 * sigma ** 2));
-
           const roundedPoints = Math.max(0, Math.round(points));
           player.score += roundedPoints;
 
           console.log(
-            `   ${player.name}: guess=${guess}, distance=${distance}, points=+${roundedPoints}, total=${player.score}`,
+            `   ${player.name}: guess=${guess}, points=+${roundedPoints}, total=${player.score}`,
           );
         }
       }
 
-      room.phase = 4; // Move to leaderboard phase
+      room.phase = 4;
       await room.save();
 
       io.to(roomCode).emit("room_updated", room);
-      console.log(`✅ Scores calculated and updated for room ${roomCode}`);
+      console.log(`âœ… Scores calculated for room ${roomCode}`);
     } catch (error) {
-      console.error("❌ Error setting answer:", error);
+      console.error("âŒ Error setting answer:", error);
       socket.emit("error", { message: "Failed to set answer" });
     }
   });
 
   // ==================== EVENT 9: NEXT QUESTION ====================
   socket.on("next_question", async ({ roomCode }) => {
-    console.log(`⏭️ Moving to next question in room ${roomCode}`);
+    console.log(
+      `â­ï¸ Host ${socket.id} moving to next question in room ${roomCode}`,
+    );
 
     try {
       const room = await Room.findOne({ roomCode });
@@ -457,62 +431,56 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Check if there are more questions
       if (room.currentQuestionIndex + 1 < room.questions.length) {
         room.currentQuestionIndex += 1;
-        room.phase = 1; // Back to present question phase
-        room.answers = new Map(); // Clear answers
+        room.phase = 1;
+        room.answers = new Map();
         room.correctAnswer = null;
         console.log(
-          `✅ Moving to question ${room.currentQuestionIndex + 1} in room ${roomCode}`,
+          `âœ… Moving to question ${room.currentQuestionIndex + 1} in room ${roomCode}`,
         );
       } else {
-        // No more questions - game ended
-        room.phase = 5; // Game end phase
-        console.log(`🏁 Game ended in room ${roomCode}`);
+        room.phase = 5;
+        console.log(`ðŸ Game ended in room ${roomCode}`);
       }
 
       await room.save();
       io.to(roomCode).emit("room_updated", room);
     } catch (error) {
-      console.error("❌ Error moving to next question:", error);
+      console.error("âŒ Error moving to next question:", error);
       socket.emit("error", { message: "Failed to move to next question" });
     }
   });
 
   // ==================== DISCONNECT ====================
   socket.on("disconnect", () => {
-    console.log("👋 User disconnected:", socket.id);
+    console.log("ðŸ‘‹ User disconnected:", socket.id);
   });
 });
 
-// Optional: Clean up expired rooms periodically (but keep admin room)
+// Clean up expired rooms periodically
 setInterval(
   async () => {
     try {
       const result = await Room.deleteMany({
         expiresAt: { $lt: new Date() },
-        roomCode: { $ne: ADMIN_ROOM_CODE }, // Don't delete admin room
       });
       if (result.deletedCount > 0) {
-        console.log(`🧹 Cleaned up ${result.deletedCount} expired room(s)`);
+        console.log(`ðŸ§¹ Cleaned up ${result.deletedCount} expired room(s)`);
       }
     } catch (error) {
-      console.error("❌ Error cleaning up rooms:", error);
+      console.error("âŒ Error cleaning up rooms:", error);
     }
   },
   60 * 60 * 1000,
-); // Every hour
+);
 
 // Start server
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Socket.io ready for connections`);
+  console.log(`ðŸš€ Server running on port ${PORT}`);
+  console.log(`ðŸ“¡ Socket.io ready for connections`);
   console.log(
-    `🌐 Accepting connections from: ${process.env.FRONTEND_URL || "http://localhost:3000"}`,
-  );
-  console.log(
-    `🔑 Admin room code: ${ADMIN_ROOM_CODE} (creates guessing game as host)`,
+    `ðŸŒ Accepting connections from: ${process.env.FRONTEND_URL || "http://localhost:3000"}`,
   );
 });

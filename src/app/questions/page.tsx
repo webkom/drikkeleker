@@ -5,7 +5,7 @@ import BeerContainer from "@/components/beer/beer-container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 

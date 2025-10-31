@@ -8,11 +8,11 @@ import { ArrowRight, Plus, Users } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import Popup from "@/app/game-room/lobby/Popup";
+import Popup from "@/components/lobby/Popup";
 import { motion } from "framer-motion";
 
 interface LobbyDefaultProps {
-  onStartProTransition: () => void; // A function to call when the secret code is entered
+  onStartProTransition: () => void;
 }
 
 const generateRoomCode = () => {
@@ -30,7 +30,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
 
   useEffect(() => {
     const newSocket = io("https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev");
-    // ... socket logic for the regular lobby
+
     newSocket.on("room_created", (data) => {
       if (data.success) router.push(`/game-room/${data.roomCode}`);
       else {
@@ -64,7 +64,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     if (!roomCode.trim() || roomCode.length !== 6)
       return setError("Skriv inn en gyldig kode");
     if (roomCode.trim() === "676767") {
-      onStartProTransition(); // Tell the parent page to start the animation!
+      onStartProTransition();
       return;
     }
     if (!socket) return;

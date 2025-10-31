@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 import FoamWave from "@/components/foamwave/foamwave";
-import Footer from "@/components/footer";
+import Footer from "@/components/shared/footer";
 
 export default function Home() {
   return (

@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import BeerContainer from "@/components/beer/beer-container";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
 import { AnimatePresence } from "framer-motion";
 
 // Import all the necessary components
 import BubbleTransition from "@/components/beer/BubbleTransition";
-import LobbyPro from "@/app/game-room/lobby/LobbyPro";
+import LobbyPro from "@/components/lobby/LobbyPro";
 import LobbyRegular from "@/components/lobby/LobbyDefault";
 
 type LobbyMode = "default" | "pro";

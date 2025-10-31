@@ -12,7 +12,7 @@ import BackButton from "@/components/back-button";
 import { useTimer } from "react-timer-hook";
 import { DRIKKELEK_URL } from "@/types/constants";
 import PlayButton from "@/app/six-minutes/PlayButton";
-import Footer from "@/components/footer";
+import Footer from "@/components/shared/footer";
 import { lilita } from "@/lib/fonts";
 import CardFace from "@/app/six-minutes/CardFace";
 import {

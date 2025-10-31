@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Edit2, Save, X } from "lucide-react";
+import { Plus, Edit2, Save, X, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Question {
   text: string;
@@ -39,31 +40,25 @@ export default function QuestionManager({
 
   const handleAddQuestion = () => {
     setError("");
-
-    if (!newQuestion.text.trim()) {
-      setError("Question cannot be empty");
-      return;
-    }
-
+    if (!newQuestion.text.trim())
+      return setError("Question text cannot be empty.");
     const min = Number(newQuestion.rangeMin);
     const max = Number(newQuestion.rangeMax);
-
-    if (isNaN(min) || isNaN(max)) {
-      setError("Min and max must be numbers");
-      return;
-    }
-
-    if (min >= max) {
-      setError("Min must be less than max");
-      return;
-    }
+    if (
+      isNaN(min) ||
+      isNaN(max) ||
+      newQuestion.rangeMin === "" ||
+      newQuestion.rangeMax === ""
+    )
+      return setError("Min and max values must be numbers.");
+    if (min >= max)
+      return setError("The 'Min' value must be less than the 'Max' value.");
 
     onAddQuestion({
       text: newQuestion.text.trim(),
       rangeMin: min,
       rangeMax: max,
     });
-
     setNewQuestion({ text: "", rangeMin: "", rangeMax: "" });
   };
 
@@ -79,60 +74,56 @@ export default function QuestionManager({
 
   const handleSaveEdit = () => {
     setError("");
-
-    if (!editQuestion.text.trim()) {
-      setError("Question cannot be empty");
-      return;
-    }
-
+    if (!editQuestion.text.trim())
+      return setError("Question text cannot be empty.");
     const min = Number(editQuestion.rangeMin);
     const max = Number(editQuestion.rangeMax);
-
-    if (isNaN(min) || isNaN(max)) {
-      setError("Min and max must be numbers");
-      return;
-    }
-
-    if (min >= max) {
-      setError("Min must be less than max");
-      return;
-    }
+    if (isNaN(min) || isNaN(max))
+      return setError("Min and max values must be numbers.");
+    if (min >= max)
+      return setError("The 'Min' value must be less than the 'Max' value.");
 
     onUpdateQuestion(editIndex!, {
       text: editQuestion.text.trim(),
       rangeMin: min,
       rangeMax: max,
     });
-
     setEditIndex(null);
-    setEditQuestion({ text: "", rangeMin: "", rangeMax: "" });
   };
 
   const handleCancelEdit = () => {
     setEditIndex(null);
-    setEditQuestion({ text: "", rangeMin: "", rangeMax: "" });
     setError("");
   };
 
   return (
-    <Card className="bg-white/95">
-      <CardHeader>
+    <Card className="bg-white/95 w-full">
+      <CardHeader
+        className="cursor-pointer select-none"
+        onClick={() => setShowQuestions(!showQuestions)}
+      >
         <CardTitle className="flex items-center justify-between">
-          <span>Questions ({questions.length})</span>
+          <span className={`${lilita.className} text-2xl text-gray-800`}>
+            Manage Questions ({questions.length})
+          </span>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowQuestions(!showQuestions)}
+            className="h-8 w-8 p-0 rounded-full"
           >
-            {showQuestions ? "Hide" : "Show"}
+            {showQuestions ? (
+              <ChevronUp size={20} />
+            ) : (
+              <ChevronDown size={20} />
+            )}
           </Button>
         </CardTitle>
       </CardHeader>
+
       {showQuestions && (
         <CardContent className="space-y-4">
-          {/* Questions List */}
           {questions.length > 0 && (
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-4 max-h-60 overflow-y-auto pr-2">
               {questions.map((q, index) => (
                 <div
                   key={index}
@@ -150,7 +141,6 @@ export default function QuestionManager({
                           })
                         }
                         placeholder="Question text"
-                        className="w-full"
                       />
                       <div className="flex gap-2">
                         <Input
@@ -163,7 +153,6 @@ export default function QuestionManager({
                             })
                           }
                           placeholder="Min"
-                          className="w-1/2"
                         />
                         <Input
                           type="number"
@@ -175,7 +164,6 @@ export default function QuestionManager({
                             })
                           }
                           placeholder="Max"
-                          className="w-1/2"
                         />
                       </div>
                       <div className="flex gap-2">
@@ -184,8 +172,7 @@ export default function QuestionManager({
                           onClick={handleSaveEdit}
                           className="flex-1 bg-green-500 hover:bg-green-600"
                         >
-                          <Save className="w-4 h-4 mr-1" />
-                          Save
+                          <Save className="w-4 h-4 mr-1" /> Save
                         </Button>
                         <Button
                           size="sm"
@@ -193,14 +180,13 @@ export default function QuestionManager({
                           onClick={handleCancelEdit}
                           className="flex-1"
                         >
-                          <X className="w-4 h-4 mr-1" />
-                          Cancel
+                          <X className="w-4 h-4 mr-1" /> Cancel
                         </Button>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                      <div className="flex-1 text-left">
                         <p className="font-medium text-gray-800">{q.text}</p>
                         <p className="text-sm text-gray-600">
                           Range: {q.rangeMin} - {q.rangeMax}
@@ -220,17 +206,17 @@ export default function QuestionManager({
             </div>
           )}
 
-          {/* Add New Question */}
           <div className="border-t border-gray-200 pt-4 space-y-3">
-            <h4 className="font-semibold text-gray-700">Add New Question</h4>
+            <h4 className="font-semibold text-gray-700 text-left">
+              Add New Question
+            </h4>
             <Input
               type="text"
-              placeholder="Question text"
+              placeholder="E.g., How many countries are in Europe?"
               value={newQuestion.text}
               onChange={(e) =>
                 setNewQuestion({ ...newQuestion, text: e.target.value })
               }
-              className="w-full"
             />
             <div className="flex gap-2">
               <Input
@@ -240,7 +226,6 @@ export default function QuestionManager({
                 onChange={(e) =>
                   setNewQuestion({ ...newQuestion, rangeMin: e.target.value })
                 }
-                className="w-1/2"
               />
               <Input
                 type="number"
@@ -249,15 +234,13 @@ export default function QuestionManager({
                 onChange={(e) =>
                   setNewQuestion({ ...newQuestion, rangeMax: e.target.value })
                 }
-                className="w-1/2"
               />
             </div>
             <Button
               onClick={handleAddQuestion}
-              className="w-full bg-violet-500 hover:bg-violet-600"
+              className="w-full bg-violet-500 hover:bg-violet-600 h-12 text-md"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Question
+              <Plus className="w-4 h-4 mr-2" /> Add Question
             </Button>
             {error && (
               <div className="p-2 bg-red-100 border border-red-400 text-red-700 text-sm rounded">

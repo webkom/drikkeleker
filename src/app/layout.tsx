@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SocketProvider } from "@/context/SocketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default function RootLayout({
           src="https://analytics.webkom.dev/js/plausible.js"
         />
       </head>
-      <body className="bg-white">{children}</body>
+      <body className="bg-white">
+        <SocketProvider>{children}</SocketProvider>
+      </body>
     </html>
   );
 }

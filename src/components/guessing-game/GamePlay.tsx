@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import HostControls from "./HostControls";
 import PlayerControls from "./PlayerControls";
 import Leaderboard from "./Leaderboard";
-import Timer from "@/components/Timer";
+import Timer from "@/components/shared/Timer";
 import PlayersList from "./PlayersList";
 
 interface Room {

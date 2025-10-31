@@ -1,53 +1,202 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useGameSocket } from "./hooks/useGameSocket";
-import ChallengeGame from "@/app/game-room/[roomCode]/versions/viljens-drikkeleker/ChallengeGame";
-import GuessingGame from "@/app/game-room/[roomCode]/versions/viljens-pro/GuessingGame";
+import { use, useState, useEffect } from "react";
+import { lilita } from "@/lib/fonts";
+import { useGameSocket } from "@/hooks/useGameSocket";
+import RoomLobby from "@/components/guessing-game/RoomLobby";
+import GamePlay from "@/components/guessing-game/GamePlay";
+import BeerContainer from "@/components/beer/beer-container";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
-export default function GameRoomPage() {
-  const { roomCode } = useParams();
-  const [loading, setLoading] = useState(true);
-  const { room, isConnected } = useGameSocket(roomCode as string);
+export default function GameRoomPage({
+  params,
+}: {
+  params: Promise<{ roomCode: string }>;
+}) {
+  const { roomCode } = use(params);
 
+  const {
+    socket,
+    room,
+    isHost,
+    isConnected,
+    error,
+    playerName,
+    joinRoom,
+    addQuestion,
+    updateQuestion,
+    startGame,
+    startPhase,
+    submitGuess,
+    setCorrectAnswer,
+    nextQuestion,
+  } = useGameSocket(roomCode);
+
+  const [inputName, setInputName] = useState("");
+  const [hasJoinedAsPlayer, setHasJoinedAsPlayer] = useState(false);
+
+  // Check if we're a returning player
   useEffect(() => {
-    if (room) {
-      setLoading(false);
+    const storedName = sessionStorage.getItem(`playerName_${roomCode}`);
+    if (storedName && room) {
+      setHasJoinedAsPlayer(true);
     }
-  }, [room]);
+  }, [roomCode, room]);
 
-  if (!isConnected || loading) {
+  const handleJoinRoom = () => {
+    if (inputName.trim()) {
+      joinRoom(inputName.trim());
+      setHasJoinedAsPlayer(true);
+    }
+  };
+
+  // Loading state
+  if (!isConnected) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-violet-500 to-purple-600">
-        <div className="text-white text-2xl">Connecting to room...</div>
-      </div>
+      <main className="h-screen">
+        <BeerContainer color="violet">
+          <div className="flex flex-col items-center justify-center h-full text-white text-2xl gap-4">
+            <Loader2 className="w-12 h-12 animate-spin" />
+            Connecting to Server...
+          </div>
+        </BeerContainer>
+      </main>
     );
   }
 
+  // Waiting for room data
   if (!room) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-500 to-pink-600">
-        <div className="text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">Room not found</h2>
-          <p className="text-xl">The room code {roomCode} does not exist.</p>
-        </div>
-      </div>
+      <main className="h-screen">
+        <BeerContainer color="violet">
+          <div className="flex flex-col items-center justify-center h-full text-white text-2xl gap-4">
+            <Loader2 className="w-12 h-12 animate-spin" />
+            Loading Room...
+          </div>
+        </BeerContainer>
+      </main>
     );
   }
 
-  // Route to correct game based on game type
-  if (room.gameType === "challenges") {
-    return <ChallengeGame roomCode={roomCode as string} />;
+  // HOST VIEW - Goes straight to lobby/game
+  if (isHost) {
+    return (
+      <main className="h-screen">
+        <BackButton
+          href="/game-room/lobby"
+          className="absolute top-4 left-4 z-10"
+        />
+        <BeerContainer color="violet" className="overflow-y-auto">
+          {!room.gameStarted ? (
+            <RoomLobby
+              room={room}
+              isHost={true}
+              playerName="Host"
+              onAddQuestion={addQuestion}
+              onUpdateQuestion={updateQuestion}
+              onStartGame={startGame}
+              error={error}
+            />
+          ) : (
+            <GamePlay
+              room={room}
+              isHost={true}
+              playerName="Host"
+              onStartPhase={startPhase}
+              onSubmitGuess={submitGuess}
+              onSetCorrectAnswer={setCorrectAnswer}
+              onNextQuestion={nextQuestion}
+              error={error}
+            />
+          )}
+          <Footer />
+        </BeerContainer>
+      </main>
+    );
   }
 
-  if (room.gameType === "guessing") {
-    return <GuessingGame roomCode={roomCode as string} />;
+  // PLAYER VIEW - Need name first
+  if (!hasJoinedAsPlayer || !playerName) {
+    return (
+      <main className="h-screen">
+        <BackButton
+          href="/game-room/lobby"
+          className="absolute top-4 left-4 z-10"
+        />
+        <BeerContainer color="violet">
+          <div className="flex flex-col items-center justify-center h-full px-4">
+            <h1
+              className={`${lilita.className} text-5xl text-white mb-8 text-center`}
+            >
+              Join Room: {roomCode}
+            </h1>
+            <div className="bg-white rounded-xl p-6 shadow-lg max-w-sm w-full">
+              <Input
+                type="text"
+                placeholder="Enter your name"
+                value={inputName}
+                onChange={(e) => setInputName(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleJoinRoom()}
+                className="w-full p-3 border-gray-300 rounded-lg mb-4 text-lg text-center h-14"
+                maxLength={20}
+                autoFocus
+              />
+              <Button
+                onClick={handleJoinRoom}
+                disabled={!inputName.trim()}
+                className="w-full bg-violet-500 hover:bg-violet-600 disabled:bg-gray-400 text-white font-bold py-3 h-12 rounded-lg text-lg"
+              >
+                Join Game
+              </Button>
+              {error && (
+                <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 text-sm rounded">
+                  {error}
+                </div>
+              )}
+            </div>
+          </div>
+          <Footer />
+        </BeerContainer>
+      </main>
+    );
   }
 
+  // PLAYER VIEW - After joining with name
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-white text-2xl">Unknown game type</div>
-    </div>
+    <main className="h-screen">
+      <BackButton
+        href="/game-room/lobby"
+        className="absolute top-4 left-4 z-10"
+      />
+      <BeerContainer color="violet" className="overflow-y-auto">
+        {!room.gameStarted ? (
+          <RoomLobby
+            room={room}
+            isHost={false}
+            playerName={playerName}
+            onAddQuestion={addQuestion}
+            onUpdateQuestion={updateQuestion}
+            onStartGame={startGame}
+            error={error}
+          />
+        ) : (
+          <GamePlay
+            room={room}
+            isHost={false}
+            playerName={playerName}
+            onStartPhase={startPhase}
+            onSubmitGuess={submitGuess}
+            onSetCorrectAnswer={setCorrectAnswer}
+            onNextQuestion={nextQuestion}
+            error={error}
+          />
+        )}
+        <Footer />
+      </BeerContainer>
+    </main>
   );
 }

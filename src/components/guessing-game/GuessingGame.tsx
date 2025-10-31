@@ -5,8 +5,8 @@ import { useGameSocket } from "../../hooks/useGameSocket";
 import RoomLobby from "./RoomLobby";
 import GamePlay from "./GamePlay";
 import BeerContainer from "@/components/beer/beer-container";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
 import { lilita } from "@/lib/fonts";
 
 interface GuessingGameProps {
@@ -37,6 +37,7 @@ export default function GameRoomPage({
   } = useGameSocket(roomCode);
 
   const [hasJoined, setHasJoined] = useState(false);
+  and;
   const [inputName, setInputName] = useState("");
 
   // Check if player has already joined (from session storage)
@@ -50,6 +51,17 @@ export default function GameRoomPage({
       }
     }
   }, [roomCode, room]);
+  // In src/components/guessing-game/GuessingGame.tsx
+  // Add this useEffect after the existing session storage check (around line 47):
+
+  useEffect(() => {
+    if (isHost && room) {
+      // Host is already "in" the room, skip the join form
+      setHasJoined(true);
+      // Optionally set a default name for the host
+      setInputName("Host");
+    }
+  }, [isHost, room]);
 
   const handleJoinRoom = () => {
     if (inputName.trim()) {
