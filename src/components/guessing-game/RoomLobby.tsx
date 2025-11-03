@@ -74,7 +74,7 @@ export default function RoomLobby({
       <div className="w-full max-w-4xl space-y-6">
         <Card className="bg-white/95">
           <CardHeader>
-            <CardTitle className="text-2xl">Room Code</CardTitle>
+            <CardTitle className="text-2xl">Kode</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center justify-center gap-4">
             <div className="text-6xl font-mono font-bold text-violet-600 tracking-widest">
@@ -101,7 +101,7 @@ export default function RoomLobby({
               <span>Players ({room.players.length})</span>
               {isHost && (
                 <span className="text-sm text-violet-600 font-normal">
-                  👑 You are the host
+                  👑 Host
                 </span>
               )}
             </CardTitle>

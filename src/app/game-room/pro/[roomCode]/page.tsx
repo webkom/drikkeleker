@@ -11,6 +11,7 @@ import Footer from "@/components/shared/footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import LoadingScreen from "@/components/beer/loading-screen";
 
 export default function GameRoomPage({
   params,
@@ -54,31 +55,16 @@ export default function GameRoomPage({
     }
   };
 
-  // Loading state
-  if (!isConnected) {
+   if (!isConnected) {
     return (
-      <main className="h-screen">
-        <BeerContainer color="violet">
-          <div className="flex flex-col items-center justify-center h-full text-white text-2xl gap-4">
-            <Loader2 className="w-12 h-12 animate-spin" />
-            Connecting to Server...
-          </div>
-        </BeerContainer>
-      </main>
+      <LoadingScreen color={"violet"}/>
     );
   }
 
   // Waiting for room data
   if (!room) {
     return (
-      <main className="h-screen">
-        <BeerContainer color="violet">
-          <div className="flex flex-col items-center justify-center h-full text-white text-2xl gap-4">
-            <Loader2 className="w-12 h-12 animate-spin" />
-            Loading Room...
-          </div>
-        </BeerContainer>
-      </main>
+     <LoadingScreen color={"violet"}/>
     );
   }
 

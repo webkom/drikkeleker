@@ -8,8 +8,8 @@ import { AnimatePresence } from "framer-motion";
 
 // Import all the necessary components
 import BubbleTransition from "@/components/beer/BubbleTransition";
-import LobbyPro from "@/components/lobby/LobbyPro";
-import LobbyRegular from "@/components/lobby/LobbyDefault";
+import LobbyPro from "@/components/lobbies/LobbyPro";
+import LobbyRegular from "@/components/lobbies/LobbyDefault";
 
 type LobbyMode = "default" | "pro";
 
