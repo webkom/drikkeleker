@@ -42,9 +42,7 @@ function emitRoomUpdated(roomDoc) {
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {})
-  .catch((err) => {
-    console.error("❌ Could not connect to MongoDB:", err);
-  });
+  .catch((err) => {});
 
 io.on("connection", (socket) => {
   socket.on("create_room", async ({ roomCode, gameType }) => {
@@ -347,6 +345,4 @@ setInterval(
 
 // Start server
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+server.listen(PORT, () => {});

@@ -2,7 +2,7 @@
 
 import DiceScene from "./DiceScene";
 import BeerContainer from "@/components/beer/beer-container";
-import BackButton from "@/components/back-button";
+import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
 import { lilita } from "@/lib/fonts";
 
