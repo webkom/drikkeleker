@@ -21,6 +21,7 @@ interface SlideContent {
     id: string | number;
     title?: string;
     content: React.ReactNode;
+    color?: Color;
 }
 
 interface CustomSwiperProps {
@@ -105,27 +106,30 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
                 watchSlidesProgress={true}
                 {...swiperOptions}
             >
-                {slides.map((slide) => (
-                    <SwiperSlide key={slide.id}>
-                        <Card
-                            className="relative overflow-hidden shadow-xl rounded-xl bg-white"
-                            style={{height: slideHeight}}
-                        >
-                            {slide.title && (
-                                <div
-                                    className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${colorClass}`}>
-                                    <p className="text-sm text-white font-medium text-center">
-                                        {slide.title}
-                                    </p>
-                                </div>
-                            )}
-                            <CardContent
-                                className="pt-14 pb-6 px-6 text-xl h-full flex items-center justify-center text-gray-900">
-                                <div>{slide.content}</div>
-                            </CardContent>
-                        </Card>
-                    </SwiperSlide>
-                ))}
+                {slides.map((slide) => {
+                    const slideColorClass = slide.color ? getColorClasses(slide.color) : colorClass;
+                    return (
+                        <SwiperSlide key={slide.id}>
+                            <Card
+                                className="relative overflow-hidden shadow-xl rounded-xl bg-white"
+                                style={{height: slideHeight}}
+                            >
+                                {slide.title && (
+                                    <div
+                                        className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${slideColorClass}`}>
+                                        <p className="text-sm text-white font-medium text-center">
+                                            {slide.title}
+                                        </p>
+                                    </div>
+                                )}
+                                <CardContent
+                                    className="pt-14 pb-6 px-6 text-xl h-full flex items-center justify-center text-gray-900">
+                                    <div>{slide.content}</div>
+                                </CardContent>
+                            </Card>
+                        </SwiperSlide>
+                    );
+                })}
             </Swiper>
         </div>
     );

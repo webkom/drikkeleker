@@ -17,6 +17,7 @@ interface LobbyDefaultProps {
 
 const generateRoomCode = () => {
     let code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Make sure we don't accidentally generate the secret PRO code
     if (code === "676767") return generateRoomCode();
     return code;
 };
@@ -27,7 +28,6 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     const [error, setError] = useState("");
     const router = useRouter();
 
-    // Use the shared socket from SocketContext
     const { socket } = useSocket();
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         const handleRoomCreated = (data: any) => {
             setIsLoading(false);
             if (data.success) {
-                // Redirect to default challenges game
+                // When creating a default room, always go to the default page
                 router.push(`/game-room/default/${data.roomCode}`);
             } else {
                 setError(data.error || "Kunne ikke lage rom");
@@ -46,8 +46,17 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         const handleRoomJoined = (data: any) => {
             setIsLoading(false);
             if (data.success) {
-                // Redirect to default challenges game
-                router.push(`/game-room/default/${data.roomCode}`);
+                // ==================== THIS IS THE FIX ====================
+                // The server tells us the gameType. We use it to navigate.
+                // This makes the lobby smart enough to handle any room code.
+                if (data.gameType === "guessing") {
+                    // If the user entered a code for a PRO game, send them there.
+                    router.push(`/game-room/pro/${data.roomCode}`);
+                } else {
+                    // Otherwise, it's a default "challenges" game.
+                    router.push(`/game-room/default/${data.roomCode}`);
+                }
+                // =======================================================
             } else {
                 setError(data.error || "Kunne ikke bli med i rom");
             }
@@ -71,7 +80,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         if (!socket) return;
         setIsLoading(true);
         setError("");
-        // Create a "challenges" game type
+        // This correctly creates a "challenges" type room
         socket.emit("create_room", {
             roomCode: generateRoomCode(),
             gameType: "challenges"
@@ -82,11 +91,13 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         if (!roomCode.trim() || roomCode.length !== 6) {
             return setError("Skriv inn en gyldig kode");
         }
-        // Check for secret Pro code
+
+        // Secret code to access PRO mode still works
         if (roomCode.trim() === "676767") {
             onStartProTransition();
             return;
         }
+
         if (!socket) return;
         setIsLoading(true);
         setError("");

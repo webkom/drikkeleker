@@ -8,6 +8,7 @@ import Footer from "@/components/shared/footer";
 import {Button} from "@/components/ui/button";
 import {ArrowLeft, ArrowRight, Flame, Users} from "lucide-react";
 import CustomSwiper from "@/components/shared/custom-swiper";
+import type {Color} from "@/lib/colors";
 
 const mild = [
     "Mild 1",
@@ -70,11 +71,17 @@ interface SpicyLevels {
     spicy: boolean;
 }
 
+interface Question {
+    text: string;
+    level: SpicyLevel;
+    isAbakus: boolean;
+}
+
 interface StoredData {
     card: number;
     levels: SpicyLevels;
     AbakusMode: boolean;
-    shuffledQuestions: string[];
+    shuffledQuestions: Question[];
     configKey: string;
     updatedAt: string;
 }
@@ -104,7 +111,7 @@ const getStoredData = (): {
     card: number;
     levels: SpicyLevels;
     AbakusMode: boolean;
-    shuffledQuestions: string[];
+    shuffledQuestions: Question[];
     configKey: string;
 } => {
     if (typeof window === "undefined") {
@@ -161,7 +168,7 @@ const NeverHaveI = () => {
     const [spicyLevels, setSpicyLevels] = useState<SpicyLevels>(defaultLevels);
     const [AbakusMode, setAbakusMode] = useState(false);
     const [currentCard, setCurrentCard] = useState(0);
-    const [shuffledQuestions, setShuffledQuestions] = useState<string[]>([]);
+    const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
     const [configKey, setConfigKey] = useState('');
     const [prevDisabled, setPrevDisabled] = useState(false);
     const [nextDisabled, setNextDisabled] = useState(false);
@@ -180,26 +187,26 @@ const NeverHaveI = () => {
 
 
 
-    const getCombinedQuestions = () => {
+    const getCombinedQuestions = (): Question[] => {
 
-        if (!spicyLevels) return ["Laster..."];
+        if (!spicyLevels) return [{text: "Laster...", level: "mild", isAbakus: false}];
 
-        let combined: string[] = [];
+        let combined: Question[] = [];
 
         if (spicyLevels.mild) {
-            combined = [...combined, ...mild];
-            if (AbakusMode) combined = [...combined, ...AbakusMild];
+            combined = [...combined, ...mild.map(text => ({text, level: "mild" as SpicyLevel, isAbakus: false}))];
+            if (AbakusMode) combined = [...combined, ...AbakusMild.map(text => ({text, level: "mild" as SpicyLevel, isAbakus: true}))];
         }
         if (spicyLevels.hot) {
-            combined = [...combined, ...hot];
-            if (AbakusMode) combined = [...combined, ...AbakusHot];
+            combined = [...combined, ...hot.map(text => ({text, level: "hot" as SpicyLevel, isAbakus: false}))];
+            if (AbakusMode) combined = [...combined, ...AbakusHot.map(text => ({text, level: "hot" as SpicyLevel, isAbakus: true}))];
         }
         if (spicyLevels.spicy) {
-            combined = [...combined, ...spicy];
-            if (AbakusMode) combined = [...combined, ...AbakusSpicy];
+            combined = [...combined, ...spicy.map(text => ({text, level: "spicy" as SpicyLevel, isAbakus: false}))];
+            if (AbakusMode) combined = [...combined, ...AbakusSpicy.map(text => ({text, level: "spicy" as SpicyLevel, isAbakus: true}))];
         }
 
-        return combined.length > 0 ? combined : ["Velg minst én kategori!"];
+        return combined.length > 0 ? combined : [{text: "Velg minst én kategori!", level: "mild", isAbakus: false}];
     };
 
 
@@ -264,7 +271,8 @@ const NeverHaveI = () => {
     const slides = currentQuestions.map((question, index) => ({
         id: `question-${index}`,
         title: `Oppgave ${index + 1} av ${currentQuestions.length}`,
-        content: question,
+        content: question.text,
+        color: question.level === "mild" ? "green" as Color : question.level === "hot" ? "orange" as Color : "rose" as Color,
     }));
 
     const handleNavigate = (index: number) => {
@@ -276,6 +284,34 @@ const NeverHaveI = () => {
         {level: "hot", label: "Hot", color: "from-orange-400 to-orange-600", flames: 2},
         {level: "spicy", label: "Spicy", color: "from-red-500 to-red-700", flames: 3},
     ];
+
+    const currentQuestion = currentQuestions[currentCard];
+    const getColorScheme = (level: SpicyLevel) => {
+        switch (level) {
+            case "mild":
+                return {
+                    gradient: "from-green-400/20 to-green-600/20",
+                    border: "border-green-500",
+                    glow: "shadow-green-500/50",
+                    header: "from-green-400 to-green-600"
+                };
+            case "hot":
+                return {
+                    gradient: "from-orange-400/20 to-orange-600/20",
+                    border: "border-orange-500",
+                    glow: "shadow-orange-500/50",
+                    header: "from-orange-400 to-orange-600"
+                };
+            case "spicy":
+                return {
+                    gradient: "from-red-400/20 to-red-600/20",
+                    border: "border-red-500",
+                    glow: "shadow-red-500/50",
+                    header: "from-red-500 to-red-700"
+                };
+        }
+    };
+    const colorScheme = currentQuestion ? getColorScheme(currentQuestion.level) : getColorScheme("mild");
 
     return (
         <main className="overflow-hidden h-screen">
@@ -298,7 +334,7 @@ const NeverHaveI = () => {
                                         transition-all duration-300 transform
                                         ${isActive
                                         ? `bg-gradient-to-br ${option.color} scale-105 shadow-lg ring-2 ring-white/50`
-                                        : "bg-white/20 hover:bg-white/30 scale-100 opacity-60 hover:opacity-100"
+                                        : "bg-black/20 hover:bg-black/30 scale-100 border-2 border-white/30 hover:border-white/50 opacity-50 hover:opacity-70"
                                     }
                                     `}
                                 >
@@ -332,7 +368,7 @@ const NeverHaveI = () => {
                                 transition-all duration-300 transform
                                 ${AbakusMode
                                 ? "bg-gradient-to-br from-purple-500 to-pink-600 scale-105 shadow-lg ring-2 ring-white/50"
-                                : "bg-white/20 hover:bg-white/30 scale-100"
+                                : "bg-black/20 hover:bg-black/30 scale-100 border-2 border-white/30 hover:border-white/50 opacity-50 hover:opacity-70"
                             }
                             `}
                         >
@@ -342,11 +378,9 @@ const NeverHaveI = () => {
                                     className={AbakusMode ? "fill-white" : "fill-white/50"}
                                 />
                                 <span>Abakus relatert</span>
-                                {AbakusMode && (
                                     <span className="ml-1 text-xs bg-white/30 px-2 py-0.5 rounded-full">
-                                        PÅ
+                                        {AbakusMode ? "På" : "Av"}
                                     </span>
-                                )}
                             </div>
                         </button>
                     </div>
@@ -357,13 +391,12 @@ const NeverHaveI = () => {
                             effect="cards"
                             currentIndex={currentCard}
                             onNavigate={handleNavigate}
-                            color="rose"
                             slideHeight="400px"
                         />
                         <div className="flex gap-2 mt-8">
                             <Button
                                 onClick={() => setValidCurrentCard(currentCard - 1)}
-                                className="bg-rose-500 hover:bg-rose-500/90 w-full group"
+                                className={`bg-gradient-to-r ${colorScheme.header} hover:opacity-90 w-full group transition-all`}
                                 disabled={prevDisabled}
                             >
                                 <ArrowLeft
@@ -374,7 +407,7 @@ const NeverHaveI = () => {
                             </Button>
                             <Button
                                 onClick={() => setValidCurrentCard(currentCard + 1)}
-                                className="bg-rose-500 hover:bg-rose-500/90 w-full group"
+                                className={`bg-gradient-to-r ${colorScheme.header} hover:opacity-90 w-full group transition-all`}
                                 disabled={nextDisabled}
                             >
                                 Neste

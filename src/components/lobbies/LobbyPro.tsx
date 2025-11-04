@@ -10,10 +10,11 @@ import ShinyText from "@/components/shared/shiny-text";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
-import { Plus, Users, Loader2, ArrowRight, UserCog } from "lucide-react";
+import { Loader2, ArrowRight, UserCog, Users } from "lucide-react";
 
-const generateRoomCode = () =>
-    Math.floor(100000 + Math.random() * 900000).toString();
+const generateRoomCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 const LobbyPro = () => {
     const [roomCode, setRoomCode] = useState("");
@@ -31,40 +32,43 @@ const LobbyPro = () => {
         const handleRoomCreated = (data: any) => {
             setIsLoading(false);
             if (data.success) {
-                // Redirect to PRO guessing game (not /default/)
-                router.push(`/game-room/${data.roomCode}`);
+                console.log("PRO room created, redirecting to:", `/game-room/pro/${data.roomCode}`);
+                router.push(`/game-room/pro/${data.roomCode}`);
             } else {
                 setError(data.error || "Could not create room");
             }
         };
 
-        const handleRoomExists = (data: any) => {
-            setIsLoading(false);
-            if (data.roomExists) {
-                setShowNameInput(true);
-            } else {
-                setError("Room not found");
-            }
-        };
-
         const handleRoomJoined = (data: any) => {
             setIsLoading(false);
-            if (data.success && data.playerName) {
-                sessionStorage.setItem(`playerName_${roomCode}`, data.playerName);
-                // Redirect to PRO guessing game (not /default/)
-                router.push(`/game-room/${roomCode}`);
-            } else if (!data.success) {
+            console.log("Room joined data:", data);
+
+            if (data.success) {
+                // Check if it's a PRO room (guessing game)
+                if (data.gameType === "guessing") {
+                    if (data.isHost) {
+                        router.push(`/game-room/pro/${roomCode || data.roomCode}`);
+                    } else if (data.playerName) {
+                        sessionStorage.setItem(`playerName_${roomCode}`, data.playerName);
+                        router.push(`/game-room/pro/${roomCode}`);
+                    } else {
+                        // Room exists, need player name
+                        setShowNameInput(true);
+                    }
+                } else {
+                    // Wrong room type
+                    setError("This is not a PRO room. Please use the default lobby.");
+                }
+            } else {
                 setError(data.error || "Could not join room");
             }
         };
 
         socket.on("room_created", handleRoomCreated);
-        socket.on("room_exists", handleRoomExists);
         socket.on("room_joined", handleRoomJoined);
 
         return () => {
             socket.off("room_created", handleRoomCreated);
-            socket.off("room_exists", handleRoomExists);
             socket.off("room_joined", handleRoomJoined);
         };
     }, [socket, router, roomCode]);
@@ -79,14 +83,14 @@ const LobbyPro = () => {
         setIsLoading(true);
         setError("");
         const newRoomCode = generateRoomCode();
-        // Create a "guessing" game type for PRO
         socket.emit("create_room", { roomCode: newRoomCode, gameType: "guessing" });
     };
 
     const handleVerifyCode = () => {
         if (!roomCode.trim() || roomCode.length !== 6) {
-            return setError("Enter a valid code");
+            return setError("Enter a valid 6-digit code");
         }
+
         if (!socket) return;
 
         setIsLoading(true);
