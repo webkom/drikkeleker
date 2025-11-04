@@ -18,7 +18,9 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ color = "amber" }) => (
             <div key={i} className="loading-bubble" />
           ))}
         </div>
-        <p className={`${lilita.className} text-2xl animate-pulse`}>Kobler til rom...</p>
+        <p className={`${lilita.className} text-2xl animate-pulse`}>
+          Kobler til rom...
+        </p>
       </div>
     </BeerContainer>
   </main>
