@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import LoadingScreen from "@/components/beer/loading-screen";
 
-// Mock data for preview mode
+
 const MOCK_PLAYERS = [
     { name: "Alice", score: 450 },
     { name: "Bob", score: 320 },
@@ -60,7 +60,7 @@ export default function GameRoomPage({
     const [previewMode, setPreviewMode] = useState<string | null>(null);
     const [mockRoom, setMockRoom] = useState<any>(null);
 
-    // Check for preview mode
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const urlParams = new URLSearchParams(window.location.search);
@@ -69,7 +69,7 @@ export default function GameRoomPage({
             if (mode && roomCode === 'PREVIEW') {
                 setPreviewMode(mode);
 
-                // Generate mock room based on preview mode
+
                 const baseMockRoom = {
                     roomCode: 'PREVIEW',
                     players: MOCK_PLAYERS,
@@ -82,7 +82,7 @@ export default function GameRoomPage({
                     gameStarted: false,
                 };
 
-                // Configure mock room based on preview mode
+
                 if (mode === 'lobby-host' || mode === 'lobby-player') {
                     setMockRoom({ ...baseMockRoom, gameStarted: false });
                 } else if (mode.startsWith('phase1')) {
@@ -123,7 +123,7 @@ export default function GameRoomPage({
                     });
                 }
 
-                // Set appropriate player name and host status based on mode
+
                 if (mode.includes('host')) {
                     setHasJoinedAsPlayer(true);
                 } else if (mode.includes('player')) {
@@ -133,7 +133,7 @@ export default function GameRoomPage({
         }
     }, [roomCode]);
 
-    // Check if we're a returning player
+
     useEffect(() => {
         if (!previewMode) {
             const storedName = sessionStorage.getItem(`playerName_${roomCode}`);
@@ -143,7 +143,7 @@ export default function GameRoomPage({
         }
     }, [roomCode, room, previewMode]);
 
-    // Host automatically bypasses join screen
+
     useEffect(() => {
         if (!previewMode && isHost && room) {
             setHasJoinedAsPlayer(true);
@@ -157,7 +157,7 @@ export default function GameRoomPage({
         }
     };
 
-    // Preview mode rendering
+
     if (previewMode && mockRoom) {
         const isHostPreview = previewMode.includes('host');
         const previewPlayerName = isHostPreview ? "Host" : "Deg";
@@ -169,7 +169,7 @@ export default function GameRoomPage({
                     className="absolute top-4 left-4 z-10"
                 />
                 <BeerContainer color="slate" className="overflow-y-auto">
-                    {/* Preview Mode Banner */}
+
                     <div className="bg-yellow-500 text-slate-900 text-center py-2 px-4 font-bold text-sm sticky top-0 z-10 shine-container">
                         FORHÅNDSVISNINGSMODUS: {previewMode.toUpperCase().replace(/-/g, ' ')}
                     </div>
@@ -193,7 +193,7 @@ export default function GameRoomPage({
         );
     }
 
-    // Loading states
+
     if (!isConnected) {
         return <LoadingScreen color="slate" />;
     }
@@ -202,7 +202,7 @@ export default function GameRoomPage({
         return <LoadingScreen color="slate" />;
     }
 
-    // HOST VIEW - Goes straight to game room
+
     if (isHost) {
         return (
             <main className="h-screen">
@@ -230,7 +230,7 @@ export default function GameRoomPage({
         );
     }
 
-    // PLAYER VIEW - Need name first
+
     if (!hasJoinedAsPlayer || !playerName) {
         return (
             <main className="h-screen">
@@ -281,7 +281,7 @@ export default function GameRoomPage({
         );
     }
 
-    // PLAYER VIEW - After joining with name
+
     return (
         <main className="h-screen">
             <BackButton

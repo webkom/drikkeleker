@@ -66,7 +66,7 @@ export default function DefaultGamePage({
     useEffect(() => {
         if (!socket || !isConnected) return;
 
-        // Join the room
+
         socket.emit("join_room", { roomCode });
 
         const handleRoomJoined = (data: any) => {
@@ -76,17 +76,15 @@ export default function DefaultGamePage({
         const handleChallengeAdded = (data: any) => {
           console.log("socket event: challenge_added", data);
 
-          // Handle both string and object formats
-          const newChallenge = typeof data.challenge === 'string'
-            ? { _id: Date.now().toString(), text: data.challenge }
-            : data.challenge;
-
           setChallenges((prev) => {
-            // Check if already exists
-            if (prev.some((c) => c._id === newChallenge._id)) {
-              return prev;
-            }
-            // Return new array (immutable update)
+            const challenge = data.challenge;
+            const challengeId = challenge._id || challenge.id || Date.now().toString();
+            const challengeText = typeof challenge === 'string' ? challenge : challenge.text;
+
+            const newChallenge = {
+              _id: challengeId,
+              text: challengeText
+            };
             return [...prev, newChallenge];
           });
         };

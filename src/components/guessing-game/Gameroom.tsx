@@ -26,7 +26,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Timer from "@/components/shared/Timer";
 import ShinyText from "@/components/shared/shiny-text";
 
-// Interfaces and main components remain unchanged...
 interface Player {
     name: string;
     score: number;
@@ -102,7 +101,7 @@ export default function GameRoom({
     );
 }
 
-// ... All components before GuessingPhase are unchanged ...
+
 function Lobby({
                    room,
                    isHost,
@@ -173,7 +172,7 @@ function Lobby({
                     <PlayersList players={room.players} currentPlayerName={playerName} />
                 </div>
 
-                {/* Question Manager - Only for Host */}
+
                 {isHost && (
                     <QuestionManager
                         questions={room.questions || []}
@@ -182,7 +181,7 @@ function Lobby({
                     />
                 )}
 
-                {/* Start Game Button */}
+
                 {isHost && (
                     <div className="space-y-3">
                         {showWarning && (
@@ -395,7 +394,7 @@ function QuestionManager({
                                     disabled={!formData.text.trim()}
                                     className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 shine-container"
                                 >
-                                    <Save size={18} className="mr-2" />
+                                    <Plus size={18} className="mr-2" />
                                     {editingIndex !== null ? "Oppdater" : "Legg til"}
                                 </Button>
                                 <Button
@@ -414,7 +413,7 @@ function QuestionManager({
             <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
                 {questions.length === 0 ? (
                     <div className="text-gray-600 bg-gray-50 p-6 rounded-2xl text-center">
-                        <p className="text-lg">Ingen spørsmål ennå. Legg til ditt første spørsmål!</p>
+                        <p className="text-lg">Ingen spørsmål ennå</p>
                     </div>
                 ) : (
                     questions.map((q, idx) => (
@@ -492,7 +491,7 @@ function GamePlay({
 
     return (
         <div className="flex flex-col items-center text-center h-full w-full px-4 py-8">
-            {/* Progress Bar */}
+
             <div className="w-full max-w-4xl mb-6">
                 <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-gray-200">
                     <div className="flex justify-between items-center mb-3">
@@ -517,7 +516,7 @@ function GamePlay({
                 </div>
             </div>
 
-            {/* Current Question Display - ONLY FOR HOST OR AFTER PHASE 1 */}
+
             {(isHost || phase !== 1) && (
                 <div className="w-full max-w-4xl mb-6">
                     <div className="bg-white rounded-3xl p-8 shadow-2xl border-2 border-yellow-400">
@@ -531,7 +530,7 @@ function GamePlay({
                 </div>
             )}
 
-            {/* Phase-specific content */}
+
             <div className="w-full max-w-4xl">
                 {phase === 1 && (
                     <QuestionIntro
@@ -604,7 +603,7 @@ function QuestionIntro({
 }) {
     return (
         <div className="space-y-6">
-            {/* Players Ready Display */}
+
             <div className="bg-white rounded-3xl p-6 shadow-2xl border-2 border-gray-200">
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-2">
                     <Users size={28} />
@@ -779,9 +778,8 @@ function GuessingPhase({
         return (
             <div className="bg-white rounded-3xl p-8 shadow-2xl border-2 border-green-400">
                 <div className="text-center space-y-6">
-                    <div className="text-6xl text-green-500">✓</div>
                     <h3 className="text-3xl font-bold text-green-600">
-                        Gjetning sendt inn!
+                        Svar mottatt
                     </h3>
                     <p className="text-xl text-gray-700">
                         Din gjetning: <span className="font-bold text-green-600">{guess}</span>
@@ -842,8 +840,8 @@ function GuessingPhase({
             {useSlider ? (
                 <div className="space-y-4">
                     <div className="relative">
-                        {/* ==================== THIS IS THE FIX ==================== */}
-                        {/* We add a lot of specific, cross-browser classes to override the thumb. */}
+
+
                         <input
                             type="range"
                             min={question.rangeMin}
@@ -866,7 +864,7 @@ function GuessingPhase({
                                 background: `linear-gradient(to right, #eab308 ${fillPercent}%, #e5e7eb ${fillPercent}%)`,
                             }}
                         />
-                        {/* ========================================================= */}
+
                     </div>
                     <div className="text-center">
                         <p className="text-5xl font-bold text-yellow-600">
@@ -909,7 +907,6 @@ function GuessingPhase({
     );
 }
 
-// ... RevealPhase, Leaderboard, and GameEnd components are unchanged ...
 function RevealPhase({
                          question,
                          players,
@@ -933,7 +930,7 @@ function RevealPhase({
 
     return (
         <div className="space-y-6">
-            {/* All Guesses */}
+
             <div className="bg-white rounded-3xl p-6 shadow-2xl border-2 border-gray-200">
                 <h3 className="text-2xl font-bold text-gray-800 mb-4">Alle gjetninger</h3>
                 <div className="grid gap-3">
@@ -1033,7 +1030,7 @@ function Leaderboard({
 
     return (
         <div className="space-y-6">
-            {/* Correct Answer */}
+
             <div className="text-center p-8 bg-white rounded-3xl border-2 border-yellow-400 shadow-2xl">
                 <h3 className="text-2xl font-bold text-yellow-600 mb-3">
                     Riktig svar
@@ -1043,7 +1040,7 @@ function Leaderboard({
                 </p>
             </div>
 
-            {/* Leaderboard */}
+
             <div className="space-y-4">
                 <h3 className="text-3xl font-bold text-white text-center">
                     {isFinalQuestion ? "Endelig stilling" : "Nåværende stilling"}
@@ -1103,7 +1100,7 @@ function Leaderboard({
                 </div>
             </div>
 
-            {/* Next Question Button */}
+
             {isHost && (
                 <div className="pt-4">
                     <Button
