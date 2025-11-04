@@ -9,8 +9,8 @@ import {
 } from "react";
 import { io, Socket } from "socket.io-client";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+const BACKEND_URL = "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev";
+// const BACKEND_URL = "https://localhost:3001"
 
 interface SocketContextType {
   socket: Socket | null;
