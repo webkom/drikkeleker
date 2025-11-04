@@ -43,7 +43,7 @@ interface Room {
   phase?: number;
   answers?: Record<string, number>;
   correctAnswer?: number | null;
-  roundStartedAt?: number;
+  roundStartedAt?: number | null;
   gameStarted: boolean;
 }
 interface GameRoomProps {
@@ -541,7 +541,7 @@ function GamePlay({
             <HostGuessingView
               players={room.players}
               answers={room.answers || {}}
-              roundStartedAt={room.roundStartedAt}
+              roundStartedAt={room.roundStartedAt??undefined}
             />
           ) : (
             <GuessingPhase
@@ -554,7 +554,7 @@ function GamePlay({
               }
               totalPlayers={room.players.length}
               error={error}
-              roundStartedAt={room.roundStartedAt}
+              roundStartedAt={room.roundStartedAt??undefined}
             />
           ))}
         {phase === 3 && (
