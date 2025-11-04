@@ -541,7 +541,7 @@ function GamePlay({
             <HostGuessingView
               players={room.players}
               answers={room.answers || {}}
-              roundStartedAt={room.roundStartedAt??undefined}
+              roundStartedAt={room.roundStartedAt ?? undefined}
             />
           ) : (
             <GuessingPhase
@@ -554,7 +554,7 @@ function GamePlay({
               }
               totalPlayers={room.players.length}
               error={error}
-              roundStartedAt={room.roundStartedAt??undefined}
+              roundStartedAt={room.roundStartedAt ?? undefined}
             />
           ))}
         {phase === 3 && (
