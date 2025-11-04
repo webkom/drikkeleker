@@ -12,9 +12,7 @@ interface BeerProps {
     | "teal"
     | "orange"
     | "violet"
-    | "slate"
-    | "rose";
-
+    | "slate";
   children?: React.ReactNode;
   className?: string;
 }
@@ -30,7 +28,6 @@ const BeerContainer = ({ children, className, color = "amber" }: BeerProps) => {
     orange: "bg-orange-200",
     violet: "bg-violet-200",
     slate: "bg-slate-200",
-    rose: "bg-rose-200",
   };
 
   return (

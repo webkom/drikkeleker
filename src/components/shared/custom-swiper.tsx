@@ -13,12 +13,15 @@ import {
 import type { SwiperProps } from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-creative";
+import "swiper/css/effect-cards";
 import { Card, CardContent } from "@/components/ui/card";
+import { Color, getColorClasses } from "@/lib/colors";
 
 interface SlideContent {
   id: string | number;
   title?: string;
   content: React.ReactNode;
+  color?: Color;
 }
 
 interface CustomSwiperProps {
@@ -43,6 +46,8 @@ interface CustomSwiperProps {
   onCardClick?: (id: string | number) => void;
   onNavigate?: (index: number) => void;
   currentIndex: number;
+  color?: Color;
+  slideHeight?: string;
 }
 
 const effectModules: Record<string, any> = {
@@ -72,8 +77,11 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
   onCardClick,
   onNavigate,
   currentIndex,
+  color = "violet",
+  slideHeight = "300px",
 }) => {
   const swiperRef = useRef<any>(null);
+  const colorClass = getColorClasses(color);
 
   useEffect(() => {
     if (swiperRef.current && swiperRef.current.activeIndex !== currentIndex) {
@@ -90,28 +98,40 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
           effect === "creative" ? creativeEffectConfig : undefined
         }
         modules={effectModules[effect] ? [effectModules[effect]] : []}
-        className="w-full h-[300px]"
+        className="w-full"
+        style={{ height: slideHeight }}
         onSlideChange={(swiper) => onNavigate && onNavigate(swiper.activeIndex)}
         initialSlide={currentIndex}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
+        watchSlidesProgress={true}
         {...swiperOptions}
       >
-        {slides.map((slide) => (
-          <SwiperSlide key={slide.id}>
-            <Card className="relative overflow-hidden h-[300px]">
-              {slide.title && (
-                <div className="absolute top-0 left-0 right-0 bg-violet-500 border-b border-violet-200 px-4 py-2 z-10">
-                  <p className="text-sm text-violet-100 font-medium text-center">
-                    {slide.title}
-                  </p>
-                </div>
-              )}
-              <CardContent className="pt-10 pb-6 px-6 text-xl h-full flex items-center justify-center">
-                <div>{slide.content}</div>
-              </CardContent>
-            </Card>
-          </SwiperSlide>
-        ))}
+        {slides.map((slide) => {
+          const slideColorClass = slide.color
+            ? getColorClasses(slide.color)
+            : colorClass;
+          return (
+            <SwiperSlide key={slide.id}>
+              <Card
+                className="relative overflow-hidden shadow-xl rounded-xl bg-white"
+                style={{ height: slideHeight }}
+              >
+                {slide.title && (
+                  <div
+                    className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${slideColorClass}`}
+                  >
+                    <p className="text-sm text-white font-medium text-center">
+                      {slide.title}
+                    </p>
+                  </div>
+                )}
+                <CardContent className="pt-14 pb-6 px-6 text-xl h-full flex items-center justify-center text-gray-900">
+                  <div>{slide.content}</div>
+                </CardContent>
+              </Card>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </div>
   );

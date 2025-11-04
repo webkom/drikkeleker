@@ -2,12 +2,12 @@
 
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import CustomSwiper from "@/components/shared/custom-swiper";
 
 const questions = [
   "Hvem blir påspandert mest på byen?",
@@ -108,18 +108,9 @@ const questions = [
   "Hvem tar seg mest på puppene?",
   "Hvem kunne hatt sugarmama/sugardaddy?",
   "Hvem blacker ut mest?",
-  "Hvem skal ta en bånnski med deg?",
+  "Hvem skal ta en bå nnski med deg?",
   "SKÅL!",
 ];
-
-interface Card {
-  id: number;
-  content: string;
-  style: {
-    transform: string;
-    transition: string;
-  };
-}
 
 interface StoredCard {
   card: number;
@@ -145,7 +136,6 @@ const getStoredCard = (): number | undefined => {
 
 const QuestionsPage = () => {
   const [currentCard, setCurrentCard] = useState(getStoredCard() || 0);
-  const [cards, setCards] = useState<Card[]>([]);
   const [prevDisabled, setPrevDisabled] = useState(false);
   const [nextDisabled, setNextDisabled] = useState(false);
 
@@ -156,27 +146,6 @@ const QuestionsPage = () => {
     setPrevDisabled(currentCard === 0);
     setNextDisabled(currentCard === questions.length - 1);
 
-    const updatedCards: Card[] = questions.map((content, index) => {
-      const relativeIndex = index - currentCard;
-      const transform =
-        relativeIndex < 0
-          ? `translate(-100vw, ${relativeIndex * 10}px)`
-          : `translate(0, ${relativeIndex * 10}px)`;
-
-      const style = {
-        transform: transform,
-        transition: "transform 0.5s",
-      };
-
-      return { id: index, content, style };
-    });
-
-    setCards(
-      updatedCards.slice(
-        currentCard === 0 ? 0 : currentCard - 1,
-        currentCard + 5,
-      ),
-    );
     localStorage.setItem(
       "current_card",
       JSON.stringify({
@@ -186,32 +155,31 @@ const QuestionsPage = () => {
     );
   }, [currentCard]);
 
+  // Convert questions to slides format for CustomSwiper
+  const slides = questions.map((question, index) => ({
+    id: index,
+    title: `Spørsmål ${index + 1}`,
+    content: question,
+  }));
+
+  const handleNavigate = (index: number) => {
+    setValidCurrentCard(index);
+  };
+
   return (
     <main className="overflow-hidden h-screen">
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="fuchsia">
         <div className="flex flex-col items-center text-center h-full">
           <h1 className={`${lilita.className} text-5xl pt-12`}>100 Spørsmål</h1>
-          <div className="w-full max-w-2xl flex flex-col grow justify-center">
-            <div className="relative h-96">
-              {cards.map((card, index) => (
-                <Card
-                  key={card.id}
-                  className="absolute cursor-pointer left-0 right-0 flex flex-col justify-center h-full bottom-12"
-                  style={{
-                    ...card.style,
-                    zIndex: -index + 5,
-                  }}
-                  onClick={() => setValidCurrentCard(card.id + 1)}
-                >
-                  <CardHeader>
-                    <CardTitle>Spørsmål {card.id + 1}</CardTitle>
-                  </CardHeader>
-                  <CardContent>{card.content}</CardContent>
-                </Card>
-              ))}
-            </div>
-            <div className="flex gap-2">
+          <div className="w-full max-w-2xl flex flex-col grow mt-20">
+            <CustomSwiper
+              slides={slides}
+              effect="cards"
+              currentIndex={currentCard}
+              onNavigate={handleNavigate}
+            />
+            <div className="flex gap-2 mt-8">
               <Button
                 onClick={() => setValidCurrentCard(currentCard - 1)}
                 className="bg-fuchsia-500 hover:bg-fuchsia-500/90 w-full group"

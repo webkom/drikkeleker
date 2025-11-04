@@ -1,4 +1,4 @@
-import Stepper, { Step } from "@/components/Stepper";
+import Stepper, { Step } from "@/components/shared/Stepper";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, X } from "lucide-react";

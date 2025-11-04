@@ -9,10 +9,11 @@ import {
   MicVocal,
   ScrollText,
   Timer,
+  ListChecks,
 } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 import FoamWave from "@/components/foamwave/foamwave";
-import Footer from "@/components/footer";
+import Footer from "@/components/shared/footer";
 
 export default function Home() {
   return (
@@ -55,6 +56,12 @@ export default function Home() {
             label="100 Spørsmål"
             href="/questions  "
           />
+          {/*<NavButton
+                        icon={<ListChecks/>}
+                        color="rose"
+                        label="Never Have I Ever"
+                        href="/never-have-i  "
+                    />*/}
           <NavButton
             icon={<Dice6 />}
             color="teal"

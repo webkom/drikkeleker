@@ -5,11 +5,11 @@ import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
 import ProgressBar from "./ProgressBar";
 import SongDetails from "./SongDetails";
-import BackButton from "@/components/back-button";
+import BackButton from "@/components/shared/back-button";
 import { useTimer } from "react-timer-hook";
 import { DRIKKELEK_URL } from "@/types/constants";
 import PlayButton from "@/app/six-minutes/PlayButton";
-import Footer from "@/components/footer";
+import Footer from "@/components/shared/footer";
 import { lilita } from "@/lib/fonts";
 import {
   AlertDialog,

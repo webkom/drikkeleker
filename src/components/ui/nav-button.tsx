@@ -1,29 +1,23 @@
+// src/components/ui/nav-button.tsx
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Color, getColorClasses } from "@/lib/colors";
 
 interface NavButtonProps {
   label: string;
   href: string;
-  color?: "blue" | "red" | "green" | "fuchsia" | "teal" | "orange" | "violet";
+  color?: Color;
   icon?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 const NavButton = ({ label, href, color, icon, children }: NavButtonProps) => {
-  const colorVariants: { [id: string]: string } = {
-    blue: "bg-blue-500 hover:bg-blue-500/90",
-    red: "bg-red-500 hover:bg-red-500/90",
-    green: "bg-green-500 hover:bg-green-500/90",
-    fuchsia: "bg-fuchsia-500 hover:bg-fuchsia-500/90",
-    teal: "bg-teal-500 hover:bg-teal-500/90",
-    orange: "bg-orange-500 hover:bg-orange-500/90",
-    violet: "bg-violet-500 hover:bg-violet-500/90",
-  };
+  const colorClass = getColorClasses(color);
 
   return (
     <Link href={href} passHref>
-      <Button className={`w-full group ${colorVariants[color!]}`} size="lg">
+      <Button className={`w-full group ${colorClass}`} size="lg">
         <div className="flex gap-4 items-center">
           {icon && icon}
           {label}

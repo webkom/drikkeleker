@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useEffect, useState, use, useCallback } from "react";
-import { Socket } from "socket.io-client";
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
-import CustomSwiper from "@/components/custom-swiper";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import CustomSwiper from "@/components/shared/custom-swiper";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
 import { ArrowRight, Play, ArrowLeft, Plus, Send } from "lucide-react";
 import BubbleDigit from "@/components/beer/bubble-digit";
-import "./room.css";
-import QuestionInput from "@/components/question-input";
+import QuestionInput from "@/components/shared/question-input";
 import { Card } from "@/components/ui/card";
+import { useSocket } from "@/context/SocketContext";
+import LoadingScreen from "@/components/beer/loading-screen";
 
 const suggestions = [
   "Peikeleik: Pek på personen som {{cursor}}",
@@ -35,12 +35,15 @@ const getDigitContainerWidth = (num: number) => {
   return digitCount * 150;
 };
 
-const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
+export default function DefaultGamePage({
+  params,
+}: {
+  params: Promise<{ roomCode: string }>;
+}) {
   const unwrappedParams = use(params);
   const roomCode = unwrappedParams.roomCode;
 
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [connected, setConnected] = useState(false);
+  const { socket, isConnected } = useSocket();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [currentCard, setCurrentCard] = useState(0);
@@ -61,63 +64,66 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   }, [challengeCount, oldNumber]);
 
   useEffect(() => {
-    const initSocket = async () => {
-      const { io } = await import("socket.io-client");
-      const newSocket = io(
-        // "http://localhost:3001",
-        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
-      );
+    if (!socket || !isConnected) return;
 
-      newSocket.on("connect", () => {
-        setConnected(true);
-        newSocket.emit("join_room", { roomCode });
-      });
+    socket.emit("join_room", { roomCode });
 
-      newSocket.on("disconnect", () => {
-        setConnected(false);
-      });
-
-      newSocket.on("room_joined", (data) => {
-        setGameStarted(data.gameStarted || false);
-      });
-
-      newSocket.on("error", () => {});
-
-      newSocket.on("challenge_added", (data) => {
-        setChallenges((prev) => {
-          if (prev.some((c) => c._id === data.challenge._id)) {
-            return prev;
-          }
-          return [...prev, data.challenge];
-        });
-      });
-
-      newSocket.on("challenge_added_mid_game", (data) => {
-        setChallenges((prev) => {
-          if (prev.some((c) => c._id === data.challenge._id)) {
-            return prev;
-          }
-          return [...prev, data.challenge];
-        });
-      });
-
-      newSocket.on("game_started", (data) => {
-        setGameStarted(true);
-        setChallenges(data.challenges);
-        setCurrentCard(0);
-      });
-
-      setSocket(newSocket);
+    const handleRoomJoined = (data: any) => {
+      setGameStarted(data.gameStarted || false);
     };
 
-    initSocket();
+    const handleChallengeAdded = (data: any) => {
+      console.log("socket event: challenge_added", data);
+
+      setChallenges((prev) => {
+        const challenge = data.challenge;
+        const challengeId =
+          challenge._id || challenge.id || Date.now().toString();
+        const challengeText =
+          typeof challenge === "string" ? challenge : challenge.text;
+
+        const newChallenge = {
+          _id: challengeId,
+          text: challengeText,
+        };
+        return [...prev, newChallenge];
+      });
+    };
+
+    const handleChallengeAddedMidGame = (data: any) => {
+      console.log("socket event: challenge_added_mid_game", data);
+
+      const newChallenge =
+        typeof data.challenge === "string"
+          ? { _id: Date.now().toString(), text: data.challenge }
+          : data.challenge;
+
+      setChallenges((prev) => {
+        if (prev.some((c) => c._id === newChallenge._id)) {
+          return prev;
+        }
+        return [...prev, newChallenge];
+      });
+    };
+
+    const handleGameStarted = (data: any) => {
+      setGameStarted(true);
+      setChallenges(data.challenges);
+      setCurrentCard(0);
+    };
+
+    socket.on("room_joined", handleRoomJoined);
+    socket.on("challenge_added", handleChallengeAdded);
+    socket.on("challenge_added_mid_game", handleChallengeAddedMidGame);
+    socket.on("game_started", handleGameStarted);
 
     return () => {
-      if (socket) {
-        socket.disconnect();
-      }
+      socket.off("room_joined", handleRoomJoined);
+      socket.off("challenge_added", handleChallengeAdded);
+      socket.off("challenge_added_mid_game", handleChallengeAddedMidGame);
+      socket.off("game_started", handleGameStarted);
     };
-  }, [roomCode]);
+  }, [socket, isConnected, roomCode]);
 
   const handleAddChallenge = useCallback(() => {
     if (!newChallenge.trim() || !socket) {
@@ -155,23 +161,8 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
   const setValidCurrentCard = (card: number) =>
     setCurrentCard(Math.min(Math.max(card, 0), challenges.length - 1));
 
-  if (!connected) {
-    return (
-      <main className="h-screen overflow-hidden">
-        <BeerContainer color="violet">
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="relative w-32 h-32 mb-8 loading-container">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="loading-bubble" />
-              ))}
-            </div>
-            <p className={`${lilita.className} text-2xl animate-pulse`}>
-              Kobler til rom...
-            </p>
-          </div>
-        </BeerContainer>
-      </main>
-    );
+  if (!isConnected) {
+    return <LoadingScreen color="violet" />;
   }
 
   return (
@@ -339,5 +330,4 @@ const RoomPage = ({ params }: { params: Promise<{ roomCode: string }> }) => {
       </BeerContainer>
     </main>
   );
-};
-export default RoomPage;
+}

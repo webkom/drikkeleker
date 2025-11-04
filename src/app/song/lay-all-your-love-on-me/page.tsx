@@ -1,6 +1,6 @@
-import Lyrics from "@/components/lyrics";
-import BackButton from "@/components/back-button";
-import Footer from "@/components/footer";
+import Lyrics from "@/components/shared/lyrics";
+import BackButton from "@/components/shared/back-button";
+import Footer from "@/components/shared/footer";
 import BeerContainer from "@/components/beer/beer-container";
 
 const layAllYourLoveOnMe = [

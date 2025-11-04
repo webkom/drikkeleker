@@ -34,11 +34,11 @@ yarn start
 ```
 
 and in the frontend:
-change the file in: src/app/game-room/[roomCode]/page.tsx
-and in src/app/lobby/page.tsx
+change the file in: src/app/game-room/[roomCode]/RoomLobby.tsx
+and in src/app/lobby/RoomLobby.tsx
 change the fetch URL to your local backend, e.g. `http://localhost:3001` (the same port as in the .env file)
 
-(Do this by commenting out line 56 in the [roomCode]/page.tsx file and uncommenting out line 56, and for the local lobby/page.tsx file you comment out 29 and uncomment 30)
+(Do this by commenting out line 56 in the [roomCode]/RoomLobby.tsx file and uncommenting out line 56, and for the local lobby/RoomLobby.tsx file you comment out 29 and uncomment 30)
 
 then in the root folder run:
 
