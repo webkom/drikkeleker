@@ -30,12 +30,13 @@ const roomSchema = new mongoose.Schema(
 		expiresAt: {
 			type: Date,
 			required: true,
-			index: { expires: '2h' } // Alternative to manual cleanup
+			index: { expires: '2h' }
 		},
 
 		// ========== GUESSING GAME SPECIFIC FIELDS ==========
 		questions: [
 			{
+				_id: false, // Don't add _id to subdocuments
 				text: String,
 				rangeMin: Number,
 				rangeMax: Number,
@@ -45,12 +46,10 @@ const roomSchema = new mongoose.Schema(
 			type: Number,
 			default: 0,
 		},
-		// Phase: 1=present question, 2=guessing, 3=set answer, 4=leaderboard, 5=game end
 		phase: {
 			type: Number,
 			default: 0,
 		},
-		// CRITICAL: Define 'answers' as a Mongoose Map.
 		answers: {
 			type: Map,
 			of: Number,
@@ -61,20 +60,21 @@ const roomSchema = new mongoose.Schema(
 			default: null,
 		},
 		roundStartedAt: {
-			type: Number, // Timestamp
+			type: Number,
 			default: null,
 		},
 
 		// ========== CHALLENGE GAME SPECIFIC FIELDS ==========
 		challenges: [
 			{
+				_id: false, // Don't add _id to subdocuments
 				text: String,
 			},
 		],
 	},
 	{
-		timestamps: true, // Adds createdAt and updatedAt
-		minimize: false, // Ensures empty objects/maps are saved
+		timestamps: true,
+		minimize: false,
 	}
 );
 

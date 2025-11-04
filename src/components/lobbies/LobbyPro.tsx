@@ -10,7 +10,7 @@ import ShinyText from "@/components/shared/shiny-text";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
-import { Loader2, ArrowRight, UserCog, Users } from "lucide-react";
+import {Loader2, ArrowRight, UserCog, Users, Eye, ChevronDown, ArrowLeft} from "lucide-react";
 
 const generateRoomCode = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -22,9 +22,32 @@ const LobbyPro = () => {
     const [showNameInput, setShowNameInput] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showPreviewDropdown, setShowPreviewDropdown] = useState(false);
     const router = useRouter();
 
     const { socket } = useSocket();
+
+    // Preview options for developers
+    const previewOptions = [
+        { id: "lobby-host", label: "Lobby - Host View" },
+        { id: "lobby-player", label: "Lobby - Player View" },
+        { id: "phase1-host", label: "Phase 1 - Host (Question Intro)" },
+        { id: "phase1-player", label: "Phase 1 - Player (Question Intro)" },
+        { id: "phase2-host", label: "Phase 2 - Host (Guessing)" },
+        { id: "phase2-player", label: "Phase 2 - Player (Guessing)" },
+        { id: "phase2-answered", label: "Phase 2 - Player (Answered)" },
+        { id: "phase3-host", label: "Phase 3 - Host (Reveal)" },
+        { id: "phase3-player", label: "Phase 3 - Player (Reveal)" },
+        { id: "phase4-host", label: "Phase 4 - Host (Leaderboard)" },
+        { id: "phase4-player", label: "Phase 4 - Player (Leaderboard)" },
+        { id: "phase5", label: "Phase 5 - Game End" },
+    ];
+
+    const handlePreviewSelect = (previewId: string) => {
+        sessionStorage.setItem('previewMode', previewId);
+        router.push(`/game-room/pro/PREVIEW?mode=${previewId}`);
+        setShowPreviewDropdown(false);
+    };
 
     useEffect(() => {
         if (!socket) return;
@@ -44,7 +67,6 @@ const LobbyPro = () => {
             console.log("Room joined data:", data);
 
             if (data.success) {
-                // Check if it's a PRO room (guessing game)
                 if (data.gameType === "guessing") {
                     if (data.isHost) {
                         router.push(`/game-room/pro/${roomCode || data.roomCode}`);
@@ -52,11 +74,9 @@ const LobbyPro = () => {
                         sessionStorage.setItem(`playerName_${roomCode}`, data.playerName);
                         router.push(`/game-room/pro/${roomCode}`);
                     } else {
-                        // Room exists, need player name
                         setShowNameInput(true);
                     }
                 } else {
-                    // Wrong room type
                     setError("This is not a PRO room. Please use the default lobby.");
                 }
             } else {
@@ -139,10 +159,61 @@ const LobbyPro = () => {
             </div>
 
             <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
+                {/* For checking out the pages */}
+                {/*<Card className="border-2 border-yellow-400">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-center gap-2 text-yellow-700">
+                            <Eye size={20} /> Developer Preview
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="relative">
+                            <Button
+                                onClick={() => setShowPreviewDropdown(!showPreviewDropdown)}
+                                className="w-full bg-yellow-500 hover:bg-yellow-600 h-12 text-lg rounded-xl flex items-center justify-between shine-container"
+                            >
+                                <span>View Game States</span>
+                                <ChevronDown
+                                    size={20}
+                                    className={`transition-transform duration-200 ${showPreviewDropdown ? 'rotate-180' : ''}`}
+                                />
+                            </Button>
+
+                            <AnimatePresence>
+                                {showPreviewDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-2xl border-2 border-yellow-400 max-h-96 overflow-y-auto"
+                                    >
+                                        <div className="p-2">
+                                            {previewOptions.map((option) => (
+                                                <button
+                                                    key={option.id}
+                                                    onClick={() => handlePreviewSelect(option.id)}
+                                                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-yellow-50 transition-all duration-200 border border-transparent hover:border-yellow-300"
+                                                >
+                                                    <div className="font-semibold text-gray-800">
+                                                        {option.label}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                        <p className="text-xs text-yellow-700 mt-2 text-center font-medium">
+                            Preview different game phases without playing
+                        </p>
+                    </CardContent>
+                </Card>*/}
+
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-center gap-2">
-                            <UserCog size={24} /> Play as host
+                            <UserCog size={24} /> Spill som host
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -159,7 +230,7 @@ const LobbyPro = () => {
                 <Card style={{ perspective: "1200px" }}>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-center gap-2">
-                            <Users size={24} /> Join as player
+                            <Users size={24} /> Bli med som spiller
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="min-h-[80px]">
@@ -207,7 +278,7 @@ const LobbyPro = () => {
                                 >
                                     <Input
                                         type="text"
-                                        placeholder="Your name"
+                                        placeholder="Brukernavn"
                                         value={playerName}
                                         onChange={(e) => {
                                             setPlayerName(e.target.value);
@@ -223,7 +294,7 @@ const LobbyPro = () => {
                                             variant="outline"
                                             className="flex-1 h-12 rounded-xl"
                                         >
-                                            Back
+                                            <ArrowLeft />
                                         </Button>
                                         <Button
                                             onClick={handleJoinWithName}

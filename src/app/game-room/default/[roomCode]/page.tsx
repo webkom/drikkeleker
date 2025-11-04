@@ -74,21 +74,36 @@ export default function DefaultGamePage({
         };
 
         const handleChallengeAdded = (data: any) => {
-            setChallenges((prev) => {
-                if (prev.some((c) => c._id === data.challenge._id)) {
-                    return prev;
-                }
-                return [...prev, data.challenge];
-            });
+          console.log("socket event: challenge_added", data);
+
+          // Handle both string and object formats
+          const newChallenge = typeof data.challenge === 'string'
+            ? { _id: Date.now().toString(), text: data.challenge }
+            : data.challenge;
+
+          setChallenges((prev) => {
+            // Check if already exists
+            if (prev.some((c) => c._id === newChallenge._id)) {
+              return prev;
+            }
+            // Return new array (immutable update)
+            return [...prev, newChallenge];
+          });
         };
 
         const handleChallengeAddedMidGame = (data: any) => {
-            setChallenges((prev) => {
-                if (prev.some((c) => c._id === data.challenge._id)) {
-                    return prev;
-                }
-                return [...prev, data.challenge];
-            });
+          console.log("socket event: challenge_added_mid_game", data);
+
+          const newChallenge = typeof data.challenge === 'string'
+            ? { _id: Date.now().toString(), text: data.challenge }
+            : data.challenge;
+
+          setChallenges((prev) => {
+            if (prev.some((c) => c._id === newChallenge._id)) {
+              return prev;
+            }
+            return [...prev, newChallenge];
+          });
         };
 
         const handleGameStarted = (data: any) => {

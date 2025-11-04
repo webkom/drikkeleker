@@ -1,14 +1,33 @@
+
+
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 
 interface TimerProps {
-  timeLeft: number;
-  maxTime: number;
+  startTime: number;
+  duration: number;
 }
 
-export default function Timer({ timeLeft, maxTime }: TimerProps) {
-  const percentage = (timeLeft / maxTime) * 100;
+export default function Timer({ startTime, duration }: TimerProps) {
+  const [timeLeft, setTimeLeft] = useState<number>(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    return Math.max(0, duration - elapsed);
+  });
+
+  useEffect(() => {
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setTimeLeft(Math.max(0, duration - elapsed));
+    };
+
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [startTime, duration]);
+
+  const percentage = (timeLeft / duration) * 100;
 
   const getColorClass = () => {
     if (timeLeft > 15) return "bg-green-500";
@@ -36,9 +55,6 @@ export default function Timer({ timeLeft, maxTime }: TimerProps) {
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <p className="text-center text-gray-600">
-        {timeLeft > 0 ? "Time remaining to submit your guess" : "Time's up!"}
-      </p>
     </div>
   );
 }

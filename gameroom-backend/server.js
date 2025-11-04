@@ -15,56 +15,39 @@ const io = new Server(server, {
 	},
 });
 
-/**
- * Helper function to safely convert a Mongoose Room document to a plain
- * JavaScript object that can be sent over the network as JSON.
- * It crucially converts the `answers` Map into a plain object.
- * @param {import("mongoose").Document} roomDoc The Mongoose document for the room.
- * @returns {object} A client-safe, plain JavaScript object.
- */
 function sanitizeRoomForEmit(roomDoc) {
 	if (!roomDoc) return null;
 	const room = roomDoc.toObject();
 
-	// This is the most critical part: Convert the server-side Map to a client-side object.
 	if (room.answers instanceof Map) {
 		room.answers = Object.fromEntries(room.answers);
 	} else {
 		room.answers = {};
 	}
 
-	// Ensure other fields have sensible defaults if they don't exist
 	room.questions = room.questions || [];
 	room.players = room.players || [];
+	// Also ensure challenges array exists for the default game
+	room.challenges = room.challenges || [];
 
 	return room;
 }
 
-/**
- * Utility to broadcast the sanitized room state to all clients in that room.
- * @param {import("mongoose").Document} roomDoc
- */
+
 function emitRoomUpdated(roomDoc) {
 	if (roomDoc) {
 		io.to(roomDoc.roomCode).emit("room_updated", sanitizeRoomForEmit(roomDoc));
 	}
 }
 
-// Connect to MongoDB
 mongoose
 	.connect(process.env.MONGO_URI)
-	.then(() => console.log("✅ MongoDB connected"))
-	.catch((err) => console.error("❌ MongoDB error:", err));
-
-// Socket.io connection handler
-io.on("connection", (socket) => {
-	console.log("👤 User connected:", socket.id);
-
-	// Log all incoming events for debugging
-	socket.onAny((event, ...args) => {
-		console.log(`📨 [${socket.id.slice(0, 6)}] Received: ${event}`, JSON.stringify(args).slice(0, 200));
+	.then(() => {})
+	.catch((err) => {
+		console.error("❌ Could not connect to MongoDB:", err);
 	});
 
+io.on("connection", (socket) => {
 	socket.on("create_room", async ({ roomCode, gameType }) => {
 		try {
 			if (await Room.findOne({ roomCode })) {
@@ -80,7 +63,6 @@ io.on("connection", (socket) => {
 			socket.join(roomCode);
 			socket.emit("room_created", { success: true, roomCode, isHost: true, gameType });
 		} catch (error) {
-			console.error("❌ Error creating room:", error);
 			socket.emit("room_created", { success: false, error: "Failed to create room" });
 		}
 	});
@@ -94,42 +76,89 @@ io.on("connection", (socket) => {
 			socket.join(roomCode);
 			const isHost = room.host === socket.id;
 
-			if (isHost) {
-				socket.emit("room_joined", {
-					success: true,
-					room: sanitizeRoomForEmit(room),
-					isHost: true,
-					gameType: room.gameType,
-					roomCode: room.roomCode
-				});
-			} else if (playerName) {
-				if (!room.players.some((p) => p.name === playerName)) {
-					room.players.push({ name: playerName, score: 0 });
-					await room.save();
-					emitRoomUpdated(room);
-				}
-				socket.emit("room_joined", {
-					success: true,
-					room: sanitizeRoomForEmit(room),
-					isHost: false,
-					playerName,
-					gameType: room.gameType,
-					roomCode: room.roomCode
-				});
-			} else {
-				socket.emit("room_joined", {
-					success: true,
-					room: sanitizeRoomForEmit(room),
-					isHost: false,
-					gameType: room.gameType,
-					roomCode: room.roomCode
-				});
+			const payload = {
+				success: true,
+				room: sanitizeRoomForEmit(room),
+				isHost,
+				gameType: room.gameType,
+				roomCode: room.roomCode,
+				...(playerName && { playerName }),
+			};
+
+			if (room.gameType === 'guessing' && !isHost && playerName && !room.players.some((p) => p.name === playerName)) {
+				room.players.push({ name: playerName, score: 0 });
+				await room.save();
+				emitRoomUpdated(room);
+				payload.room = sanitizeRoomForEmit(room);
 			}
+
+			socket.emit("room_joined", payload);
+
+			// Special handling for default game: send existing challenges one by one
+			if (room.gameType === 'challenges') {
+				room.challenges.forEach(challenge => {
+					socket.emit('challenge_added', {
+						challenge: { _id: challenge._id, text: challenge.text },
+						challengeCount: room.challenges.length
+					});
+				});
+				if (room.gameStarted) {
+					socket.emit('game_started', {
+						gameStarted: true,
+						challenges: room.challenges.map(c => ({_id: c._id, text: c.text}))
+					});
+				}
+			}
+
 		} catch (error) {
-			console.error("❌ Error joining room:", error);
 			socket.emit("room_joined", { success: false, error: "Failed to join room" });
 		}
 	});
+
+	// ==================== THIS IS THE FIX ====================
+	// This handler for the "Default Game" was missing.
+	socket.on("add_challenge", async ({ roomCode, challenge }) => {
+		try {
+			const room = await Room.findOne({ roomCode });
+
+			if (!room) {
+				return socket.emit("error", { message: "Room not found." });
+			}
+
+			// Ensure this logic only runs for the "challenges" game type
+			if (room.gameType !== "challenges") {
+				return socket.emit("error", { message: "This action is not for this game type." });
+			}
+
+			// Add the new challenge to the room's challenges array
+			room.challenges.push({ text: challenge });
+			await room.save();
+
+			// Get the newly added challenge (it's the last one in the array)
+			const newChallenge = room.challenges[room.challenges.length - 1];
+			const challengeCount = room.challenges.length;
+
+			// Prepare the payload that the frontend expects
+			const payload = {
+				challenge: {
+					_id: newChallenge._id, // Mongoose adds an _id automatically
+					text: newChallenge.text,
+				},
+				challengeCount,
+			};
+
+			// Emit the correct event back to all clients in the room
+			if (room.gameStarted) {
+				io.to(roomCode).emit("challenge_added_mid_game", payload);
+			} else {
+				io.to(roomCode).emit("challenge_added", payload);
+			}
+
+		} catch (error) {
+			socket.emit("error", { message: "Failed to add challenge." });
+		}
+	});
+	// =========================================================
 
 	socket.on("add_question", async ({ roomCode, question }) => {
 		try {
@@ -139,7 +168,7 @@ io.on("connection", (socket) => {
 				await room.save();
 				emitRoomUpdated(room);
 			}
-		} catch (e) { console.error("Error adding question:", e); }
+		} catch (e) { /* silent fail */ }
 	});
 
 	socket.on("update_question", async ({ roomCode, index, question }) => {
@@ -150,124 +179,78 @@ io.on("connection", (socket) => {
 				await room.save();
 				emitRoomUpdated(room);
 			}
-		} catch (e) { console.error("Error updating question:", e); }
+		} catch (e) { /* silent fail */ }
 	});
 
 	socket.on("start_game", async ({ roomCode }) => {
 		try {
 			const room = await Room.findOne({ roomCode });
-			console.log('🎮 START_GAME:', {
-				roomCode,
-				requesterId: socket.id,
-				hostId: room?.host,
-				isHost: socket.id === room?.host,
-				gameType: room?.gameType,
-				playerCount: room?.players?.length,
-				questionCount: room?.questions?.length,
-				currentPhase: room?.phase
-			});
+			if (!room) return;
 
-			if (room && room.host === socket.id && room.gameType === "guessing") {
+			// Logic for "guessing" game
+			if (room.gameType === "guessing" && room.host === socket.id) {
 				if (room.players.length < 2 || room.questions.length < 1) {
-					console.log('❌ Cannot start game - insufficient players or questions');
 					return socket.emit("error", { message: "Cannot start game" });
 				}
 				room.gameStarted = true;
 				room.phase = 1;
 				room.correctAnswer = null;
-				// FIX: Always treat `answers` as a Map on the server. Reset with `new Map()`.
 				room.answers = new Map();
 				await room.save();
 				emitRoomUpdated(room);
-				console.log(`✅ Game started in room ${roomCode}, phase: ${room.phase}`);
-			} else {
-				console.log('❌ Cannot start game - permission denied or wrong game type');
 			}
-		} catch (error) {
-			console.error("❌ Error starting game:", error);
-		}
+			// Logic for "challenges" game
+			else if (room.gameType === "challenges") {
+				if (room.challenges.length < 1) {
+					return socket.emit("error", { message: "Need at least 1 challenge to start" });
+				}
+				room.gameStarted = true;
+				await room.save();
+
+				const shuffled = [...room.challenges].sort(() => Math.random() - 0.5);
+				io.to(roomCode).emit("game_started", {
+					gameStarted: true,
+					challenges: shuffled.map((c) => ({_id: c._id, text: c.text})),
+				});
+			}
+
+		} catch (error) { /* silent fail */ }
 	});
 
 	socket.on("start_phase", async ({ roomCode, phase }) => {
 		try {
 			const room = await Room.findOne({ roomCode });
-			console.log('🎯 START_PHASE:', {
-				roomCode,
-				requestedPhase: phase,
-				currentPhase: room?.phase,
-				requesterId: socket.id,
-				hostId: room?.host,
-				isHost: socket.id === room?.host
-			});
-
 			if (room && room.host === socket.id) {
 				room.phase = phase;
 				if (phase === 2) {
 					room.roundStartedAt = Date.now();
-					// FIX: Reset with a new Map.
 					room.answers = new Map();
-					console.log(`⏱️  Starting guessing round for room ${roomCode}`);
 				}
 				await room.save();
 				emitRoomUpdated(room);
-				console.log(`✅ Phase updated to ${phase} in room ${roomCode}`);
-			} else {
-				console.log('❌ Cannot change phase - permission denied');
 			}
-		} catch (error) {
-			console.error("❌ Error starting phase:", error);
-		}
+		} catch (error) { /* silent fail */ }
 	});
 
 	socket.on("submit_guess", async ({ roomCode, playerName, guess }) => {
 		try {
 			const room = await Room.findOne({ roomCode });
-			if (!room || room.phase !== 2) {
-				console.log('❌ Cannot submit guess:', {
-					roomCode,
-					playerName,
-					guess,
-					roomExists: !!room,
-					currentPhase: room?.phase,
-					reason: !room ? 'room not found' : 'not in guessing phase'
-				});
-				return;
-			}
-
-			// FIX: Use Map methods `.has()` and `.set()`.
-			if (room.answers.has(playerName)) {
-				console.log(`⚠️  Player ${playerName} already submitted guess`);
-				return;
-			}
+			if (!room || room.phase !== 2 || room.answers.has(playerName)) return;
 
 			room.answers.set(playerName, guess);
-			console.log(`📝 Guess submitted:`, {
-				roomCode,
-				playerName,
-				guess,
-				totalAnswers: room.answers.size,
-				totalPlayers: room.players.length
-			});
 
-			const allAnswered = room.players.every((p) => room.answers.has(p.name));
-			if (allAnswered) {
+			if (room.players.every((p) => room.answers.has(p.name))) {
 				room.phase = 3;
-				console.log(`✅ All players answered! Moving to phase 3`);
 			}
 			await room.save();
 			emitRoomUpdated(room);
-		} catch (error) {
-			console.error("❌ Error submitting guess:", error);
-		}
+		} catch (error) { /* silent fail */ }
 	});
 
 	socket.on("set_answer", async ({ roomCode, correctAnswer }) => {
 		try {
 			const room = await Room.findOne({ roomCode });
-			if (!room || room.host !== socket.id) {
-				console.log('❌ Cannot set answer - permission denied');
-				return;
-			}
+			if (!room || room.host !== socket.id) return;
 
 			room.correctAnswer = correctAnswer;
 			const currentQuestion = room.questions[room.currentQuestionIndex];
@@ -275,79 +258,46 @@ io.on("connection", (socket) => {
 			const sigma = 0.2;
 			const maxDistance = currentQuestion.rangeMax - currentQuestion.rangeMin;
 
-			console.log(`🎯 Setting correct answer: ${correctAnswer}`);
-			console.log(`📊 Calculating scores...`);
-
 			for (const player of room.players) {
-				// FIX: Use Map method `.get()`.
 				const guess = room.answers.get(player.name);
 				if (guess !== undefined) {
 					const distance = Math.abs(correctAnswer - guess);
 					const normalizedDistance = distance / Math.max(1, maxDistance);
 					const points = maxPoints * Math.exp(-(normalizedDistance ** 2) / (2 * sigma ** 2));
-					const roundedPoints = Math.round(points);
-					player.score += roundedPoints;
-					console.log(`  ${player.name}: guessed ${guess}, earned ${roundedPoints} points (total: ${player.score})`);
-				} else {
-					console.log(`  ${player.name}: no guess submitted`);
+					player.score += Math.round(points);
 				}
 			}
 
 			room.phase = 4;
 			await room.save();
 			emitRoomUpdated(room);
-			console.log(`✅ Scores calculated, moving to phase 4 (leaderboard)`);
-		} catch (error) {
-			console.error("❌ Error setting answer:", error);
-		}
+		} catch (error) { /* silent fail */ }
 	});
 
 	socket.on("next_question", async ({ roomCode }) => {
 		try {
 			const room = await Room.findOne({ roomCode });
-			if (!room || room.host !== socket.id) {
-				console.log('❌ Cannot move to next question - permission denied');
-				return;
-			}
-
-			console.log(`➡️  Next question requested:`, {
-				currentIndex: room.currentQuestionIndex,
-				totalQuestions: room.questions.length
-			});
+			if (!room || room.host !== socket.id) return;
 
 			if (room.currentQuestionIndex + 1 < room.questions.length) {
 				room.currentQuestionIndex += 1;
 				room.phase = 1;
-				// FIX: Reset with a new Map.
 				room.answers = new Map();
 				room.correctAnswer = null;
-				console.log(`✅ Moving to question ${room.currentQuestionIndex + 1}, phase reset to 1`);
 			} else {
-				room.phase = 5; // Game End
-				console.log(`🏁 Game ended - no more questions`);
+				room.phase = 5;
 			}
 			await room.save();
 			emitRoomUpdated(room);
-		} catch (error) {
-			console.error("❌ Error moving to next question:", error);
-		}
-	});
-
-	socket.on("disconnect", () => {
-		console.log("👋 User disconnected:", socket.id);
+		} catch (error) { /* silent fail */ }
 	});
 });
 
 // Clean up expired rooms periodically
 setInterval(async () => {
 	try {
-		const result = await Room.deleteMany({ expiresAt: { $lt: new Date() } });
-		if (result.deletedCount > 0) {
-			console.log(`🧹 Cleaned up ${result.deletedCount} expired room(s)`);
-		}
-	} catch (error) {
-		console.error("❌ Error cleaning up rooms:", error);
-	}
+		await Room.deleteMany({ expiresAt: { $lt: new Date() } });
+	} catch (error) { /* silent fail */ }
 }, 60 * 60 * 1000);
 
 // Start server
