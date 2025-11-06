@@ -16,7 +16,7 @@ import { Card } from "@/components/ui/card";
 
 const suggestions = [
   "Peikeleik: Pek på personen som {{cursor}}",
-  "Kiss/Marry/Kill: {{cursor}}",
+  "Fuck/Marry/Kill: {{cursor}}",
   "Alle som har {{cursor}} må ta 5 slurker",
   "Hvis du har {{cursor}}, del ut 3 slurker",
   "Kategori: {{cursor}}",
@@ -24,7 +24,6 @@ const suggestions = [
   "Redflag, dealbreaker eller okay: {{cursor}}",
   "Ny regel resten av runden: {{cursor}}",
 ];
-
 interface Challenge {
   _id: string;
   text: string;
@@ -62,7 +61,7 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
         // "http://localhost:3001",
-        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
+        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev"
       );
 
       newSocket.on("connect", () => {
