@@ -440,13 +440,13 @@ const NeverHaveI = () => {
   }[] = [
     {
       level: "mild",
-      label: "Mild",
+      label: "",
       color: "from-green-400 to-green-600",
       icon: <Flame size={16} className="fill-current" />,
     },
     {
       level: "hot",
-      label: "Hot",
+      label: "",
       color: "from-orange-400 to-orange-600",
       icon: (
         <>
@@ -457,7 +457,7 @@ const NeverHaveI = () => {
     },
     {
       level: "spicy",
-      label: "Spicy",
+      label: "",
       color: "from-red-500 to-red-700",
       icon: (
         <>
@@ -471,7 +471,7 @@ const NeverHaveI = () => {
       level: "abakus",
       label: "Abakus-relatert",
       color: "from-purple-500 to-pink-600",
-      icon: <Users size={16} className="fill-current" />,
+      icon: <></>,
     },
   ];
 
@@ -513,7 +513,7 @@ const NeverHaveI = () => {
     : getColorScheme("mild");
 
   return (
-    <main className="overflow-hidden h-screen">
+    <main className="overflow-auto h-screen">
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="rose">
         <div className="flex flex-col items-center text-center h-full">
@@ -521,16 +521,14 @@ const NeverHaveI = () => {
             Never Have I Ever
           </h1>
 
-          <div className="mt-8 flex gap-3 bg-white/10 backdrop-blur-sm p-2 rounded-2xl flex-wrap justify-center max-w-2xl">
+          <div className="mt-8 flex gap-3  backdrop-blur-sm p-2 rounded-2xl flex-wrap justify-center max-w-2xl">
             {spicyOptions.map((option) => {
               const isActive = spicyLevels?.[option.level] || false;
               return (
                 <button
                   key={option.level}
                   onClick={() => toggleSpicyLevel(option.level)}
-                  className={`
-                    relative px-6 py-3 rounded-xl font-semibold text-white
-                    transition-all duration-300 transform
+                  className={`relative px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 transform
                     ${
                       isActive
                         ? `bg-gradient-to-br ${option.color} scale-105 shadow-lg ring-2 ring-white/50`
@@ -538,7 +536,7 @@ const NeverHaveI = () => {
                     }
                   `}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between">
                     <div className="flex gap-0.5">{option.icon}</div>
                     <span>{option.label}</span>
                   </div>
