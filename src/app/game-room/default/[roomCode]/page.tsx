@@ -15,8 +15,8 @@ import { useSocket } from "@/context/SocketContext";
 import LoadingScreen from "@/components/beer/loading-screen";
 
 const suggestions = [
-  "Peikeleik: Pek på personen som {{cursor}}",
-  "Fuck/Marry/Kill: {{cursor}}",
+  "Peikeleik: Peik på personen som {{cursor}}",
+  "Kiss/Marry/Kill: {{cursor}}",
   "Alle som har {{cursor}} må ta 5 slurker",
   "Hvis du har {{cursor}}, del ut 3 slurker",
   "Kategori: {{cursor}}",
@@ -174,7 +174,7 @@ export default function DefaultGamePage({
             <h1
               className={`${lilita.className} text-5xl pt text-center room-code`}
             >
-              Kode: {roomCode}
+              Kode: {roomCode.toUpperCase()}
             </h1>
             {!gameStarted ? (
               <Button

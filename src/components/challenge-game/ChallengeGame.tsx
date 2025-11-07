@@ -61,7 +61,7 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
         // "http://localhost:3001",
-        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev"
+        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
       );
 
       newSocket.on("connect", () => {
