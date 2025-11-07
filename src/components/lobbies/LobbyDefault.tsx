@@ -117,6 +117,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     }
 
     if (roomCode.trim() === "676767") {
+      // Pro Room Code
       onStartProTransition();
       return;
     }

@@ -112,7 +112,6 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
             ? getColorClasses(slide.color)
             : colorClass;
 
-          // Use gradient if provided, otherwise use color class
           const headerClass = slide.gradient
             ? `bg-gradient-to-r ${slide.gradient}`
             : slideColorClass;

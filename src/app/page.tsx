@@ -60,7 +60,7 @@ export default function Home() {
             icon={<ListChecks />}
             color="rose"
             label="Never Have I Ever"
-            href="/never-have-i  "
+            href="/never-have-i"
           />
           <NavButton
             icon={<Dice6 />}

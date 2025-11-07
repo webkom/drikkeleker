@@ -15,7 +15,7 @@ import { useSocket } from "@/context/SocketContext";
 import LoadingScreen from "@/components/beer/loading-screen";
 
 const suggestions = [
-  "Peikeleik: Pek på personen som {{cursor}}",
+  "Peikeleik: Peik på personen som {{cursor}}",
   "Kiss/Marry/Kill: {{cursor}}",
   "Alle som har {{cursor}} må ta 5 slurker",
   "Hvis du har {{cursor}}, del ut 3 slurker",

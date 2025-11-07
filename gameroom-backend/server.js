@@ -27,7 +27,6 @@ function sanitizeRoomForEmit(roomDoc) {
 
   room.questions = room.questions || [];
   room.players = room.players || [];
-  // Also ensure challenges array exists for the default game
   room.challenges = room.challenges || [];
 
   return room;
@@ -47,7 +46,6 @@ mongoose
 io.on("connection", (socket) => {
   socket.on("create_room", async ({ roomCode, gameType }) => {
     try {
-      // Validate and sanitize room code
       if (!roomCode || typeof roomCode !== "string") {
         return socket.emit("room_created", {
           success: false,
@@ -69,7 +67,6 @@ io.on("connection", (socket) => {
         });
       }
 
-      // Check if room already exists (case-insensitive)
       if (await Room.findOne({ roomCode: normalizedCode })) {
         return socket.emit("room_created", {
           success: false,
@@ -101,7 +98,6 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", async ({ roomCode, playerName }) => {
     try {
-      // Normalize room code to match how it was stored
       const normalizedCode = roomCode
         ? roomCode
             .trim()
@@ -168,8 +164,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ==================== THIS IS THE FIX ====================
-  // This handler for the "Default Game" was missing.
   socket.on("add_challenge", async ({ roomCode, challenge }) => {
     try {
       const room = await Room.findOne({ roomCode });
@@ -178,22 +172,18 @@ io.on("connection", (socket) => {
         return socket.emit("error", { message: "Room not found." });
       }
 
-      // Ensure this logic only runs for the "challenges" game type
       if (room.gameType !== "challenges") {
         return socket.emit("error", {
           message: "This action is not for this game type.",
         });
       }
 
-      // Add the new challenge to the room's challenges array
       room.challenges.push({ text: challenge });
       await room.save();
 
-      // Get the newly added challenge (it's the last one in the array)
       const newChallenge = room.challenges[room.challenges.length - 1];
       const challengeCount = room.challenges.length;
 
-      // Prepare the payload that the frontend expects
       const payload = {
         challenge: {
           _id: newChallenge._id, // Mongoose adds an _id automatically
@@ -212,7 +202,6 @@ io.on("connection", (socket) => {
       socket.emit("error", { message: "Failed to add challenge." });
     }
   });
-  // =========================================================
 
   socket.on("add_question", async ({ roomCode, question }) => {
     try {
