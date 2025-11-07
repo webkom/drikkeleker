@@ -94,6 +94,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
 
     // Secret code to access PRO mode still works
     if (roomCode.trim() === "676767") {
+      // Pro Room Code
       onStartProTransition();
       return;
     }
