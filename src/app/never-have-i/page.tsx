@@ -11,69 +11,193 @@ import CustomSwiper from "@/components/shared/custom-swiper";
 import type { Color } from "@/lib/colors";
 
 const mild = [
-  "Mild 1",
-  "Mild 2",
-  "Mild 3",
-  "Mild 4",
-  "Mild 5",
-  "Mild 6",
-  "Mild 7",
-  "Mild 8",
+  "Planlagt fylla-meldinger edru",
+  "Tapt et veddemål",
+  "Brukket et ben",
+  "Vært på TV",
+  "Vært på en Tinderdate",
+  "Tatt en tatovering",
+  "Løyet til politiet",
+  "Brukt et fake-leg",
+  "Brukt noen andres tannbørste",
+  "Sovnet i offentligheten",
+  "Ledd så mye at jeg tisset på meg",
+  "Gått gjennom en annens persons meldinger",
+  "Løpt et maraton",
+  "Faket at jeg var syk for å slippe skolen",
+  "Slettet et innlegg fordi det fikk for få likes/kommentarer",
+  "Kastet mat eller drikke på noen",
+  "Sett en hel serie på en dag",
+  "Strøket på en prøve",
+  "Jukset på en prøve",
+  "Tatt alkohol fra foreldrene mine",
+  "Tatt mat fra et kjøleskap som ikke var mitt",
+  "Tisset i bassenget",
+  "Vært innlagt på sykehuset",
+  "Klippet mitt eget hår",
+  "Sovnet på nach",
+  "Fastet",
+  "Blokkert noen",
+  "Haiket",
+  "Tatt opp en haiker",
+  "Besvimt",
+  "Sovnet på fest",
+  "Vært i en slåsskamp",
+  "Stalket noen på sosiale medier",
+  "Stalket noen på Snap-map",
+  "Fått sparken",
+  "Vært en del av et rykte som ikke var sant",
+  "Grått på en fest",
+  "Grått på jobb",
+  "Dratt på jobb med hangover",
+  "Brukt over 5k på byen",
+  "Brukt over 10k på byen",
+  "Googlet meg selv",
+  "Fått fartsbot",
+  "Sovnet på vors",
+  "Blacket ut",
 ];
 
-const hot = ["Hot 1", "Hot 2", "Hot 3", "Hot 4", "Hot 5", "Hot 6"];
+const hot = [
+  "Stjålet noe",
+  "Kysset flere på en kveld",
+  "Kysset noen offentlig",
+  "Brukt noen for penger",
+  "Hatt et ons",
+  "Ghostet noen",
+  "Havnet på legevakten på grunn av fylla",
+  "Løyet om alderen min",
+  "Sendt nudes",
+  "Fått nudes",
+  "Kysset noen i regnet",
+  "Gitt noen dårlig råd med vilje",
+  "Blitt pumpet",
+  "Flørtet med en som har kjæreste",
+  "Flørtet med en 20+ år eldre",
+  "Løyet om sivilstatus",
+  "Sextet",
+  "Gått inn på noen som hadde sex",
+  "Vært i samme rom som noen som hadde sex",
+  "Vært vitne til noe kriminelt",
+  "Vært i en politibil",
+  "Blitt ghostet",
+  "Kysset en fremmed",
+  "Fått/gitt et sugemerke",
+  "Datet flere personer samtidig",
+  "Fantasert om å gå tilbake til en eks",
+  "Blitt forelsket i en venn",
+  "Danset på et bord",
+  "Datet noen bare fordi jeg kjedet meg",
+  "Flørtet for å få gratis drikke",
+  "Blitt nektet inngang på et utested",
+  "Blitt kastet ut av et utested",
+  "Mistet telefonen min på byen",
+  "Vært forelsket i to personer samtidig",
+  "Hatt en situationship",
+  "Grått over noen jeg aldri datet",
+  "Fått noen til å tro jeg var interessert uten å være det",
+  "Sjekket eksens nye kjæreste på sosiale medier",
+  "Slettet bilder for å late som noe aldri skjedde",
+  "Vært forelsket",
+  "Brukt en datingapp",
+  "Fått eller gitt en bodyshot",
+  "Kysset eksen min",
+  "Hatt et crush på noen jeg ikke burde",
+  "Kysset noen av samme kjønn",
+  'Løyet i "Jeg har aldri"',
+  "Hatt rebound",
+  "Gått tilbake til eksen",
+];
 
 const spicy = [
-  "Spicy 1",
-  "Spicy 2",
-  "Spicy 3",
-  "Spicy 4",
-  "Spicy 5",
-  "Spicy 6",
-  "Spicy 7",
+  "Nakenbadet",
+  "Brukt noen andres undertøy",
+  "Vært utro",
+  "Sagt feil navn under sex",
+  "Faket en orgasme",
+  "Hatt 69",
+  "Drukket over 60%",
+  "Gitt noen en lapdance",
+  "Fått en lapdance",
+  "Hatt trekant",
+  "Sugd på noen sine tær",
+  "Hatt sex utenfor soverommet",
+  "Hatt sex i dusjen",
+  "Våknet og ikke husket hvordan jeg kom hjem",
+  "Brukt håndjern eller bind for øynene",
+  'Hatt en "friends with benefits"',
+  "Gitt et kyss bare for å gjøre noen sjalu",
+  "Hatt sex i bilen",
+  "Prøvd rollespill",
+  "Angret på et hookup umiddelbart etterpå",
+  "Blitt med noen hjem bare fordi jeg var full",
+  "Løyet om at jeg ikke husket noe, men egentlig gjorde det",
+  "Løyet om hvor jeg var etter en kveld",
+  "Sovet over hos noen og sneket meg ut om morgenen",
+  "Fått beskjed om å være stillere",
+  "Flørtet med en venns eks",
+  "Snakket med eksen min mens jeg var med noen andre",
+  "Flashet noen",
+  "Kalt typen (eller flirt) feil navn",
+  "Kjørt brannbil (pule med mensen)",
+  "Rainbow kiss",
+  "Knulla eksen",
 ];
 
-const AbakusMild = [
-  "Abakus Mild 1",
-  "Abakus Mild 2",
-  "Abakus Mild 3",
-  "Abakus Mild 4",
-  "Abakus Mild 5",
+const abakus = [
+  "Tilbrakt en natt på kontoret",
+  "Hatt et abacrush",
+  "Kysset en abakule",
+  "Kastet opp på Abakus-arrangement",
+  "Sovnet på sofaen på kontoret",
+  "Drukket på kontoret",
+  "Spilt Mario Kart på kontoret",
+  "Møtt opp bakfull på forelesning",
+  "Gjemt meg for noen i Abakus",
+  "Stjålet fra Snackoverflow",
+  "Spist kake på kontoret",
+  "Fullført listingsløp",
+  "Kysset en i samme komite",
+  "Kysset en fadder/kysset et fadderbarn",
+  "Danset på bordet på Labamba",
+  "Blitt kastet ut fra Labamba",
+  "Vært på en bedpress bare for maten",
+  "Kjøpt en planke på Labamba",
+  "Tatt av buksene på Labamba",
+  "Spilt Ludøl",
+  "Hatt en greie for noen fra Indøk",
+  "Stjålet fra kontoret til Thilde",
+  "Vært i baris på Labamba",
+  "Fått en dalje",
+  "Tatt en lambo",
+  "Vært på en galla",
+  "Tatt av buksene på galla",
+  "Glemt en innleveringsfrist",
+  "Fått prikker",
+  "Strøket på eksamen",
+  "Blacket ut etter en kveld på Labamba",
+  "Konta en eksamen",
+  "Crusha på en i samme komite",
+  "Vært på AbaCava søndag",
 ];
 
-const AbakusHot = [
-  "Abakus Hot 1",
-  "Abakus Hot 2",
-  "Abakus Hot 3",
-  "Abakus Hot 4",
-];
-
-const AbakusSpicy = [
-  "Abakus Spicy 1",
-  "Abakus Spicy 2",
-  "Abakus Spicy 3",
-  "Abakus Spicy 4",
-  "Abakus Spicy 5",
-];
-
-type SpicyLevel = "mild" | "hot" | "spicy";
+type SpicyLevel = "mild" | "hot" | "spicy" | "abakus";
 
 interface SpicyLevels {
   mild: boolean;
   hot: boolean;
   spicy: boolean;
+  abakus: boolean;
 }
 
 interface Question {
   text: string;
   level: SpicyLevel;
-  isAbakus: boolean;
 }
 
 interface StoredData {
   card: number;
   levels: SpicyLevels;
-  AbakusMode: boolean;
   shuffledQuestions: Question[];
   configKey: string;
   updatedAt: string;
@@ -83,6 +207,7 @@ const defaultLevels: SpicyLevels = {
   mild: true,
   hot: false,
   spicy: false,
+  abakus: false,
 };
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -94,14 +219,13 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return shuffled;
 };
 
-const getConfigKey = (levels: SpicyLevels, AbakusMode: boolean): string => {
-  return `${levels.mild ? "M" : ""}${levels.hot ? "H" : ""}${levels.spicy ? "S" : ""}${AbakusMode ? "A" : ""}`;
+const getConfigKey = (levels: SpicyLevels): string => {
+  return `${levels.mild ? "M" : ""}${levels.hot ? "H" : ""}${levels.spicy ? "S" : ""}${levels.abakus ? "A" : ""}`;
 };
 
 const getStoredData = (): {
   card: number;
   levels: SpicyLevels;
-  AbakusMode: boolean;
   shuffledQuestions: Question[];
   configKey: string;
 } => {
@@ -109,7 +233,6 @@ const getStoredData = (): {
     return {
       card: 0,
       levels: { ...defaultLevels },
-      AbakusMode: false,
       shuffledQuestions: [],
       configKey: "",
     };
@@ -121,21 +244,13 @@ const getStoredData = (): {
       return {
         card: 0,
         levels: { ...defaultLevels },
-        AbakusMode: false,
         shuffledQuestions: [],
         configKey: "",
       };
     }
 
     const parsed = JSON.parse(storedData);
-    const {
-      card,
-      levels,
-      AbakusMode,
-      shuffledQuestions,
-      configKey,
-      updatedAt,
-    } = parsed;
+    const { card, levels, shuffledQuestions, configKey, updatedAt } = parsed;
 
     const storedTime = new Date(updatedAt).getTime();
     const now = new Date().getTime();
@@ -150,7 +265,6 @@ const getStoredData = (): {
       return {
         card,
         levels,
-        AbakusMode,
         shuffledQuestions,
         configKey: configKey || "",
       };
@@ -160,7 +274,6 @@ const getStoredData = (): {
   return {
     card: 0,
     levels: { ...defaultLevels },
-    AbakusMode: false,
     shuffledQuestions: [],
     configKey: "",
   };
@@ -168,7 +281,6 @@ const getStoredData = (): {
 
 const NeverHaveI = () => {
   const [spicyLevels, setSpicyLevels] = useState<SpicyLevels>(defaultLevels);
-  const [AbakusMode, setAbakusMode] = useState(false);
   const [currentCard, setCurrentCard] = useState(0);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [configKey, setConfigKey] = useState("");
@@ -180,15 +292,13 @@ const NeverHaveI = () => {
     setIsHydrated(true);
     const stored = getStoredData();
     setSpicyLevels(stored.levels);
-    setAbakusMode(stored.AbakusMode);
     setCurrentCard(stored.card);
     setShuffledQuestions(stored.shuffledQuestions);
     setConfigKey(stored.configKey);
   }, []);
 
   const getCombinedQuestions = (): Question[] => {
-    if (!spicyLevels)
-      return [{ text: "Laster...", level: "mild", isAbakus: false }];
+    if (!spicyLevels) return [{ text: "Laster...", level: "mild" }];
 
     let combined: Question[] = [];
 
@@ -198,18 +308,8 @@ const NeverHaveI = () => {
         ...mild.map((text) => ({
           text,
           level: "mild" as SpicyLevel,
-          isAbakus: false,
         })),
       ];
-      if (AbakusMode)
-        combined = [
-          ...combined,
-          ...AbakusMild.map((text) => ({
-            text,
-            level: "mild" as SpicyLevel,
-            isAbakus: true,
-          })),
-        ];
     }
     if (spicyLevels.hot) {
       combined = [
@@ -217,18 +317,8 @@ const NeverHaveI = () => {
         ...hot.map((text) => ({
           text,
           level: "hot" as SpicyLevel,
-          isAbakus: false,
         })),
       ];
-      if (AbakusMode)
-        combined = [
-          ...combined,
-          ...AbakusHot.map((text) => ({
-            text,
-            level: "hot" as SpicyLevel,
-            isAbakus: true,
-          })),
-        ];
     }
     if (spicyLevels.spicy) {
       combined = [
@@ -236,29 +326,28 @@ const NeverHaveI = () => {
         ...spicy.map((text) => ({
           text,
           level: "spicy" as SpicyLevel,
-          isAbakus: false,
         })),
       ];
-      if (AbakusMode)
-        combined = [
-          ...combined,
-          ...AbakusSpicy.map((text) => ({
-            text,
-            level: "spicy" as SpicyLevel,
-            isAbakus: true,
-          })),
-        ];
+    }
+    if (spicyLevels.abakus) {
+      combined = [
+        ...combined,
+        ...abakus.map((text) => ({
+          text,
+          level: "abakus" as SpicyLevel,
+        })),
+      ];
     }
 
     return combined.length > 0
       ? combined
-      : [{ text: "Velg minst én kategori!", level: "mild", isAbakus: false }];
+      : [{ text: "Velg minst én kategori!", level: "mild" }];
   };
 
   useEffect(() => {
     if (!isHydrated) return;
 
-    const newConfigKey = getConfigKey(spicyLevels, AbakusMode);
+    const newConfigKey = getConfigKey(spicyLevels);
 
     if (newConfigKey !== configKey || shuffledQuestions.length === 0) {
       const combined = getCombinedQuestions();
@@ -267,7 +356,7 @@ const NeverHaveI = () => {
       setConfigKey(newConfigKey);
       setCurrentCard(0);
     }
-  }, [isHydrated, spicyLevels, AbakusMode, configKey]);
+  }, [isHydrated, spicyLevels, configKey]);
 
   const currentQuestions =
     isHydrated && shuffledQuestions.length > 0
@@ -287,7 +376,6 @@ const NeverHaveI = () => {
         JSON.stringify({
           card: currentCard,
           levels: spicyLevels,
-          AbakusMode: AbakusMode,
           shuffledQuestions: shuffledQuestions,
           configKey: configKey,
           updatedAt: new Date(),
@@ -298,7 +386,6 @@ const NeverHaveI = () => {
     currentCard,
     currentQuestions.length,
     spicyLevels,
-    AbakusMode,
     shuffledQuestions,
     configKey,
     isHydrated,
@@ -307,28 +394,39 @@ const NeverHaveI = () => {
   const toggleSpicyLevel = (level: SpicyLevel) => {
     const newLevels = { ...spicyLevels, [level]: !spicyLevels[level] };
 
-    if (!newLevels.mild && !newLevels.hot && !newLevels.spicy) {
+    if (
+      !newLevels.mild &&
+      !newLevels.hot &&
+      !newLevels.spicy &&
+      !newLevels.abakus
+    ) {
       return;
     }
 
     setSpicyLevels(newLevels);
   };
 
-  const toggleAbakusMode = () => {
-    setAbakusMode(!AbakusMode);
-  };
+  const slides = currentQuestions.map((question, index) => {
+    const getGradient = (level: SpicyLevel): string => {
+      switch (level) {
+        case "mild":
+          return "from-green-400 to-green-600";
+        case "hot":
+          return "from-orange-400 to-orange-600";
+        case "spicy":
+          return "from-red-500 to-red-700";
+        case "abakus":
+          return "from-purple-500 to-pink-600";
+      }
+    };
 
-  const slides = currentQuestions.map((question, index) => ({
-    id: `question-${index}`,
-    title: `Oppgave ${index + 1} av ${currentQuestions.length}`,
-    content: question.text,
-    color:
-      question.level === "mild"
-        ? ("green" as Color)
-        : question.level === "hot"
-          ? ("orange" as Color)
-          : ("rose" as Color),
-  }));
+    return {
+      id: `question-${index}`,
+      title: `Oppgave ${index + 1} av ${currentQuestions.length}`,
+      content: question.text,
+      gradient: getGradient(question.level),
+    };
+  });
 
   const handleNavigate = (index: number) => {
     setValidCurrentCard(index);
@@ -338,25 +436,42 @@ const NeverHaveI = () => {
     level: SpicyLevel;
     label: string;
     color: string;
-    flames: number;
+    icon: JSX.Element;
   }[] = [
     {
       level: "mild",
       label: "Mild",
       color: "from-green-400 to-green-600",
-      flames: 1,
+      icon: <Flame size={16} className="fill-current" />,
     },
     {
       level: "hot",
       label: "Hot",
       color: "from-orange-400 to-orange-600",
-      flames: 2,
+      icon: (
+        <>
+          <Flame size={16} className="fill-current" />
+          <Flame size={16} className="fill-current" />
+        </>
+      ),
     },
     {
       level: "spicy",
       label: "Spicy",
       color: "from-red-500 to-red-700",
-      flames: 3,
+      icon: (
+        <>
+          <Flame size={16} className="fill-current" />
+          <Flame size={16} className="fill-current" />
+          <Flame size={16} className="fill-current" />
+        </>
+      ),
+    },
+    {
+      level: "abakus",
+      label: "Abakus-relatert",
+      color: "from-purple-500 to-pink-600",
+      icon: <Users size={16} className="fill-current" />,
     },
   ];
 
@@ -384,6 +499,13 @@ const NeverHaveI = () => {
           glow: "shadow-red-500/50",
           header: "from-red-500 to-red-700",
         };
+      case "abakus":
+        return {
+          gradient: "from-purple-400/20 to-pink-600/20",
+          border: "border-purple-500",
+          glow: "shadow-purple-500/50",
+          header: "from-purple-500 to-pink-600",
+        };
     }
   };
   const colorScheme = currentQuestion
@@ -399,7 +521,7 @@ const NeverHaveI = () => {
             Never Have I Ever
           </h1>
 
-          <div className="mt-8 flex gap-3 bg-white/10 backdrop-blur-sm p-2 rounded-2xl">
+          <div className="mt-8 flex gap-3 bg-white/10 backdrop-blur-sm p-2 rounded-2xl flex-wrap justify-center max-w-2xl">
             {spicyOptions.map((option) => {
               const isActive = spicyLevels?.[option.level] || false;
               return (
@@ -407,59 +529,22 @@ const NeverHaveI = () => {
                   key={option.level}
                   onClick={() => toggleSpicyLevel(option.level)}
                   className={`
-                                        relative px-6 py-3 rounded-xl font-semibold text-white
-                                        transition-all duration-300 transform
-                                        ${
-                                          isActive
-                                            ? `bg-gradient-to-br ${option.color} scale-105 shadow-lg ring-2 ring-white/50`
-                                            : "bg-black/20 hover:bg-black/30 scale-100 border-2 border-white/30 hover:border-white/50 opacity-50 hover:opacity-70"
-                                        }
-                                    `}
+                    relative px-6 py-3 rounded-xl font-semibold text-white
+                    transition-all duration-300 transform
+                    ${
+                      isActive
+                        ? `bg-gradient-to-br ${option.color} scale-105 shadow-lg ring-2 ring-white/50`
+                        : "bg-black/20 hover:bg-black/30 scale-100 border-2 border-white/30 hover:border-white/50 opacity-50 hover:opacity-70"
+                    }
+                  `}
                 >
                   <div className="flex items-center gap-2">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: option.flames }).map((_, i) => (
-                        <Flame
-                          key={i}
-                          size={16}
-                          className={`${
-                            isActive ? "fill-white" : "fill-white/50"
-                          }`}
-                        />
-                      ))}
-                    </div>
+                    <div className="flex gap-0.5">{option.icon}</div>
                     <span>{option.label}</span>
                   </div>
                 </button>
               );
             })}
-          </div>
-
-          {/* Abakus Mode Toggle */}
-          <div className="mt-4">
-            <button
-              onClick={toggleAbakusMode}
-              className={`
-                                relative px-8 py-3 rounded-2xl font-semibold text-white
-                                transition-all duration-300 transform
-                                ${
-                                  AbakusMode
-                                    ? "bg-gradient-to-br from-purple-500 to-pink-600 scale-105 shadow-lg ring-2 ring-white/50"
-                                    : "bg-black/20 hover:bg-black/30 scale-100 border-2 border-white/30 hover:border-white/50 opacity-50 hover:opacity-70"
-                                }
-                            `}
-            >
-              <div className="flex items-center gap-2">
-                <Users
-                  size={20}
-                  className={AbakusMode ? "fill-white" : "fill-white/50"}
-                />
-                <span>Abakus relatert</span>
-                <span className="ml-1 text-xs bg-white/30 px-2 py-0.5 rounded-full">
-                  {AbakusMode ? "På" : "Av"}
-                </span>
-              </div>
-            </button>
           </div>
 
           <div className="w-full max-w-2xl flex flex-col grow mt-20">

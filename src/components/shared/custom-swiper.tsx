@@ -22,6 +22,7 @@ interface SlideContent {
   title?: string;
   content: React.ReactNode;
   color?: Color;
+  gradient?: string; // Add gradient support for custom colors
 }
 
 interface CustomSwiperProps {
@@ -110,6 +111,12 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
           const slideColorClass = slide.color
             ? getColorClasses(slide.color)
             : colorClass;
+
+          // Use gradient if provided, otherwise use color class
+          const headerClass = slide.gradient
+            ? `bg-gradient-to-r ${slide.gradient}`
+            : slideColorClass;
+
           return (
             <SwiperSlide key={slide.id}>
               <Card
@@ -118,7 +125,7 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
               >
                 {slide.title && (
                   <div
-                    className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${slideColorClass}`}
+                    className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${headerClass}`}
                   >
                     <p className="text-sm text-white font-medium text-center">
                       {slide.title}

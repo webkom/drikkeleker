@@ -47,23 +47,47 @@ mongoose
 io.on("connection", (socket) => {
   socket.on("create_room", async ({ roomCode, gameType }) => {
     try {
-      if (await Room.findOne({ roomCode })) {
+      // Validate and sanitize room code
+      if (!roomCode || typeof roomCode !== "string") {
         return socket.emit("room_created", {
           success: false,
-          error: "Room already exists",
+          error: "Invalid room code",
         });
       }
+
+      // Normalize room code: trim, convert to lowercase, remove special characters
+      const normalizedCode = roomCode
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9æøå]/g, "");
+
+      // Validate length (3-20 characters)
+      if (normalizedCode.length < 3 || normalizedCode.length > 20) {
+        return socket.emit("room_created", {
+          success: false,
+          error: "Romkoden må være mellom 3 og 20 tegn",
+        });
+      }
+
+      // Check if room already exists (case-insensitive)
+      if (await Room.findOne({ roomCode: normalizedCode })) {
+        return socket.emit("room_created", {
+          success: false,
+          error: "Rom finnes allerede",
+        });
+      }
+
       const newRoom = new Room({
-        roomCode,
+        roomCode: normalizedCode,
         gameType,
         host: socket.id,
         expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
       });
       await newRoom.save();
-      socket.join(roomCode);
+      socket.join(normalizedCode);
       socket.emit("room_created", {
         success: true,
-        roomCode,
+        roomCode: normalizedCode,
         isHost: true,
         gameType,
       });
@@ -77,14 +101,22 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", async ({ roomCode, playerName }) => {
     try {
-      const room = await Room.findOne({ roomCode });
+      // Normalize room code to match how it was stored
+      const normalizedCode = roomCode
+        ? roomCode
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9æøå]/g, "")
+        : "";
+
+      const room = await Room.findOne({ roomCode: normalizedCode });
       if (!room) {
         return socket.emit("room_joined", {
           success: false,
           error: "Room not found",
         });
       }
-      socket.join(roomCode);
+      socket.join(normalizedCode);
       const isHost = room.host === socket.id;
 
       const payload = {

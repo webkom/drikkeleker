@@ -174,7 +174,7 @@ export default function DefaultGamePage({
             <h1
               className={`${lilita.className} text-5xl pt text-center room-code`}
             >
-              Kode: {roomCode}
+              Kode: {roomCode.toUpperCase()}
             </h1>
             {!gameStarted ? (
               <Button

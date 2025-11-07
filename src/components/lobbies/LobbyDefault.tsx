@@ -4,26 +4,21 @@ import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users } from "lucide-react";
+import { ArrowRight, Plus, Users, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Popup from "@/components/lobbies/Popup";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSocket } from "@/context/SocketContext";
 
 interface LobbyDefaultProps {
   onStartProTransition: () => void;
 }
 
-const generateRoomCode = () => {
-  let code = Math.floor(100000 + Math.random() * 900000).toString();
-  // Make sure we don't accidentally generate the secret PRO code
-  if (code === "676767") return generateRoomCode();
-  return code;
-};
-
 const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   const [roomCode, setRoomCode] = useState("");
+  const [customRoomName, setCustomRoomName] = useState("");
+  const [showCreateInput, setShowCreateInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -36,7 +31,6 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     const handleRoomCreated = (data: any) => {
       setIsLoading(false);
       if (data.success) {
-        // When creating a default room, always go to the default page
         router.push(`/game-room/default/${data.roomCode}`);
       } else {
         setError(data.error || "Kunne ikke lage rom");
@@ -46,17 +40,11 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     const handleRoomJoined = (data: any) => {
       setIsLoading(false);
       if (data.success) {
-        // ==================== THIS IS THE FIX ====================
-        // The server tells us the gameType. We use it to navigate.
-        // This makes the lobby smart enough to handle any room code.
         if (data.gameType === "guessing") {
-          // If the user entered a code for a PRO game, send them there.
           router.push(`/game-room/pro/${data.roomCode}`);
         } else {
-          // Otherwise, it's a default "challenges" game.
           router.push(`/game-room/default/${data.roomCode}`);
         }
-        // =======================================================
       } else {
         setError(data.error || "Kunne ikke bli med i rom");
       }
@@ -72,27 +60,62 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   }, [socket, router]);
 
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRoomCode(e.target.value.slice(0, 6));
+    setRoomCode(e.target.value);
+    setError("");
+  };
+
+  const handleInputCustomName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomRoomName(e.target.value);
+    setError("");
+  };
+
+  const validateRoomName = (name: string) => {
+    const normalized = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9æøå]/g, "");
+    if (normalized.length < 3) {
+      return "Romnavnet må være minst 3 tegn";
+    }
+    if (normalized.length > 20) {
+      return "Romnavnet kan ikke være mer enn 20 tegn";
+    }
+    return null;
+  };
+
+  const handleShowCreateInput = () => {
+    setShowCreateInput(true);
+    setError("");
+  };
+
+  const handleBackToCreateButton = () => {
+    setShowCreateInput(false);
+    setCustomRoomName("");
     setError("");
   };
 
   const handleCreateRoom = () => {
     if (!socket) return;
+
+    const validationError = validateRoomName(customRoomName);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setIsLoading(true);
     setError("");
-    // This correctly creates a "challenges" type room
     socket.emit("create_room", {
-      roomCode: generateRoomCode(),
+      roomCode: customRoomName.trim(),
       gameType: "challenges",
     });
   };
 
   const handleJoinRoom = () => {
-    if (!roomCode.trim() || roomCode.length !== 6) {
-      return setError("Skriv inn en gyldig kode");
+    if (!roomCode.trim()) {
+      return setError("Skriv inn en romkode");
     }
 
-    // Secret code to access PRO mode still works
     if (roomCode.trim() === "676767") {
       onStartProTransition();
       return;
@@ -104,8 +127,12 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     socket.emit("join_room", { roomCode: roomCode.trim() });
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPressJoin = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleJoinRoom();
+  };
+
+  const handleKeyPressCreate = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleCreateRoom();
   };
 
   return (
@@ -122,22 +149,72 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         <Popup />
       </div>
       <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
-        <Card>
+        <Card style={{ perspective: "1200px" }}>
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
               <Plus size={24} /> Lag nytt rom
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Button
-              onClick={handleCreateRoom}
-              disabled={isLoading}
-              className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
-            >
-              {isLoading ? "Oppretter..." : <ArrowRight size={24} />}
-            </Button>
+          <CardContent className="min-h-[80px]">
+            <AnimatePresence mode="wait">
+              {!showCreateInput ? (
+                <motion.div
+                  key="create-button"
+                  initial={{ opacity: 0, rotateY: -90 }}
+                  animate={{ opacity: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, rotateY: 90 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <Button
+                    onClick={handleShowCreateInput}
+                    disabled={isLoading}
+                    className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
+                  >
+                    <ArrowRight size={24} />
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="create-input"
+                  initial={{ opacity: 0, rotateY: -90 }}
+                  animate={{ opacity: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, rotateY: 90 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  style={{ transformStyle: "preserve-3d" }}
+                  className="flex flex-col gap-3"
+                >
+                  <Input
+                    type="text"
+                    placeholder="romkode"
+                    value={customRoomName}
+                    onChange={handleInputCustomName}
+                    onKeyPress={handleKeyPressCreate}
+                    className="text-center text-2xl border-gray-300 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleBackToCreateButton}
+                      variant="outline"
+                      className="flex-1 h-12 rounded-xl"
+                    >
+                      <ArrowLeft size={20} />
+                    </Button>
+                    <Button
+                      onClick={handleCreateRoom}
+                      disabled={isLoading || !customRoomName.trim()}
+                      className="flex-1 bg-green-500 hover:bg-green-600 h-12 rounded-xl"
+                    >
+                      {isLoading ? "..." : <ArrowRight size={24} />}
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
@@ -146,27 +223,33 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
           </CardHeader>
           <CardContent className="flex flex-row items-center gap-3">
             <Input
-              type="number"
-              placeholder="123456"
+              type="text"
+              placeholder="romkode"
               value={roomCode}
               onChange={handleInputCode}
-              onKeyPress={handleKeyPress}
-              maxLength={6}
-              className="flex-grow text-center text-3xl font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+              onKeyPress={handleKeyPressJoin}
+              className="flex-grow text-center text-2xl border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 uppercase"
+              autoCapitalize="off"
+              autoCorrect="off"
             />
             <Button
               onClick={handleJoinRoom}
-              disabled={isLoading || roomCode.length !== 6}
+              disabled={isLoading || !roomCode.trim()}
               className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
             >
               {isLoading ? "..." : <ArrowRight size={24} />}
             </Button>
           </CardContent>
         </Card>
+
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-3">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-md p-3"
+          >
             <p className="text-red-600 text-sm">{error}</p>
-          </div>
+          </motion.div>
         )}
       </div>
     </motion.div>

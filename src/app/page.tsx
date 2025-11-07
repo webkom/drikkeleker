@@ -56,12 +56,12 @@ export default function Home() {
             label="100 Spørsmål"
             href="/questions  "
           />
-          {/*<NavButton
-                        icon={<ListChecks/>}
-                        color="rose"
-                        label="Never Have I Ever"
-                        href="/never-have-i  "
-                    />*/}
+          <NavButton
+            icon={<ListChecks />}
+            color="rose"
+            label="Never Have I Ever"
+            href="/never-have-i  "
+          />
           <NavButton
             icon={<Dice6 />}
             color="teal"
