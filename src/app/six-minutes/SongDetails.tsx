@@ -1,11 +1,13 @@
 import { DRIKKELEK_URL } from "@/types/constants";
 import { useSongs } from "./SongsProvider";
+import { ImgHTMLAttributes } from "react";
 
 type SongDetailsProps = {
   currentSong: number;
+  loading: ImgHTMLAttributes<HTMLImageElement>["loading"];
 };
 
-const SongDetails = ({ currentSong }: SongDetailsProps) => {
+const SongDetails = ({ currentSong, loading }: SongDetailsProps) => {
   const { songs, isShuffling } = useSongs();
 
   if (isShuffling)
@@ -21,7 +23,7 @@ const SongDetails = ({ currentSong }: SongDetailsProps) => {
     );
 
   return (
-    <div className="m-auto text-center flex flex-col items-center justify-center">
+    <div className="m-auto text-center flex flex-col items-center justify-center px-8">
       <img
         src={`${DRIKKELEK_URL}/${
           songs[currentSong].filename.split(".")[0]
@@ -30,6 +32,7 @@ const SongDetails = ({ currentSong }: SongDetailsProps) => {
         className="rounded-md"
         width={300}
         height={300}
+        loading={loading}
       />
       <h1 className="sm:text-2xl text-xl mt-4">{songs[currentSong].title}</h1>
       <h2 className="sm:text-xl text-lg text-gray-500 font-normal">
