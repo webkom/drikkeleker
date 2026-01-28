@@ -53,13 +53,11 @@ io.on("connection", (socket) => {
         });
       }
 
-      // Normalize room code: trim, convert to lowercase, remove special characters
       const normalizedCode = roomCode
         .trim()
         .toLowerCase()
         .replace(/[^a-z0-9æøå]/g, "");
 
-      // Validate length (3-20 characters)
       if (normalizedCode.length < 3 || normalizedCode.length > 20) {
         return socket.emit("room_created", {
           success: false,
@@ -192,7 +190,6 @@ io.on("connection", (socket) => {
         challengeCount,
       };
 
-      // Emit the correct event back to all clients in the room
       if (room.gameStarted) {
         io.to(roomCode).emit("challenge_added_mid_game", payload);
       } else {
@@ -212,7 +209,6 @@ io.on("connection", (socket) => {
         emitRoomUpdated(room);
       }
     } catch (e) {
-      /* silent fail */
     }
   });
 
@@ -225,7 +221,6 @@ io.on("connection", (socket) => {
         emitRoomUpdated(room);
       }
     } catch (e) {
-      /* silent fail */
     }
   });
 
@@ -234,7 +229,6 @@ io.on("connection", (socket) => {
       const room = await Room.findOne({ roomCode });
       if (!room) return;
 
-      // Logic for "guessing" game
       if (room.gameType === "guessing" && room.host === socket.id) {
         if (room.players.length < 2 || room.questions.length < 1) {
           return socket.emit("error", { message: "Cannot start game" });
@@ -246,7 +240,6 @@ io.on("connection", (socket) => {
         await room.save();
         emitRoomUpdated(room);
       }
-      // Logic for "challenges" game
       else if (room.gameType === "challenges") {
         if (room.challenges.length < 1) {
           return socket.emit("error", {
@@ -263,7 +256,6 @@ io.on("connection", (socket) => {
         });
       }
     } catch (error) {
-      /* silent fail */
     }
   });
 
@@ -280,7 +272,6 @@ io.on("connection", (socket) => {
         emitRoomUpdated(room);
       }
     } catch (error) {
-      /* silent fail */
     }
   });
 
@@ -297,7 +288,6 @@ io.on("connection", (socket) => {
       await room.save();
       emitRoomUpdated(room);
     } catch (error) {
-      /* silent fail */
     }
   });
 
@@ -327,7 +317,6 @@ io.on("connection", (socket) => {
       await room.save();
       emitRoomUpdated(room);
     } catch (error) {
-      /* silent fail */
     }
   });
 
@@ -347,23 +336,19 @@ io.on("connection", (socket) => {
       await room.save();
       emitRoomUpdated(room);
     } catch (error) {
-      /* silent fail */
     }
   });
 });
 
-// Clean up expired rooms periodically
 setInterval(
   async () => {
     try {
       await Room.deleteMany({ expiresAt: { $lt: new Date() } });
     } catch (error) {
-      /* silent fail */
     }
   },
   60 * 60 * 1000,
 );
 
-// Start server
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {});
