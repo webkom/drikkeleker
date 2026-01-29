@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import type { SwiperProps } from "swiper/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
-  EffectCreative,
   EffectCards,
   EffectCoverflow,
+  EffectCreative,
+  EffectCube,
   EffectFade,
   EffectFlip,
-  EffectCube,
 } from "swiper/modules";
-import type { SwiperProps } from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/effect-cards";
@@ -22,7 +22,7 @@ interface SlideContent {
   title?: string;
   content: React.ReactNode;
   color?: Color;
-  gradient?: string; // Add gradient support for custom colors
+  gradient?: string;
 }
 
 interface CustomSwiperProps {
@@ -67,11 +67,15 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
   className = "mySwiper",
   creativeEffectConfig = {
     prev: {
-      shadow: true,
-      translate: [0, 0, -400],
+      shadow: false,
+      translate: ["-120%", 0, -500],
+
+      rotate: [0, 0, -15],
     },
     next: {
-      translate: ["100%", 0, 0],
+      shadow: false,
+      translate: ["120%", 0, -500],
+      rotate: [0, 0, 15],
     },
   },
   swiperOptions = {},
@@ -117,23 +121,25 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
             : slideColorClass;
 
           return (
-            <SwiperSlide key={slide.id}>
+            <SwiperSlide key={slide.id} className="rounded-2xl">
               <Card
-                className="relative overflow-hidden shadow-xl rounded-xl bg-white"
+                className="bg-transparent shadow-none "
                 style={{ height: slideHeight }}
               >
-                {slide.title && (
-                  <div
-                    className={`absolute top-0 left-0 right-0 border-b px-4 py-3 z-10 rounded-t-xl ${headerClass}`}
-                  >
-                    <p className="text-sm text-white font-medium text-center">
-                      {slide.title}
-                    </p>
-                  </div>
-                )}
-                <CardContent className="pt-14 pb-6 px-6 text-xl h-full flex items-center justify-center text-gray-900">
-                  <div>{slide.content}</div>
-                </CardContent>
+                <div className="w-full h-full bg-white overflow-hidden relative shadow-sm ">
+                  {slide.title && (
+                    <div
+                      className={`absolute top-0 left-0 right-0  px-4 py-3 z-10  ${headerClass}`}
+                    >
+                      <p className="text-sm text-white font-medium text-center">
+                        {slide.title}
+                      </p>
+                    </div>
+                  )}
+                  <CardContent className="pt-14 pb-6 px-6 text-xl h-full flex items-center justify-center text-gray-900">
+                    <div>{slide.content}</div>
+                  </CardContent>
+                </div>
               </Card>
             </SwiperSlide>
           );
@@ -142,5 +148,4 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
     </div>
   );
 };
-
 export default CustomSwiper;

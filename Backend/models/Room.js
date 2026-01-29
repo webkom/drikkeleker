@@ -10,11 +10,11 @@ const roomSchema = new mongoose.Schema(
     },
     gameType: {
       type: String,
-      enum: ["challenges", "guessing"],
+      enum: ["challenges", "guessing", "alias"],
       required: true,
     },
     host: {
-      type: String, // Socket ID of the host
+      type: String,
       required: true,
     },
     players: [
@@ -33,44 +33,48 @@ const roomSchema = new mongoose.Schema(
       index: { expires: "2h" },
     },
 
-    // ========== GUESSING GAME SPECIFIC FIELDS ==========
     questions: [
       {
-        _id: false, // Don't add _id to subdocuments
+        _id: false,
         text: String,
         rangeMin: Number,
         rangeMax: Number,
       },
     ],
-    currentQuestionIndex: {
-      type: Number,
-      default: 0,
-    },
-    phase: {
-      type: Number,
-      default: 0,
-    },
+    currentQuestionIndex: { type: Number, default: 0 },
+    phase: { type: Number, default: 0 },
     answers: {
       type: Map,
       of: Number,
       default: () => new Map(),
     },
-    correctAnswer: {
-      type: Number,
-      default: null,
-    },
-    roundStartedAt: {
-      type: Number,
-      default: null,
-    },
+    correctAnswer: { type: Number, default: null },
+    roundStartedAt: { type: Number, default: null },
 
-    // ========== CHALLENGE GAME SPECIFIC FIELDS ==========
     challenges: [
       {
-        _id: false, // Don't add _id to subdocuments
+        _id: false,
         text: String,
       },
     ],
+
+    aliasTeams: [
+      {
+        name: { type: String, required: true },
+        score: { type: Number, default: 0 },
+        members: [String],
+      },
+    ],
+    aliasTurn: {
+      teamIndex: { type: Number, default: 0 },
+      startTime: { type: Number, default: null },
+      activeWord: { type: String, default: null },
+    },
+    aliasPlayedWordIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Word" }],
+    aliasSettings: {
+      roundDuration: { type: Number, default: 60 },
+      winScore: { type: Number, default: 30 },
+    },
   },
   {
     timestamps: true,

@@ -12,7 +12,7 @@ const Lyrics = ({ title, lyrics }: LyricsProps) => {
       <div className="flex flex-col space-y-8 max-w-2xl text-center">
         <h1 className={`${lilita.className} text-5xl`}>{title}</h1>
         {lyrics.map((verse, i) => (
-          <div key={i} className="space-y-2">
+          <div key={i} className="space-y-2 ">
             {verse.map((line, j) => (
               <p key={j} className="text-lg">
                 {line}

@@ -8,7 +8,8 @@ export type Color =
   | "orange"
   | "violet"
   | "slate"
-  | "rose";
+  | "rose"
+  | "cyan";
 
 export const colorVariants: Record<Color, string> = {
   amber: "bg-amber-500 hover:bg-amber-500/90",
@@ -21,6 +22,7 @@ export const colorVariants: Record<Color, string> = {
   violet: "bg-violet-500 hover:bg-violet-500/90",
   slate: "bg-slate-500 hover:bg-slate-500/90",
   rose: "bg-rose-500 hover:bg-rose-500/90",
+  cyan: "bg-cyan-500 hover:bg-cyan-500/90",
 };
 
 export const getColorClasses = (color?: Color, fallback: Color = "violet") =>

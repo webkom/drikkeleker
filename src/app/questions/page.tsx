@@ -155,7 +155,6 @@ const QuestionsPage = () => {
     );
   }, [currentCard]);
 
-  // Convert questions to slides format for CustomSwiper
   const slides = questions.map((question, index) => ({
     id: index,
     title: `Spørsmål ${index + 1}`,

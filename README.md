@@ -28,7 +28,7 @@ PORT=3001
 and then run:
 
 ```bash
-cd gameroom-backend
+cd Backend
 yarn install
 yarn start
 ```
@@ -38,7 +38,8 @@ change the file in: src/app/game-room/[roomCode]/RoomLobby.tsx
 and in src/app/lobby/RoomLobby.tsx
 change the fetch URL to your local backend, e.g. `http://localhost:3001` (the same port as in the .env file)
 
-(Do this by commenting out line 56 in the [roomCode]/RoomLobby.tsx file and uncommenting out line 56, and for the local lobby/RoomLobby.tsx file you comment out 29 and uncomment 30)
+(Do this by commenting out line 56 in the [roomCode]/RoomLobby.tsx file and uncommenting out line 56, and for the local
+lobby/RoomLobby.tsx file you comment out 29 and uncomment 30)
 
 then in the root folder run:
 
