@@ -69,7 +69,7 @@ const QuestionsPage = () => {
       <BeerContainer color="cyan">
         <div className=" text-center flex-1">
           <h1 className={`${lilita.className} text-5xl pt-8`}>Alias</h1>
-          <div className="w-full h-full max-w-2xl flex flex-col grow mt-12 justify-between">
+          <div className="w-full h-[70vh] max-w-2xl flex flex-col grow mt-12 justify-between">
             <CustomSwiper
               slides={slides}
               effect="cards"
@@ -77,10 +77,10 @@ const QuestionsPage = () => {
               onNavigate={handleNavigate}
               color={"cyan"}
             />
-            <div className="flex gap-2 mt-8 h-full justify-between flex-1">
+            <div className="flex gap-2 justify-between flex-1">
               <Button
                 onClick={() => setValidCurrentCard(currentCard - 1)}
-                className="bg-red-500 hover:bg-red-500/90 w-full group h-full flex-1"
+                className="bg-red-500 hover:bg-red-500/90 w-full h-full group  mb-10 flex-1"
               >
                 <ArrowLeft
                   size={20}
@@ -90,7 +90,7 @@ const QuestionsPage = () => {
               </Button>
               <Button
                 onClick={() => setValidCurrentCard(currentCard + 1)}
-                className="bg-green-500 hover:bg-green-500/90 w-full group h-full flex-1"
+                className="bg-green-500 hover:bg-green-500/90 w-full h-full group flex-1"
               >
                 Riktig
                 <ArrowRight
