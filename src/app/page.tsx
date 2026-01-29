@@ -5,11 +5,12 @@ import {
   Beer,
   Dice6,
   HeartCrack,
+  Hourglass,
+  ListChecks,
   MessageCircleQuestion,
   MicVocal,
   ScrollText,
   Timer,
-  ListChecks,
 } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 import FoamWave from "@/components/foamwave/foamwave";
@@ -79,6 +80,12 @@ export default function Home() {
             color="violet"
             label="Viljens Drikkelek"
             href="/game-room/lobby"
+          />
+          <NavButton
+            icon={<Hourglass />}
+            color="cyan"
+            label="???"
+            href="/Alias"
           />
 
           <Footer />
