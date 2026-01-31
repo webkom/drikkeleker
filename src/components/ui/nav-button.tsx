@@ -1,4 +1,3 @@
-// src/components/ui/nav-button.tsx
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -10,14 +9,22 @@ interface NavButtonProps {
   color?: Color;
   icon?: React.ReactNode;
   children?: React.ReactNode;
+  className?: string;
 }
 
-const NavButton = ({ label, href, color, icon, children }: NavButtonProps) => {
+const NavButton = ({
+  label,
+  href,
+  color,
+  icon,
+  children,
+  className,
+}: NavButtonProps) => {
   const colorClass = getColorClasses(color);
 
   return (
     <Link href={href} passHref>
-      <Button className={`w-full group ${colorClass}`} size="lg">
+      <Button className={`w-full group ${colorClass} ${className}`} size="lg">
         <div className="flex gap-4 items-center">
           {icon && icon}
           {label}
