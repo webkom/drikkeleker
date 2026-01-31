@@ -4,8 +4,8 @@ import {
   ArrowDown,
   Beer,
   Dice6,
+  Hammer,
   HeartCrack,
-  Hourglass,
   ListChecks,
   MessageCircleQuestion,
   MicVocal,
@@ -82,12 +82,17 @@ export default function Home() {
             href="/game-room/lobby"
           />
           <NavButton
-            icon={<Hourglass />}
+            icon={<Hammer />}
             color="cyan"
-            label="???"
-            href="/Alias"
+            label="Kom tilbake senere!"
+            href=""
+            className="bg-[repeating-linear-gradient(45deg,#fff200,#fff200_10px,#000000_0,#000000_50%)] bg-[length:30px_30px]
+                        [&>div]:bg-black [&>div]:text-white [&>div]:px-3 [&>div]:py-1 [&>div]:rounded-md [&>div]:shadow
+                        [&>div]:trans
+                        [&>svg]:hidden
+                        cursor-not-allowed
+                        "
           />
-
           <Footer />
         </BeerContainer>
       </div>

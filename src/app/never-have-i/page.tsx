@@ -6,9 +6,8 @@ import { useEffect, useState } from "react";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Flame, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Flame } from "lucide-react";
 import CustomSwiper from "@/components/shared/custom-swiper";
-import type { Color } from "@/lib/colors";
 
 const mild = [
   "Planlagt fylla-meldinger edru",
@@ -548,7 +547,7 @@ const NeverHaveI = () => {
           <div className="w-full max-w-2xl flex flex-col grow mt-20">
             <CustomSwiper
               slides={slides}
-              effect="cards"
+              effect="fade"
               currentIndex={currentCard}
               onNavigate={handleNavigate}
               slideHeight="400px"

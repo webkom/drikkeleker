@@ -174,7 +174,7 @@ const QuestionsPage = () => {
           <div className="w-full max-w-2xl flex flex-col grow mt-20">
             <CustomSwiper
               slides={slides}
-              effect="cards"
+              effect="slide"
               currentIndex={currentCard}
               onNavigate={handleNavigate}
             />

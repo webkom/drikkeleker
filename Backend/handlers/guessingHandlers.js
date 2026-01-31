@@ -47,7 +47,7 @@ module.exports = (io, socket) => {
       }
 
       room.gameStarted = true;
-      room.phase = 1;
+      room.phase = 1; // Present questions
       room.correctAnswer = null;
       room.answers = new Map();
 
@@ -89,7 +89,7 @@ module.exports = (io, socket) => {
       room.answers.set(playerName, guess);
 
       if (room.players.every((p) => room.answers.has(p.name))) {
-        room.phase = 3;
+        room.phase = 3; // Wait for setting correct result
       }
       await room.save();
       emitRoomUpdated(io, room);
@@ -123,7 +123,7 @@ module.exports = (io, socket) => {
         }
       }
 
-      room.phase = 4; // Phase 4: Results
+      room.phase = 4; //Results
       await room.save();
       emitRoomUpdated(io, room);
     } catch (error) {
@@ -139,11 +139,11 @@ module.exports = (io, socket) => {
 
       if (room.currentQuestionIndex + 1 < room.questions.length) {
         room.currentQuestionIndex += 1;
-        room.phase = 1;
+        room.phase = 1; // Questions
         room.answers = new Map();
         room.correctAnswer = null;
       } else {
-        room.phase = 5;
+        room.phase = 5; // Final results
       }
       await room.save();
       emitRoomUpdated(io, room);
