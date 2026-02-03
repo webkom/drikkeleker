@@ -75,6 +75,11 @@ const roomSchema = new mongoose.Schema(
       roundDuration: { type: Number, default: 60 },
       winScore: { type: Number, default: 30 },
     },
+
+    words: {
+      type: Array,
+      default: [],
+    },
   },
   {
     timestamps: true,

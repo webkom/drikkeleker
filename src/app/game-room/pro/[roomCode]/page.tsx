@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { use, useEffect, useState } from "react";
 import { lilita } from "@/lib/fonts";
-import { useGameSocket } from "@/hooks/useGameSocket";
-import GameRoom from "@/components/guessing-game/Gameroom";
+import { useProGameSocket } from "@/hooks/useProGameSocket";
+import GameRoom from "@/components/games/guessing-game/Gameroom";
 import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
@@ -60,7 +60,7 @@ export default function GameRoomPage({
     submitGuess,
     setCorrectAnswer,
     nextQuestion,
-  } = useGameSocket(roomCode);
+  } = useProGameSocket(roomCode);
 
   const [inputName, setInputName] = useState("");
   const [hasJoinedAsPlayer, setHasJoinedAsPlayer] = useState(false);

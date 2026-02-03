@@ -4,11 +4,11 @@ import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users, ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import Popup from "@/components/lobbies/Popup";
-import { motion, AnimatePresence } from "framer-motion";
+import Popup from "@/components/games/lobbies/Popup";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSocket } from "@/context/SocketContext";
 
 interface LobbyDefaultProps {
@@ -116,12 +116,12 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
       return setError("Skriv inn en romkode");
     }
 
-    // Secret code to access PRO mode still works
-    if (roomCode.trim() === "676767") {
-      // Pro Room Code
-      onStartProTransition();
-      return;
-    }
+    // Secret code to access PRO MODE is discontinued
+    /*if (roomCode.trim() === "676767") {
+          // Pro Room Code
+          onStartProTransition();
+          return;
+        }*/
 
     if (!socket) return;
     setIsLoading(true);

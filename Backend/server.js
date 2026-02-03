@@ -4,6 +4,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const Room = require("./models/Room");
+const aiHandlers = require("./handlers/aiHandlers");
 
 const registerRoomHandlers = require("./handlers/roomHandlers");
 const registerGuessingHandlers = require("./handlers/guessingHandlers");
@@ -13,9 +14,12 @@ const registerAliasHandlers = require("./handlers/aliasHandlers");
 const app = express();
 const server = http.createServer(app);
 
+app.use(express.json());
+
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
+app.post("/api/ai/suggest", aiHandlers.generateSuggestions);
 
 mongoose
   .connect(process.env.MONGO_URI)

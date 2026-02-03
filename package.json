@@ -11,6 +11,7 @@
     "prettier:check": "prettier . --check"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@next/font": "^14.2.5",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -24,6 +25,7 @@
     "clsx": "^2.1.1",
     "express": "^5.1.0",
     "firebase": "^12.1.0",
+    "groq-sdk": "^0.37.0",
     "lucide-react": "^0.417.0",
     "mongoose": "^8.18.3",
     "motion": "^12.23.22",

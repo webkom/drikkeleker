@@ -1,28 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { lilita } from "@/lib/fonts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Plus,
-  Edit2,
-  Save,
-  X,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  Check,
-  Users,
-  Clock,
-  Trophy,
-  Medal,
   ArrowRight,
+  Edit2,
+  Medal,
   Play,
-  Eye,
+  Plus,
+  Trophy,
+  Users,
+  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Timer from "@/components/shared/Timer";
 import ShinyText from "@/components/shared/shiny-text";
 
@@ -30,11 +22,13 @@ interface Player {
   name: string;
   score: number;
 }
+
 interface Question {
   text: string;
   rangeMin: number;
   rangeMax: number;
 }
+
 interface Room {
   roomCode: string;
   players: Player[];
@@ -46,6 +40,7 @@ interface Room {
   roundStartedAt?: number | null;
   gameStarted: boolean;
 }
+
 interface GameRoomProps {
   room: Room;
   isHost: boolean;
@@ -156,7 +151,6 @@ function Lobby({
           </div>
         </div>
 
-        {/* Players Card */}
         <div className="bg-white rounded-3xl p-6 shadow-2xl border-2 border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -223,6 +217,7 @@ function Lobby({
     </div>
   );
 }
+
 function PlayersList({
   players,
   currentPlayerName,

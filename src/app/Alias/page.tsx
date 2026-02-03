@@ -72,7 +72,7 @@ const QuestionsPage = () => {
           <div className="w-full h-full max-w-2xl flex flex-col grow mt-12 justify-between">
             <CustomSwiper
               slides={slides}
-              effect="cards"
+              effect="creative"
               currentIndex={currentCard}
               onNavigate={handleNavigate}
               color={"cyan"}

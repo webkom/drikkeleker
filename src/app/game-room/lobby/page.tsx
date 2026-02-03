@@ -7,8 +7,8 @@ import Footer from "@/components/shared/footer";
 import { AnimatePresence } from "framer-motion";
 
 import BubbleTransition from "@/components/beer/BubbleTransition";
-import LobbyPro from "@/components/lobbies/LobbyPro";
-import LobbyRegular from "@/components/lobbies/LobbyDefault";
+import LobbyPro from "@/components/games/lobbies/LobbyPro";
+import LobbyRegular from "@/components/games/lobbies/LobbyDefault";
 
 type LobbyMode = "default" | "pro";
 

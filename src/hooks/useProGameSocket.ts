@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSocket } from "@/context/SocketContext";
 
 interface Player {
@@ -27,7 +27,7 @@ interface Room {
   roundStartedAt: number | null;
 }
 
-export const useGameSocket = (roomCode: string) => {
+export const useProGameSocket = (roomCode: string) => {
   const { socket, isConnected } = useSocket();
 
   const [room, setRoom] = useState<Room | null>(null);

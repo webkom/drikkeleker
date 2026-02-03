@@ -1,24 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Popup from "@/components/lobbies/Popup";
+import Popup from "@/components/games/lobbies/Popup";
 import ShinyText from "@/components/shared/shiny-text";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/context/SocketContext";
-import {
-  Loader2,
-  ArrowRight,
-  UserCog,
-  Users,
-  Eye,
-  ChevronDown,
-  ArrowLeft,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, UserCog, Users } from "lucide-react";
 
 const generateRoomCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
