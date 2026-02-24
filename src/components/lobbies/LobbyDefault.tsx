@@ -4,11 +4,11 @@ import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus, Users, ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, Construction, Plus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Popup from "@/components/lobbies/Popup";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSocket } from "@/context/SocketContext";
 
 interface LobbyDefaultProps {
@@ -16,6 +16,8 @@ interface LobbyDefaultProps {
 }
 
 const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
+  const IS_DISABLED = true;
+
   const [roomCode, setRoomCode] = useState("");
   const [customRoomName, setCustomRoomName] = useState("");
   const [showCreateInput, setShowCreateInput] = useState(false);
@@ -84,6 +86,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   };
 
   const handleShowCreateInput = () => {
+    if (IS_DISABLED) return;
     setShowCreateInput(true);
     setError("");
   };
@@ -95,6 +98,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   };
 
   const handleCreateRoom = () => {
+    if (IS_DISABLED) return;
     if (!socket) return;
 
     const validationError = validateRoomName(customRoomName);
@@ -112,13 +116,12 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   };
 
   const handleJoinRoom = () => {
+    if (IS_DISABLED) return;
     if (!roomCode.trim()) {
       return setError("Skriv inn en romkode");
     }
 
-    // Secret code to access PRO mode still works
     if (roomCode.trim() === "676767") {
-      // Pro Room Code
       onStartProTransition();
       return;
     }
@@ -150,109 +153,134 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
         </h1>
         <Popup />
       </div>
-      <div className="w-full max-w-md flex flex-col grow justify-center gap-6">
-        <Card style={{ perspective: "1200px" }}>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Plus size={24} /> Lag nytt rom
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="min-h-[80px]">
-            <AnimatePresence mode="wait">
-              {!showCreateInput ? (
-                <motion.div
-                  key="create-button"
-                  initial={{ opacity: 0, rotateY: -90 }}
-                  animate={{ opacity: 1, rotateY: 0 }}
-                  exit={{ opacity: 0, rotateY: 90 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  <Button
-                    onClick={handleShowCreateInput}
-                    disabled={isLoading}
-                    className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
-                  >
-                    <ArrowRight size={24} />
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="create-input"
-                  initial={{ opacity: 0, rotateY: -90 }}
-                  animate={{ opacity: 1, rotateY: 0 }}
-                  exit={{ opacity: 0, rotateY: 90 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  style={{ transformStyle: "preserve-3d" }}
-                  className="flex flex-col gap-3"
-                >
-                  <Input
-                    type="text"
-                    placeholder="romkode"
-                    value={customRoomName}
-                    onChange={handleInputCustomName}
-                    onKeyPress={handleKeyPressCreate}
-                    className="text-center text-2xl border-gray-300 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleBackToCreateButton}
-                      variant="outline"
-                      className="flex-1 h-12 rounded-xl"
-                    >
-                      <ArrowLeft size={20} />
-                    </Button>
-                    <Button
-                      onClick={handleCreateRoom}
-                      disabled={isLoading || !customRoomName.trim()}
-                      className="flex-1 bg-green-500 hover:bg-green-600 h-12 rounded-xl"
-                    >
-                      {isLoading ? "..." : <ArrowRight size={24} />}
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Users size={24} /> Bli med
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-row items-center gap-3">
-            <Input
-              type="text"
-              placeholder="romkode"
-              value={roomCode}
-              onChange={handleInputCode}
-              onKeyPress={handleKeyPressJoin}
-              className="flex-grow text-center text-2xl border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 uppercase"
-              autoCapitalize="off"
-              autoCorrect="off"
-            />
-            <Button
-              onClick={handleJoinRoom}
-              disabled={isLoading || !roomCode.trim()}
-              className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
+      <div className="w-full max-w-md flex flex-col grow justify-center gap-6 relative">
+        {IS_DISABLED && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-[2px] bg-white/50 rounded-xl">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 max-w-[80%]"
             >
-              {isLoading ? "..." : <ArrowRight size={24} />}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 border border-red-200 rounded-md p-3"
-          >
-            <p className="text-red-600 text-sm">{error}</p>
-          </motion.div>
+              <div className="flex justify-center mb-3 text-amber-500">
+                <Construction size={40} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Under vedlikehold
+              </h3>
+              <p className="text-gray-500 text-sm">
+                Vi flytter servere, som medfører at spillet ikke fungerer for
+                øyeblikket. Kom igjen senere!
+              </p>
+            </motion.div>
+          </div>
         )}
+        <div
+          className={`flex flex-col gap-6 transition-all duration-300 ${IS_DISABLED ? "pointer-events-none grayscale opacity-40 blur-[1px]" : ""}`}
+        >
+          <Card style={{ perspective: "1200px" }}>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Plus size={24} /> Lag nytt rom
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="min-h-[80px]">
+              <AnimatePresence mode="wait">
+                {!showCreateInput ? (
+                  <motion.div
+                    key="create-button"
+                    initial={{ opacity: 0, rotateY: -90 }}
+                    animate={{ opacity: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, rotateY: 90 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    <Button
+                      onClick={handleShowCreateInput}
+                      disabled={isLoading}
+                      className="bg-green-500 hover:bg-green-600 w-full h-12 text-lg rounded-xl"
+                    >
+                      <ArrowRight size={24} />
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="create-input"
+                    initial={{ opacity: 0, rotateY: -90 }}
+                    animate={{ opacity: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, rotateY: 90 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    style={{ transformStyle: "preserve-3d" }}
+                    className="flex flex-col gap-3"
+                  >
+                    <Input
+                      type="text"
+                      placeholder="romkode"
+                      value={customRoomName}
+                      onChange={handleInputCustomName}
+                      onKeyPress={handleKeyPressCreate}
+                      className="text-center text-2xl border-gray-300 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleBackToCreateButton}
+                        variant="outline"
+                        className="flex-1 h-12 rounded-xl"
+                      >
+                        <ArrowLeft size={20} />
+                      </Button>
+                      <Button
+                        onClick={handleCreateRoom}
+                        disabled={isLoading || !customRoomName.trim()}
+                        className="flex-1 bg-green-500 hover:bg-green-600 h-12 rounded-xl"
+                      >
+                        {isLoading ? "..." : <ArrowRight size={24} />}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Users size={24} /> Bli med
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-row items-center gap-3">
+              <Input
+                type="text"
+                placeholder="romkode"
+                value={roomCode}
+                onChange={handleInputCode}
+                onKeyPress={handleKeyPressJoin}
+                className="flex-grow text-center text-2xl border-gray-300 rounded-xl px-4 py-6 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 uppercase"
+                autoCapitalize="off"
+                autoCorrect="off"
+              />
+              <Button
+                onClick={handleJoinRoom}
+                disabled={isLoading || !roomCode.trim()}
+                className="bg-violet-500 hover:bg-violet-600 h-12 px-4 rounded-xl flex-shrink-0"
+              >
+                {isLoading ? "..." : <ArrowRight size={24} />}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-200 rounded-md p-3"
+            >
+              <p className="text-red-600 text-sm">{error}</p>
+            </motion.div>
+          )}
+        </div>
       </div>
     </motion.div>
   );
