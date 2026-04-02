@@ -2,7 +2,7 @@
 
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
@@ -296,7 +296,7 @@ const NeverHaveI = () => {
     setConfigKey(stored.configKey);
   }, []);
 
-  const getCombinedQuestions = (): Question[] => {
+  const getCombinedQuestions = useCallback((): Question[] => {
     if (!spicyLevels) return [{ text: "Laster...", level: "mild" }];
 
     let combined: Question[] = [];
@@ -341,7 +341,7 @@ const NeverHaveI = () => {
     return combined.length > 0
       ? combined
       : [{ text: "Velg minst én kategori!", level: "mild" }];
-  };
+  }, [spicyLevels]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -355,7 +355,13 @@ const NeverHaveI = () => {
       setConfigKey(newConfigKey);
       setCurrentCard(0);
     }
-  }, [isHydrated, spicyLevels, configKey]);
+  }, [
+    isHydrated,
+    spicyLevels,
+    configKey,
+    getCombinedQuestions,
+    shuffledQuestions.length,
+  ]);
 
   const currentQuestions =
     isHydrated && shuffledQuestions.length > 0
@@ -547,7 +553,7 @@ const NeverHaveI = () => {
           <div className="w-full max-w-2xl flex flex-col grow mt-20">
             <CustomSwiper
               slides={slides}
-              effect="fade"
+              effect="cards"
               currentIndex={currentCard}
               onNavigate={handleNavigate}
               slideHeight="400px"
