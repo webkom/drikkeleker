@@ -2,6 +2,7 @@
 
 import { forwardRef, useState } from "react";
 import styles from "./Dice.module.css";
+import Image from "next/image";
 
 type DiceProps = {
   currentFace: number;
@@ -27,50 +28,62 @@ const Dice = forwardRef<HTMLDivElement, DiceProps>(
               }}
             >
               <div className={`${styles.face} ${styles.back}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Right  (1) */}
               <div className={`${styles.face} ${styles.right}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Left (2) */}
               <div className={`${styles.face} ${styles.left}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Top  (3) */}
               <div className={`${styles.face} ${styles.top}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Bottom  (4) */}
               <div className={`${styles.face} ${styles.bottom}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Front  (5) */}
               <div className={`${styles.face} ${styles.front}`}>
-                <img
+                <Image
                   src="/images/7b1a278f5abe8e9da907fc9c29dfd432d60dc76e17b0fabab659d2a508bc65c4.png"
                   alt="6"
-                  draggable="false"
+                  draggable={false}
+                  width={200}
+                  height={200}
                 />
               </div>
               {/* Back  (6) */}
@@ -85,27 +98,63 @@ const Dice = forwardRef<HTMLDivElement, DiceProps>(
               }}
             >
               <div className={`${styles.face} ${styles.back}`}>
-                <img src="/images/one.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/one.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Right  (1) */}
               <div className={`${styles.face} ${styles.right}`}>
-                <img src="/images/two.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/two.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Left (2) */}
               <div className={`${styles.face} ${styles.left}`}>
-                <img src="/images/three.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/three.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Top  (3) */}
               <div className={`${styles.face} ${styles.top}`}>
-                <img src="/images/four.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/four.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Bottom  (4) */}
               <div className={`${styles.face} ${styles.bottom}`}>
-                <img src="/images/five.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/five.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Front  (5) */}
               <div className={`${styles.face} ${styles.front}`}>
-                <img src="/images/six.png" alt="6" draggable="false" />
+                <Image
+                  src="/images/six.png"
+                  alt="6"
+                  draggable={false}
+                  width={200}
+                  height={200}
+                />
               </div>
               {/* Back  (6) */}
             </div>
