@@ -115,7 +115,7 @@ const Dice = forwardRef<HTMLDivElement, DiceProps>(
           className={styles.toggleEaster}
           onClick={() => setFeatureFlag(!featureFlag)}
         >
-          Vis {featureFlag ? "Terning" : "noe spennende"}
+          {featureFlag ? "Terning" : "???"}
         </button>
       </div>
     );
