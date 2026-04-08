@@ -57,12 +57,16 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
   }, [challengeCount, oldNumber]);
 
   useEffect(() => {
+    let socketInstance: Socket | null = null;
+
     const initSocket = async () => {
       const { io } = await import("socket.io-client");
       const newSocket = io(
         // "http://localhost:3001",
         "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
       );
+
+      socketInstance = newSocket;
 
       newSocket.on("connect", () => {
         setConnected(true);
@@ -109,8 +113,8 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
     initSocket();
 
     return () => {
-      if (socket) {
-        socket.disconnect();
+      if (socketInstance) {
+        socketInstance.disconnect();
       }
     };
   }, [roomCode]);
