@@ -55,6 +55,16 @@ const mild = [
   "Fått fartsbot",
   "Sovnet på vors",
   "Blacket ut",
+  "Vært på dobbeldate",
+  "Vært på trippeldate",
+  "Vært på en blinddate",
+  "Ikke klaget på en eksamen jeg burde ha klaget på",
+  "Kalt en lærer for mamma/pappa (en slurk per hendelse)",
+  "Stalket repostsa til noen",
+  "Dratt rett fra nach til skolen/forelesning",
+  "Dratt på fest du ikke er invitert til",
+  "Dratt på vors du ikke er invitert til",
+  "Dratt på nach du ikke er invitert til",
 ];
 
 const hot = [
@@ -106,6 +116,12 @@ const hot = [
   'Løyet i "Jeg har aldri"',
   "Hatt rebound",
   "Gått tilbake til eksen",
+  "Blitt nekta adgang på utested",
+  "Hatt twoman",
+  "Kasta opp på et annet menneske",
+  "Kasta opp i do hos den som hoster",
+  "Kasta opp (ikke i do) hos den som hoster",
+  "Blitt kalt feil navn av foreldre",
 ];
 
 const spicy = [
@@ -141,6 +157,33 @@ const spicy = [
   "Kjørt brannbil (pule med mensen)",
   "Rainbow kiss",
   "Knulla eksen",
+  "Kjøpt matchende undertøy bare for en fyr/pen boxer bare for en jente",
+  "Vært med noen en venn har hooka med/datet/vært sammen med",
+  "Blitt sammen med noen en venn har hooka med/datet/vært sammen med",
+  "Blitt sammen med noen etter første date",
+  "Fått crazy dårlig head",
+  "Hatt pregnancy scare",
+  "Hardlauncha en fyr etter mindre enn 4 uker",
+  "Hooka med to folk som er venner med hverandre",
+  "Gått etter en som kompisen har crush på",
+  "Blitt venn med nykjæresten til eksen",
+  "Gått rundt med svært sugemerke",
+  "Klina i en seng som ikke er din eller partneren sin",
+  "Hooka/klina med en slektning av en venn",
+  "Ditchet en venn i nød for et ligg",
+  "Ligget på første date",
+  "Pult på hyttetur med venner",
+  "Dratt hjem tidlig fra fest for å ligge",
+  "Hatt sex i foreldrene sin seng",
+  "Vært med noen som er +/- 4 år eller mer",
+  "Hatt en sugardaddy",
+  "Hatt lyst til å ligge med noen i dette rommet (en slurk per person!)",
+  "Ligget med noen i dette rommet (en slurk per person!)",
+  "Kastet ut en roomie for noen du møtte på byen",
+  "Hatt åre-fling",
+  "Fortsatt åre-flingen etter åre",
+  "Ligget med noen i en badstue",
+  "Ligget med noen i jacuzzi",
 ];
 
 const abakus = [
@@ -178,6 +221,11 @@ const abakus = [
   "Konta en eksamen",
   "Crusha på en i samme komite",
   "Vært på AbaCava søndag",
+  "Klina på kontis",
+  "Ligget med en abakule",
+  "Fått vin/ølstraff (drikk så mange slurker som du har straffer)",
+  "Vært på midtsiden",
+  "Ligget med noen i samme komite",
 ];
 
 type SpicyLevel = "mild" | "hot" | "spicy" | "abakus";
