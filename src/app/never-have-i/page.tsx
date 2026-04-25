@@ -410,9 +410,7 @@ const NeverHaveI = () => {
   ]);
 
   const currentQuestions =
-    isHydrated &&
-    configKey === currentConfigKey &&
-    shuffledQuestions.length > 0
+    isHydrated && configKey === currentConfigKey && shuffledQuestions.length > 0
       ? shuffledQuestions
       : getCombinedQuestions();
 
@@ -439,13 +437,7 @@ const NeverHaveI = () => {
     }, 150);
 
     return () => window.clearTimeout(timeoutId);
-  }, [
-    currentCard,
-    spicyLevels,
-    shuffledQuestions,
-    configKey,
-    isHydrated,
-  ]);
+  }, [currentCard, spicyLevels, shuffledQuestions, configKey, isHydrated]);
 
   const toggleSpicyLevel = (level: SpicyLevel) => {
     const newLevels = { ...spicyLevels, [level]: !spicyLevels[level] };
