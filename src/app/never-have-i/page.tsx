@@ -455,30 +455,43 @@ const NeverHaveI = () => {
     setCurrentCard(0);
   };
 
-  const slides = currentQuestions.map((question, index) => {
-    const getGradient = (level: SpicyLevel): string => {
-      switch (level) {
-        case "mild":
-          return "from-green-400 to-green-600";
-        case "hot":
-          return "from-orange-400 to-orange-600";
-        case "spicy":
-          return "from-red-500 to-red-700";
-        case "abakus":
-          return "from-purple-500 to-pink-600";
-      }
-    };
+  const visibleQuestionCount = 5;
+  const visibleQuestionStart = Math.min(
+    Math.max(currentCard - Math.floor(visibleQuestionCount / 2), 0),
+    Math.max(currentQuestions.length - visibleQuestionCount, 0),
+  );
+  const visibleQuestions = currentQuestions.slice(
+    visibleQuestionStart,
+    visibleQuestionStart + visibleQuestionCount,
+  );
+  const visibleCurrentIndex = currentCard - visibleQuestionStart;
+
+  const getGradient = (level: SpicyLevel): string => {
+    switch (level) {
+      case "mild":
+        return "from-green-400 to-green-600";
+      case "hot":
+        return "from-orange-400 to-orange-600";
+      case "spicy":
+        return "from-red-500 to-red-700";
+      case "abakus":
+        return "from-purple-500 to-pink-600";
+    }
+  };
+
+  const slides = visibleQuestions.map((question, index) => {
+    const questionIndex = visibleQuestionStart + index;
 
     return {
-      id: `${question.level}-${question.text}`,
-      title: `Oppgave ${index + 1} av ${currentQuestions.length}`,
+      id: `${questionIndex}-${question.level}-${question.text}`,
+      title: `Oppgave ${questionIndex + 1} av ${currentQuestions.length}`,
       content: question.text,
       gradient: getGradient(question.level),
     };
   });
 
   const handleNavigate = (index: number) => {
-    setValidCurrentCard(index);
+    setValidCurrentCard(visibleQuestionStart + index);
   };
 
   const spicyOptions: {
@@ -562,22 +575,24 @@ const NeverHaveI = () => {
     : getColorScheme("mild");
 
   return (
-    <main className="overflow-auto h-screen">
+    <main className="min-h-[100dvh] overflow-x-hidden overflow-y-auto">
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
-      <BeerContainer color="rose">
-        <div className="flex flex-col items-center text-center h-full">
-          <h1 className={`${lilita.className} text-5xl pt-12`}>
+      <BeerContainer color="rose" className="px-4 sm:px-8">
+        <div className="flex h-full flex-col items-center text-center">
+          <h1
+            className={`${lilita.className} pt-10 text-4xl sm:pt-12 sm:text-5xl`}
+          >
             Never Have I Ever
           </h1>
 
-          <div className="mt-8 flex gap-3  backdrop-blur-sm p-2 rounded-2xl flex-wrap justify-center max-w-2xl">
+          <div className="mt-6 flex w-full max-w-2xl flex-wrap justify-center gap-2 rounded-2xl p-1.5 backdrop-blur-sm sm:mt-8 sm:gap-3 sm:p-2">
             {spicyOptions.map((option) => {
               const isActive = spicyLevels?.[option.level] || false;
               return (
                 <button
                   key={option.level}
                   onClick={() => toggleSpicyLevel(option.level)}
-                  className={`relative px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 transform
+                  className={`relative rounded-xl px-4 py-2.5 font-semibold text-white transition-all duration-300 transform sm:px-6 sm:py-3
                     ${
                       isActive
                         ? `bg-gradient-to-br ${option.color} scale-105 shadow-lg ring-2 ring-white/50`
@@ -585,7 +600,7 @@ const NeverHaveI = () => {
                     }
                   `}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center gap-1 whitespace-nowrap">
                     <div className="flex gap-0.5">{option.icon}</div>
                     <span>{option.label}</span>
                   </div>
@@ -594,16 +609,16 @@ const NeverHaveI = () => {
             })}
           </div>
 
-          <div className="w-full max-w-2xl flex flex-col grow mt-20">
+          <div className="mt-6 flex w-full max-w-2xl grow flex-col sm:mt-20">
             <CustomSwiper
-              key={`${currentConfigKey}-${currentQuestions.length}`}
+              key={`${currentConfigKey}-${currentQuestions.length}-${visibleQuestionStart}`}
               slides={slides}
               effect="cards"
-              currentIndex={currentCard}
+              currentIndex={visibleCurrentIndex}
               onNavigate={handleNavigate}
-              slideHeight="400px"
+              slideHeight="clamp(240px, 42dvh, 400px)"
             />
-            <div className="flex gap-2 mt-8">
+            <div className="mt-4 flex gap-2 sm:mt-8">
               <Button
                 onClick={() => setValidCurrentCard(currentCard - 1)}
                 className={`bg-gradient-to-r ${colorScheme.header} hover:opacity-90 w-full group transition-all`}
