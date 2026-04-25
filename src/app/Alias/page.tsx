@@ -1,110 +1,199 @@
 "use client";
 
-import { lilita } from "@/lib/fonts";
-import BeerContainer from "@/components/beer/beer-container";
 import { useEffect, useState } from "react";
+import { Check, RefreshCw, SkipForward } from "lucide-react";
+import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import CustomSwiper from "@/components/shared/custom-swiper";
+import { lilita } from "@/lib/fonts";
 
-interface StoredCard {
-  card: number;
-  updatedAt: string;
-}
-
-const questions = ["Test1", "Test2", "Test3", "Test4", "Test5", "Test6"];
-const getStoredCard = (): number | undefined => {
-  if (typeof window === "undefined") return;
-
-  try {
-    const storedData = localStorage.getItem("current_card");
-    if (!storedData) return;
-
-    const { card, updatedAt }: StoredCard = JSON.parse(storedData);
-
-    const storedTime = new Date(updatedAt).getTime();
-    const now = new Date().getTime();
-    const isRecent = now - storedTime < 30_000;
-
-    if (isRecent) return card;
-  } catch {}
+type AliasResponse = {
+  words?: string[];
 };
 
-const QuestionsPage = () => {
-  const [currentCard, setCurrentCard] = useState(getStoredCard() || 0);
-  const [prevDisabled, setPrevDisabled] = useState(false);
-  const [nextDisabled, setNextDisabled] = useState(false);
+const shuffleArray = <T,>(items: T[]): T[] => {
+  const shuffled = [...items];
 
-  const setValidCurrentCard = (card: number) =>
-    setCurrentCard(Math.min(Math.max(card, 0), questions.length - 1));
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+  }
+
+  return shuffled;
+};
+
+export default function AliasPage() {
+  const [allWords, setAllWords] = useState<string[]>([]);
+  const [deck, setDeck] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [skipCount, setSkipCount] = useState(0);
+  const [completedDecks, setCompletedDecks] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    setPrevDisabled(currentCard === 0);
-    setNextDisabled(currentCard === questions.length - 1);
+    let isActive = true;
 
-    localStorage.setItem(
-      "current_card",
-      JSON.stringify({
-        card: currentCard,
-        updatedAt: new Date(),
-      }),
-    );
-  }, [currentCard]);
+    const loadWords = async () => {
+      try {
+        const response = await fetch("/api/admin/data?game=alias");
+        const data: AliasResponse = await response.json();
+        const cleanedWords = Array.isArray(data.words)
+          ? data.words
+              .map((word) => word.trim())
+              .filter((word) => word.length > 0)
+          : [];
 
-  const slides = questions.map((question, index) => ({
-    id: index,
-    title: `Ord ${index + 1}`,
-    content: question,
-  }));
+        if (!isActive) return;
 
-  const handleNavigate = (index: number) => {
-    setValidCurrentCard(index);
+        setAllWords(cleanedWords);
+        setDeck(shuffleArray(cleanedWords));
+        setCurrentIndex(0);
+        setError(
+          cleanedWords.length === 0 ? "Ingen alias-ord er lagt inn ennå." : "",
+        );
+      } catch {
+        if (!isActive) return;
+        setError("Kunne ikke laste alias-ord.");
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadWords();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const reshuffleDeck = () => {
+    if (allWords.length === 0) return;
+    setDeck(shuffleArray(allWords));
+    setCurrentIndex(0);
   };
 
+  const advanceWord = (result: "correct" | "skip") => {
+    if (deck.length === 0) return;
+
+    if (result === "correct") {
+      setCorrectCount((previous) => previous + 1);
+    } else {
+      setSkipCount((previous) => previous + 1);
+    }
+
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex >= deck.length) {
+      setDeck(shuffleArray(allWords));
+      setCurrentIndex(0);
+      setCompletedDecks((previous) => previous + 1);
+      return;
+    }
+
+    setCurrentIndex(nextIndex);
+  };
+
+  const currentWord = deck[currentIndex];
+  const wordsRemaining = deck.length > 0 ? deck.length - currentIndex - 1 : 0;
+
   return (
-    <main className="overflow-hidden h-screen">
+    <main className="overflow-auto min-h-screen">
       <BackButton href="/#games" className="absolute top-4 left-4 z-10" />
       <BeerContainer color="cyan">
-        <div className=" text-center flex-1">
-          <h1 className={`${lilita.className} text-5xl pt-8`}>Alias</h1>
-          <div className="w-full h-full max-w-2xl flex flex-col grow mt-12 justify-between">
-            <CustomSwiper
-              slides={slides}
-              effect="cards"
-              currentIndex={currentCard}
-              onNavigate={handleNavigate}
-              color={"cyan"}
-            />
-            <div className="flex gap-2 mt-8 h-full justify-between flex-1">
+        <div className="flex min-h-full flex-col items-center text-center">
+          <h1 className={`${lilita.className} pt-10 text-5xl`}>Alias</h1>
+          <p className="mt-3 max-w-md text-sm text-gray-700 sm:text-base">
+            Forklar ordet uten å si selve ordet. Trykk Riktig når laget ditt tar
+            det, eller Stå over om dere vil hoppe videre.
+          </p>
+
+          <div className="mt-6 flex w-full max-w-xl flex-wrap justify-center gap-2">
+            <StatPill label="Ord igjen" value={String(wordsRemaining)} />
+            <StatPill label="Riktige" value={String(correctCount)} />
+            <StatPill label="Stå over" value={String(skipCount)} />
+            <StatPill label="Bunker" value={String(completedDecks)} />
+          </div>
+
+          <section className="mt-8 flex w-full max-w-xl flex-1 flex-col justify-center gap-6">
+            <div className="rounded-[2rem] border-4 border-white/70 bg-white/90 px-6 py-8 shadow-[0_20px_60px_rgba(8,145,178,0.22)] backdrop-blur">
+              <div className="mx-auto flex max-w-sm flex-col items-center gap-4">
+                <span className="rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-700">
+                  {deck.length > 0
+                    ? `Ord ${currentIndex + 1} av ${deck.length}`
+                    : "Alias"}
+                </span>
+
+                <div className="min-h-40 flex items-center justify-center">
+                  {loading ? (
+                    <p className="text-lg font-semibold text-gray-500">
+                      Laster ord...
+                    </p>
+                  ) : error ? (
+                    <p className="text-lg font-semibold text-red-500">
+                      {error}
+                    </p>
+                  ) : (
+                    <p className="text-4xl leading-tight text-gray-900 sm:text-5xl">
+                      {currentWord}
+                    </p>
+                  )}
+                </div>
+
+                <p className="max-w-sm text-sm text-gray-500">
+                  Hold tempoet oppe. Denne siden holder bare ordene og flyten,
+                  dere teller poeng og slurker selv.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Button
-                onClick={() => setValidCurrentCard(currentCard - 1)}
-                className="bg-red-500 hover:bg-red-500/90 w-full group h-full flex-1"
+                onClick={() => advanceWord("skip")}
+                className="h-16 flex-1 bg-red-500 text-base hover:bg-red-500/90"
+                disabled={loading || !!error || deck.length === 0}
               >
-                <ArrowLeft
-                  size={20}
-                  className="mr-1 transition-transform group-hover:-translate-x-1"
-                />
-                Gi opp
+                <SkipForward className="mr-2" size={20} />
+                Stå over
               </Button>
               <Button
-                onClick={() => setValidCurrentCard(currentCard + 1)}
-                className="bg-green-500 hover:bg-green-500/90 w-full group h-full flex-1"
+                onClick={() => advanceWord("correct")}
+                className="h-16 flex-1 bg-green-500 text-base hover:bg-green-500/90"
+                disabled={loading || !!error || deck.length === 0}
               >
+                <Check className="mr-2" size={20} />
                 Riktig
-                <ArrowRight
-                  size={20}
-                  className="ml-1 transition-transform group-hover:translate-x-1"
-                />
               </Button>
             </div>
-          </div>
+
+            <Button
+              variant="outline"
+              onClick={reshuffleDeck}
+              className="h-14 border-white/70 bg-white/70 text-base text-cyan-900 hover:bg-white"
+              disabled={loading || !!error || allWords.length === 0}
+            >
+              <RefreshCw className="mr-2" size={18} />
+              Bland ordbunken på nytt
+            </Button>
+          </section>
         </div>
-        <Footer className="absolute bottom-0 left-1/2 -translate-x-1/2" />
+        <Footer />
       </BeerContainer>
     </main>
   );
-};
+}
 
-export default QuestionsPage;
+function StatPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-full border border-white/70 bg-white/70 px-4 py-2 shadow-sm backdrop-blur">
+      <p className="text-[11px] uppercase tracking-[0.25em] text-cyan-700">
+        {label}
+      </p>
+      <p className="text-lg font-bold text-gray-900">{value}</p>
+    </div>
+  );
+}

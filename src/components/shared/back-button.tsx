@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -9,15 +11,15 @@ interface BackButtonProps {
 
 const BackButton = ({ className, href }: BackButtonProps) => {
   return (
-    <Link href={href} passHref>
-      <Button variant="link" className={`${className} group`}>
+    <Button asChild variant="link" className={`${className} group`}>
+      <Link href={href}>
         <ArrowLeft
           size={20}
           className="transition-transform group-hover:-translate-x-1"
         />
         <span className="text-lg ml-1">Tilbake</span>
-      </Button>
-    </Link>
+      </Link>
+    </Button>
   );
 };
 

@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.className}>
+    <html lang="en" className={`${inter.className} scroll-smooth`}>
       <head>
         <script
           defer
@@ -24,7 +24,7 @@ export default function RootLayout({
           src="https://analytics.webkom.dev/js/plausible.js"
         />
       </head>
-      <body className="bg-white">
+      <body className="bg-white" suppressHydrationWarning>
         <SocketProvider>{children}</SocketProvider>
       </body>
     </html>

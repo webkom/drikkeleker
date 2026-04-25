@@ -1,10 +1,10 @@
 import BeerContainer from "@/components/beer/beer-container";
 import { lilita } from "@/lib/fonts";
+import SuggestionsForm from "@/components/shared/suggestions-form";
 import {
   ArrowDown,
   Beer,
   Dice6,
-  Hammer,
   HeartCrack,
   ListChecks,
   MessageCircleQuestion,
@@ -18,19 +18,22 @@ import Footer from "@/components/shared/footer";
 
 export default function Home() {
   return (
-    <main className="md:flex md:flex-col overflow-x-hidden overflow-y-scroll snap-y snap-mandatory h-dvh">
-      <div className="relative p-8 pb-0 flex flex-col items-center gap-8 text-center snap-start max-md:h-dvh">
+    <main className="min-h-dvh overflow-x-hidden">
+      <div className="relative flex flex-col items-center gap-6 p-8 pb-0 text-center min-h-dvh">
         <h1 className={`${lilita.className} text-6xl mt-12 leading-snug`}>
           Drikkeleker 🍻
         </h1>
-        <div className="lg:hidden flex flex-col items-center gap-8 mt-auto">
+        <a
+          href="#games"
+          className="mt-auto flex flex-col items-center gap-4 hover:opacity-70 transition-opacity cursor-pointer"
+        >
           <span>Dykk ned for å se Abakus sine sanger og drikkeleker!</span>
           <ArrowDown className="animate-bounce" size={48} />
-        </div>
-        <FoamWave />
+        </a>
+        <FoamWave className="-mb-px w-screen overflow-hidden" />
       </div>
-      <div className="snap-start md:grow max-md:h-dvh" id="games">
-        <BeerContainer className="max-md:h-dvh">
+      <div id="games">
+        <BeerContainer>
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
           <NavButton
             icon={<Beer />}
@@ -51,48 +54,53 @@ export default function Home() {
             href="/song/forever-alone"
           />
           <h4 className={`${lilita.className} pt-6 text-gray-800`}>Leker</h4>
-          <NavButton
-            icon={<MessageCircleQuestion />}
-            color="fuchsia"
-            label="100 Spørsmål"
-            href="/questions  "
-          />
-          <NavButton
-            icon={<ListChecks />}
-            color="rose"
-            label="Never Have I Ever"
-            href="/never-have-i"
-          />
-          <NavButton
-            icon={<Dice6 />}
-            color="teal"
-            label="Terningleken"
-            href="/dice"
-          />
-          <NavButton
-            icon={<Timer />}
-            color="orange"
-            label="6 Minutes"
-            href="/six-minutes"
-          />
-          <NavButton
-            icon={<ScrollText />}
-            color="violet"
-            label="Viljens Drikkelek"
-            href="/game-room/lobby"
-          />
-          <NavButton
-            icon={<Hammer />}
-            color="cyan"
-            label="Kom tilbake senere!"
-            href=""
-            className="bg-[repeating-linear-gradient(45deg,#fff200,#fff200_10px,#000000_0,#000000_50%)] bg-[length:30px_30px]
-                        [&>div]:bg-black [&>div]:text-white [&>div]:px-3 [&>div]:py-1 [&>div]:rounded-md [&>div]:shadow
-                        [&>div]:trans
-                        [&>svg]:hidden
-                        cursor-not-allowed
-                        "
-          />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <NavButton
+              icon={<MessageCircleQuestion />}
+              color="fuchsia"
+              label="100 Spørsmål"
+              href="/questions"
+            />
+            <NavButton
+              icon={<ListChecks />}
+              color="rose"
+              label="Never Have I Ever"
+              href="/never-have-i"
+            />
+            {/* <NavButton
+              icon={<Tags />}
+              color="cyan"
+              label="Alias"
+              href="/alias"
+            />
+            <NavButton
+              icon={<SlidersHorizontal />}
+              color="violet"
+              label="Bølgelengde"
+              href="/wavelength"
+            />*/}
+            <NavButton
+              icon={<Dice6 />}
+              color="teal"
+              label="Terningleken"
+              href="/dice"
+            />
+            <NavButton
+              icon={<Timer />}
+              color="orange"
+              label="6 Minutes"
+              href="/six-minutes"
+            />
+            <div className="sm:col-span-2">
+              <NavButton
+                icon={<ScrollText />}
+                color="violet"
+                label="Viljens Drikkelek"
+                href="/game-room/lobby"
+              />
+            </div>
+          </div>
+          <SuggestionsForm />
           <Footer />
         </BeerContainer>
       </div>
