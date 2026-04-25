@@ -331,8 +331,6 @@ const NeverHaveI = () => {
   const [currentCard, setCurrentCard] = useState(0);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [configKey, setConfigKey] = useState("");
-  const [prevDisabled, setPrevDisabled] = useState(false);
-  const [nextDisabled, setNextDisabled] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -391,53 +389,58 @@ const NeverHaveI = () => {
       : [{ text: "Velg minst én kategori!", level: "mild" }];
   }, [spicyLevels]);
 
+  const currentConfigKey = getConfigKey(spicyLevels);
+
   useEffect(() => {
     if (!isHydrated) return;
 
-    const newConfigKey = getConfigKey(spicyLevels);
-
-    if (newConfigKey !== configKey || shuffledQuestions.length === 0) {
+    if (currentConfigKey !== configKey || shuffledQuestions.length === 0) {
       const combined = getCombinedQuestions();
       const shuffled = shuffleArray(combined);
       setShuffledQuestions(shuffled);
-      setConfigKey(newConfigKey);
+      setConfigKey(currentConfigKey);
       setCurrentCard(0);
     }
   }, [
     isHydrated,
-    spicyLevels,
+    currentConfigKey,
     configKey,
     getCombinedQuestions,
     shuffledQuestions.length,
   ]);
 
   const currentQuestions =
-    isHydrated && shuffledQuestions.length > 0
+    isHydrated &&
+    configKey === currentConfigKey &&
+    shuffledQuestions.length > 0
       ? shuffledQuestions
       : getCombinedQuestions();
+
+  const prevDisabled = currentCard === 0;
+  const nextDisabled = currentCard >= currentQuestions.length - 1;
 
   const setValidCurrentCard = (card: number) =>
     setCurrentCard(Math.min(Math.max(card, 0), currentQuestions.length - 1));
 
   useEffect(() => {
-    setPrevDisabled(currentCard === 0);
-    setNextDisabled(currentCard === currentQuestions.length - 1);
+    if (!spicyLevels || !isHydrated) return;
 
-    if (spicyLevels && isHydrated) {
+    const timeoutId = window.setTimeout(() => {
       localStorage.setItem(
         "never_have_i",
         JSON.stringify({
           card: currentCard,
           levels: spicyLevels,
-          shuffledQuestions: shuffledQuestions,
-          configKey: configKey,
-          updatedAt: new Date(),
+          shuffledQuestions,
+          configKey,
+          updatedAt: new Date().toISOString(),
         }),
       );
-    }
+    }, 150);
+
+    return () => window.clearTimeout(timeoutId);
   }, [
     currentCard,
-    currentQuestions.length,
     spicyLevels,
     shuffledQuestions,
     configKey,
@@ -474,7 +477,7 @@ const NeverHaveI = () => {
     };
 
     return {
-      id: `question-${index}`,
+      id: `${question.level}-${question.text}`,
       title: `Oppgave ${index + 1} av ${currentQuestions.length}`,
       content: question.text,
       gradient: getGradient(question.level),
@@ -600,6 +603,7 @@ const NeverHaveI = () => {
 
           <div className="w-full max-w-2xl flex flex-col grow mt-20">
             <CustomSwiper
+              key={`${currentConfigKey}-${currentQuestions.length}`}
               slides={slides}
               effect="cards"
               currentIndex={currentCard}
