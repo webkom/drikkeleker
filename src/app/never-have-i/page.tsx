@@ -452,6 +452,7 @@ const NeverHaveI = () => {
     }
 
     setSpicyLevels(newLevels);
+    setCurrentCard(0);
   };
 
   const slides = currentQuestions.map((question, index) => {

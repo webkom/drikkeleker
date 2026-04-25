@@ -23,8 +23,12 @@ const NavButton = ({
   const colorClass = getColorClasses(color);
 
   return (
-    <Link href={href} passHref>
-      <Button className={`w-full group ${colorClass} ${className}`} size="lg">
+    <Button
+      asChild
+      className={`w-full group ${colorClass} ${className}`}
+      size="lg"
+    >
+      <Link href={href}>
         <div className="flex gap-4 items-center">
           {icon && icon}
           {label}
@@ -34,8 +38,8 @@ const NavButton = ({
           size={20}
           className="ml-auto transition-transform group-hover:translate-x-2"
         />
-      </Button>
-    </Link>
+      </Link>
+    </Button>
   );
 };
 
