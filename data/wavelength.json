@@ -1,0 +1,170 @@
+[
+  {
+    "id": "traffic-cone",
+    "leftLabel": "Uskyldig",
+    "rightLabel": "Kriminelt",
+    "word": "Å stjele en trafikkjegle",
+    "category": "party"
+  },
+  {
+    "id": "texting-ex",
+    "leftLabel": "God idé",
+    "rightLabel": "Forferdelig idé",
+    "word": "Å sende melding til eksen klokken 03:00",
+    "category": "party"
+  },
+  {
+    "id": "karaoke-sober",
+    "leftLabel": "Cringe",
+    "rightLabel": "Ikonisk",
+    "word": "Å ta karaoke helt edru",
+    "category": "party"
+  },
+  {
+    "id": "pineapple-pizza",
+    "leftLabel": "Motbydelig",
+    "rightLabel": "Nydelig",
+    "word": "Ananas på pizza",
+    "category": "food"
+  },
+  {
+    "id": "group-project-promise",
+    "leftLabel": "Grønt flagg",
+    "rightLabel": "Rødt flagg",
+    "word": "Å si «jeg gjør min del i kveld» i et gruppearbeid",
+    "category": "student"
+  },
+  {
+    "id": "plane-clap",
+    "leftLabel": "Helt normalt",
+    "rightLabel": "Uhinged",
+    "word": "Å klappe når flyet lander",
+    "category": "travel"
+  },
+  {
+    "id": "coffee-90",
+    "leftLabel": "Billig",
+    "rightLabel": "Altfor dyrt",
+    "word": "En kaffe til 90 kroner",
+    "category": "student"
+  },
+  {
+    "id": "crypto-party",
+    "leftLabel": "Ikke full",
+    "rightLabel": "Veldig full",
+    "word": "Å forklare krypto på en fest",
+    "category": "party"
+  },
+  {
+    "id": "leftovers",
+    "leftLabel": "Tilgivelig",
+    "rightLabel": "Utilgivelig",
+    "word": "Å spise andres rester fra kjøleskapet",
+    "category": "home"
+  },
+  {
+    "id": "notifications-zero",
+    "leftLabel": "Grønt flagg",
+    "rightLabel": "Rødt flagg",
+    "word": "Å ha null uleste varsler",
+    "category": "everyday"
+  },
+  {
+    "id": "bedpress-food",
+    "leftLabel": "Helt fair",
+    "rightLabel": "Skamløst",
+    "word": "Å dra på bedpress bare for maten",
+    "category": "abakus"
+  },
+  {
+    "id": "labamba-table",
+    "leftLabel": "Modig",
+    "rightLabel": "Idioti",
+    "word": "Å danse på bordet på LaBamba",
+    "category": "abakus"
+  },
+  {
+    "id": "fadder-week-crush",
+    "leftLabel": "Søtt",
+    "rightLabel": "Kaotisk",
+    "word": "Å få crush på noen i fadderuka dag to",
+    "category": "student"
+  },
+  {
+    "id": "snackoverflow",
+    "leftLabel": "Smålig",
+    "rightLabel": "Kriminelt geni",
+    "word": "Å snike med seg noe fra Snackoverflow uten å betale",
+    "category": "abakus"
+  },
+  {
+    "id": "afterparty-sunrise",
+    "leftLabel": "Ansvarlig",
+    "rightLabel": "Et dårlig tegn",
+    "word": "Å komme hjem etter nach når sola står opp",
+    "category": "party"
+  },
+  {
+    "id": "same-outfit",
+    "leftLabel": "Ubetydelig",
+    "rightLabel": "Katastrofe",
+    "word": "Å møte noen i nøyaktig samme outfit",
+    "category": "social"
+  },
+  {
+    "id": "read-receipts",
+    "leftLabel": "Trygt",
+    "rightLabel": "Psykopat",
+    "word": "Å ha på lesebekreftelser på alt",
+    "category": "social"
+  },
+  {
+    "id": "borrowing-hoodie",
+    "leftLabel": "Uskyldig",
+    "rightLabel": "Et statement",
+    "word": "Å låne hettegenseren til noen du bare har møtt to ganger",
+    "category": "dating"
+  },
+  {
+    "id": "office-sleep",
+    "leftLabel": "Dedikasjon",
+    "rightLabel": "Varsellampe",
+    "word": "Å sove en natt på kontoret",
+    "category": "abakus"
+  },
+  {
+    "id": "matching-outfit-date",
+    "leftLabel": "Romantisk",
+    "rightLabel": "For mye",
+    "word": "Å planlegge matchende outfits til en date",
+    "category": "dating"
+  },
+  {
+    "id": "photo-dump",
+    "leftLabel": "Diskret",
+    "rightLabel": "Tørst",
+    "word": "Å legge ut et photo dump rett etter et breakup",
+    "category": "social"
+  },
+  {
+    "id": "lecture-hungover",
+    "leftLabel": "Imponerende",
+    "rightLabel": "Bekymringsverdig",
+    "word": "Å møte opp bakfull på forelesning klokken 08:15",
+    "category": "student"
+  },
+  {
+    "id": "ferry-beer",
+    "leftLabel": "Turist",
+    "rightLabel": "Legende",
+    "word": "Å kjøpe øl på flyplassen før klokken 10",
+    "category": "travel"
+  },
+  {
+    "id": "gift-spreadsheet",
+    "leftLabel": "Gjennomtenkt",
+    "rightLabel": "Urovekkende",
+    "word": "Å ha et regneark over alle gavene du har gitt folk",
+    "category": "everyday"
+  }
+]
