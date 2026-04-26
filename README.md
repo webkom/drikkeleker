@@ -18,30 +18,21 @@ yarn dev
 
 ## To run locally:
 
-Go to backend, create .env file and include something like this:
+Multiplayer rooms now use Firebase instead of the old Socket.IO backend. Create a Firebase project, enable Anonymous Auth, create a Firestore database, and add these values to the frontend `.env.local`:
 
 ```
-MONGO_URI=mongodb://127.0.0.1:27017/gameroom
-PORT=3001
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
+ADMIN_PASSWORD=...
 ```
 
-and then run:
+Deploy the Firestore rules from `firestore.rules` before opening multiplayer rooms in production. To automatically delete old room documents, enable a Firestore TTL policy on the `expiresAt` field in the `rooms` collection group.
 
-```bash
-cd Backend
-yarn install
-yarn start
-```
-
-and in the frontend:
-change the file in: src/app/game-room/[roomCode]/RoomLobby.tsx
-and in src/app/lobby/RoomLobby.tsx
-change the fetch URL to your local backend, e.g. `http://localhost:3001` (the same port as in the .env file)
-
-(Do this by commenting out line 56 in the [roomCode]/RoomLobby.tsx file and uncommenting out line 56, and for the local
-lobby/RoomLobby.tsx file you comment out 29 and uncomment 30)
-
-then in the root folder run:
+Then run:
 
 ```bash
 yarn

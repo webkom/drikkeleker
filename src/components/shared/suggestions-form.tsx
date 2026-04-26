@@ -45,7 +45,7 @@ const SuggestionsForm = () => {
           size={14}
           className={`transition-transform ${open ? "rotate-180" : ""}`}
         />
-        Har du en idé til en ny drikkelek?
+        Savner du en drikkelek? Send inn forslag her!
       </button>
 
       {open && (

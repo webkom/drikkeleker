@@ -2,64 +2,26 @@
 
 import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Construction, Plus, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Popup from "@/components/lobbies/Popup";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSocket } from "@/context/SocketContext";
+import { createRoom, joinRoom } from "@/lib/firebaseRooms";
 
 interface LobbyDefaultProps {
   onStartProTransition: () => void;
 }
 
 const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
-  const IS_DISABLED = true;
-
   const [roomCode, setRoomCode] = useState("");
   const [customRoomName, setCustomRoomName] = useState("");
   const [showCreateInput, setShowCreateInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-
-  const { socket } = useSocket();
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleRoomCreated = (data: any) => {
-      setIsLoading(false);
-      if (data.success) {
-        router.push(`/game-room/default/${data.roomCode}`);
-      } else {
-        setError(data.error || "Kunne ikke lage rom");
-      }
-    };
-
-    const handleRoomJoined = (data: any) => {
-      setIsLoading(false);
-      if (data.success) {
-        if (data.gameType === "guessing") {
-          router.push(`/game-room/pro/${data.roomCode}`);
-        } else {
-          router.push(`/game-room/default/${data.roomCode}`);
-        }
-      } else {
-        setError(data.error || "Kunne ikke bli med i rom");
-      }
-    };
-
-    socket.on("room_created", handleRoomCreated);
-    socket.on("room_joined", handleRoomJoined);
-
-    return () => {
-      socket.off("room_created", handleRoomCreated);
-      socket.off("room_joined", handleRoomJoined);
-    };
-  }, [socket, router]);
 
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomCode(e.target.value);
@@ -86,7 +48,6 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
   };
 
   const handleShowCreateInput = () => {
-    if (IS_DISABLED) return;
     setShowCreateInput(true);
     setError("");
   };
@@ -97,10 +58,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
     setError("");
   };
 
-  const handleCreateRoom = () => {
-    if (IS_DISABLED) return;
-    if (!socket) return;
-
+  const handleCreateRoom = async () => {
     const validationError = validateRoomName(customRoomName);
     if (validationError) {
       setError(validationError);
@@ -109,14 +67,18 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
 
     setIsLoading(true);
     setError("");
-    socket.emit("create_room", {
-      roomCode: customRoomName.trim(),
-      gameType: "challenges",
-    });
+
+    const result = await createRoom(customRoomName.trim(), "challenges");
+    setIsLoading(false);
+
+    if (result.success) {
+      router.push(`/game-room/default/${result.roomCode}`);
+    } else {
+      setError(result.error || "Kunne ikke lage rom");
+    }
   };
 
-  const handleJoinRoom = () => {
-    if (IS_DISABLED) return;
+  const handleJoinRoom = async () => {
     if (!roomCode.trim()) {
       return setError("Skriv inn en romkode");
     }
@@ -126,10 +88,20 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
       return;
     }
 
-    if (!socket) return;
     setIsLoading(true);
     setError("");
-    socket.emit("join_room", { roomCode: roomCode.trim() });
+    const result = await joinRoom(roomCode.trim());
+    setIsLoading(false);
+
+    if (result.success) {
+      if (result.gameType === "guessing") {
+        router.push(`/game-room/pro/${result.roomCode}`);
+      } else {
+        router.push(`/game-room/default/${result.roomCode}`);
+      }
+    } else {
+      setError(result.error || "Kunne ikke bli med i rom");
+    }
   };
 
   const handleKeyPressJoin = (e: React.KeyboardEvent) => {
@@ -155,29 +127,7 @@ const LobbyDefault = ({ onStartProTransition }: LobbyDefaultProps) => {
       </div>
 
       <div className="w-full max-w-md flex flex-col grow justify-center gap-6 relative">
-        {IS_DISABLED && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-[2px] bg-white/50 rounded-xl">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 max-w-[80%]"
-            >
-              <div className="flex justify-center mb-3 text-amber-500">
-                <Construction size={40} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                Under vedlikehold
-              </h3>
-              <p className="text-gray-500 text-sm">
-                Vi flytter servere, som medfører at spillet ikke fungerer for
-                øyeblikket. Kom igjen senere!
-              </p>
-            </motion.div>
-          </div>
-        )}
-        <div
-          className={`flex flex-col gap-6 transition-all duration-300 ${IS_DISABLED ? "pointer-events-none grayscale opacity-40 blur-[1px]" : ""}`}
-        >
+        <div className="flex flex-col gap-6 transition-all duration-300">
           <Card style={{ perspective: "1200px" }}>
             <CardHeader>
               <CardTitle className="flex items-center justify-center gap-2">

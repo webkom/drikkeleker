@@ -2,12 +2,19 @@
 
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Flame } from "lucide-react";
 import CustomSwiper from "@/components/shared/custom-swiper";
+import type { Swiper as SwiperType } from "swiper";
 
 const mild = [
   "Planlagt fylla-meldinger edru",
@@ -332,6 +339,7 @@ const NeverHaveI = () => {
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [configKey, setConfigKey] = useState("");
   const [isHydrated, setIsHydrated] = useState(false);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -479,20 +487,42 @@ const NeverHaveI = () => {
     }
   };
 
-  const slides = visibleQuestions.map((question, index) => {
-    const questionIndex = visibleQuestionStart + index;
+  const stackBackdropCount = 3;
+  const slides = [
+    ...visibleQuestions.map((question, index) => {
+      const questionIndex = visibleQuestionStart + index;
 
-    return {
-      id: `${questionIndex}-${question.level}-${question.text}`,
-      title: `Oppgave ${questionIndex + 1} av ${currentQuestions.length}`,
-      content: question.text,
-      gradient: getGradient(question.level),
-    };
-  });
+      return {
+        id: `${questionIndex}-${question.level}-${question.text}`,
+        title: `${questionIndex + 1} av ${currentQuestions.length}`,
+        content: question.text,
+        gradient: getGradient(question.level),
+      };
+    }),
+    ...Array.from({ length: stackBackdropCount }, (_, index) => ({
+      id: `stack-backdrop-${index}`,
+      content: "",
+    })),
+  ];
 
   const handleNavigate = (index: number) => {
+    if (index >= visibleQuestions.length) {
+      swiperRef.current?.slideTo(visibleQuestions.length - 1, 0);
+      return;
+    }
     setValidCurrentCard(visibleQuestionStart + index);
   };
+
+  useLayoutEffect(() => {
+    const swiper = swiperRef.current;
+    if (!swiper) return;
+    if (swiper.activeIndex !== visibleCurrentIndex) {
+      swiper.slideTo(visibleCurrentIndex, 0);
+    }
+  }, [visibleQuestionStart, visibleCurrentIndex, currentConfigKey]);
+
+  const goPrev = () => swiperRef.current?.slidePrev();
+  const goNext = () => swiperRef.current?.slideNext();
 
   const spicyOptions: {
     level: SpicyLevel;
@@ -611,16 +641,17 @@ const NeverHaveI = () => {
 
           <div className="mt-6 flex w-full max-w-2xl grow flex-col sm:mt-20">
             <CustomSwiper
-              key={`${currentConfigKey}-${currentQuestions.length}-${visibleQuestionStart}`}
+              key={`${currentConfigKey}-${currentQuestions.length}`}
               slides={slides}
               effect="cards"
               currentIndex={visibleCurrentIndex}
               onNavigate={handleNavigate}
+              onSwiperReady={(swiper) => (swiperRef.current = swiper)}
               slideHeight="clamp(240px, 42dvh, 400px)"
             />
             <div className="mt-4 flex gap-2 sm:mt-8">
               <Button
-                onClick={() => setValidCurrentCard(currentCard - 1)}
+                onClick={goPrev}
                 className={`bg-gradient-to-r ${colorScheme.header} hover:opacity-90 w-full group transition-all`}
                 disabled={prevDisabled}
               >
@@ -631,7 +662,7 @@ const NeverHaveI = () => {
                 Forrige
               </Button>
               <Button
-                onClick={() => setValidCurrentCard(currentCard + 1)}
+                onClick={goNext}
                 className={`bg-gradient-to-r ${colorScheme.header} hover:opacity-90 w-full group transition-all`}
                 disabled={nextDisabled}
               >

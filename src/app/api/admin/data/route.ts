@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
 const DATA_DIR = join(process.cwd(), "data");
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "abakus";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const ALLOWED_GAMES = [
   "questions",
@@ -38,6 +38,13 @@ export async function POST(request: NextRequest) {
     game: Game;
     data: unknown;
   };
+
+  if (!ADMIN_PASSWORD) {
+    return NextResponse.json(
+      { error: "ADMIN_PASSWORD is not configured" },
+      { status: 500 },
+    );
+  }
 
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

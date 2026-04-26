@@ -199,6 +199,25 @@ export default function GameRoomPage({
     );
   }
 
+  if (!isConnected && error) {
+    return (
+      <main className="h-screen">
+        <BackButton
+          href="/game-room/lobby"
+          className="absolute top-4 left-4 z-10"
+        />
+        <BeerContainer color="slate">
+          <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+            <div className="max-w-md rounded-2xl border border-red-300 bg-red-100 p-6 font-semibold text-red-700">
+              {error}
+            </div>
+          </div>
+          <Footer />
+        </BeerContainer>
+      </main>
+    );
+  }
+
   if (!isConnected) {
     return <LoadingScreen color="slate" />;
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { lilita } from "@/lib/fonts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import Popup from "@/components/lobbies/Popup";
 import ShinyText from "@/components/shared/shiny-text";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useSocket } from "@/context/SocketContext";
+import { createRoom, joinRoom } from "@/lib/firebaseRooms";
 import {
   Loader2,
   ArrowRight,
@@ -33,8 +33,6 @@ const LobbyPro = () => {
   const [showPreviewDropdown, setShowPreviewDropdown] = useState(false);
   const router = useRouter();
 
-  const { socket } = useSocket();
-
   // Preview options for developers
   const previewOptions = [
     { id: "lobby-host", label: "Lobby - Host View" },
@@ -57,90 +55,68 @@ const LobbyPro = () => {
     setShowPreviewDropdown(false);
   };
 
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleRoomCreated = (data: any) => {
-      setIsLoading(false);
-      if (data.success) {
-        console.log(
-          "PRO room created, redirecting to:",
-          `/game-room/pro/${data.roomCode}`,
-        );
-        router.push(`/game-room/pro/${data.roomCode}`);
-      } else {
-        setError(data.error || "Could not create room");
-      }
-    };
-
-    const handleRoomJoined = (data: any) => {
-      setIsLoading(false);
-      console.log("Room joined data:", data);
-
-      if (data.success) {
-        if (data.gameType === "guessing") {
-          if (data.isHost) {
-            router.push(`/game-room/pro/${roomCode || data.roomCode}`);
-          } else if (data.playerName) {
-            sessionStorage.setItem(`playerName_${roomCode}`, data.playerName);
-            router.push(`/game-room/pro/${roomCode}`);
-          } else {
-            setShowNameInput(true);
-          }
-        } else {
-          setError("This is not a PRO room. Please use the default lobby.");
-        }
-      } else {
-        setError(data.error || "Could not join room");
-      }
-    };
-
-    socket.on("room_created", handleRoomCreated);
-    socket.on("room_joined", handleRoomJoined);
-
-    return () => {
-      socket.off("room_created", handleRoomCreated);
-      socket.off("room_joined", handleRoomJoined);
-    };
-  }, [socket, router, roomCode]);
-
   const handleInputCode = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomCode(e.target.value.slice(0, 6));
     setError("");
   };
 
-  const handleCreateRoom = () => {
-    if (!socket) return;
+  const handleCreateRoom = async () => {
     setIsLoading(true);
     setError("");
     const newRoomCode = generateRoomCode();
-    socket.emit("create_room", { roomCode: newRoomCode, gameType: "guessing" });
+    const result = await createRoom(newRoomCode, "guessing");
+    setIsLoading(false);
+
+    if (result.success) {
+      router.push(`/game-room/pro/${result.roomCode}`);
+    } else {
+      setError(result.error || "Could not create room");
+    }
   };
 
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     if (!roomCode.trim() || roomCode.length !== 6) {
       return setError("Enter a valid 6-digit code");
     }
 
-    if (!socket) return;
-
     setIsLoading(true);
     setError("");
-    socket.emit("join_room", { roomCode: roomCode.trim() });
+    const result = await joinRoom(roomCode.trim());
+    setIsLoading(false);
+
+    if (!result.success) {
+      setError(result.error || "Could not join room");
+      return;
+    }
+
+    if (result.gameType !== "guessing") {
+      setError("This is not a PRO room. Please use the default lobby.");
+      return;
+    }
+
+    if (result.isHost) {
+      router.push(`/game-room/pro/${result.roomCode}`);
+    } else {
+      setShowNameInput(true);
+    }
   };
 
-  const handleJoinWithName = () => {
+  const handleJoinWithName = async () => {
     if (!playerName.trim()) {
       return setError("Enter your name");
     }
-    if (!socket) return;
 
     setIsLoading(true);
     setError("");
-    socket.emit("join_room", {
-      roomCode: roomCode.trim(),
-      playerName: playerName.trim(),
-    });
+    const result = await joinRoom(roomCode.trim(), playerName.trim());
+    setIsLoading(false);
+
+    if (result.success) {
+      sessionStorage.setItem(`playerName_${roomCode}`, playerName.trim());
+      router.push(`/game-room/pro/${result.roomCode}`);
+    } else {
+      setError(result.error || "Could not join room");
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
