@@ -3,12 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import type { WavelengthCard } from "@/types/wavelength";
 import { lilita } from "@/lib/fonts";
-import {
-  getSuggestions,
-  deleteSuggestion,
-  clearSuggestions,
-  type Suggestion,
-} from "@/lib/firebaseSuggestions";
+import type { Suggestion } from "@/lib/firebaseSuggestions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -153,7 +148,7 @@ export default function AdminPage() {
       fetch("/api/admin/data?game=songs").then((r) => r.json()),
       fetch("/api/admin/data?game=alias").then((r) => r.json()),
       fetch("/api/admin/data?game=wavelength").then((r) => r.json()),
-      getSuggestions(),
+      fetch("/api/admin/suggestions").then((r) => r.json()),
     ]);
     if (Array.isArray(q)) setQuestions(q);
     if (nhi && typeof nhi === "object" && !Array.isArray(nhi)) setNhiData(nhi);
@@ -563,7 +558,11 @@ export default function AdminPage() {
                   disabled={suggestions.length === 0}
                   onClick={async () => {
                     setSuggestionsStatus("Sletter...");
-                    await clearSuggestions();
+                    await fetch("/api/admin/suggestions", {
+                      method: "DELETE",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ password }),
+                    });
                     setSuggestions([]);
                     setSuggestionsStatus("✓ Slettet!");
                     setTimeout(() => setSuggestionsStatus(""), 3000);
@@ -591,7 +590,11 @@ export default function AdminPage() {
                     </div>
                     <button
                       onClick={async () => {
-                        await deleteSuggestion(s.id);
+                        await fetch("/api/admin/suggestions", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ password, id: s.id }),
+                        });
                         setSuggestions((prev) =>
                           prev.filter((x) => x.id !== s.id),
                         );
