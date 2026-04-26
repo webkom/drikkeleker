@@ -3,6 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import type { WavelengthCard } from "@/types/wavelength";
 import { lilita } from "@/lib/fonts";
+import {
+  getSuggestions,
+  deleteSuggestion,
+  clearSuggestions,
+  type Suggestion,
+} from "@/lib/firebaseSuggestions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -52,13 +58,6 @@ const SONG_LABELS: Record<SongKey, string> = {
   "lay-all-your-love-on-me": "Lay All Your Love On Me",
   "forever-alone": "Forever Alone",
 };
-
-interface Suggestion {
-  id: string;
-  text: string;
-  name: string;
-  submittedAt: string;
-}
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "questions", label: "100 Spørsmål" },
@@ -154,7 +153,7 @@ export default function AdminPage() {
       fetch("/api/admin/data?game=songs").then((r) => r.json()),
       fetch("/api/admin/data?game=alias").then((r) => r.json()),
       fetch("/api/admin/data?game=wavelength").then((r) => r.json()),
-      fetch("/api/admin/data?game=suggestions").then((r) => r.json()),
+      getSuggestions(),
     ]);
     if (Array.isArray(q)) setQuestions(q);
     if (nhi && typeof nhi === "object" && !Array.isArray(nhi)) setNhiData(nhi);
@@ -162,7 +161,7 @@ export default function AdminPage() {
       setSongsData(songs);
     if (alias?.words && Array.isArray(alias.words)) setAliasData(alias);
     setWavelengthData(normalizeWavelengthCards(wavelength));
-    if (Array.isArray(sug)) setSuggestions(sug);
+    setSuggestions(sug);
   }, []);
 
   const handleLogin = async () => {
@@ -562,11 +561,13 @@ export default function AdminPage() {
                   variant="destructive"
                   className="gap-1"
                   disabled={suggestions.length === 0}
-                  onClick={() =>
-                    save("suggestions", [], setSuggestionsStatus).then(() =>
-                      setSuggestions([]),
-                    )
-                  }
+                  onClick={async () => {
+                    setSuggestionsStatus("Sletter...");
+                    await clearSuggestions();
+                    setSuggestions([]);
+                    setSuggestionsStatus("✓ Slettet!");
+                    setTimeout(() => setSuggestionsStatus(""), 3000);
+                  }}
                 >
                   <Trash2 size={14} /> Slett alle
                 </Button>
@@ -589,12 +590,10 @@ export default function AdminPage() {
                       </p>
                     </div>
                     <button
-                      onClick={() => {
-                        const updated = suggestions.filter(
-                          (x) => x.id !== s.id,
-                        );
-                        save("suggestions", updated, setSuggestionsStatus).then(
-                          () => setSuggestions(updated),
+                      onClick={async () => {
+                        await deleteSuggestion(s.id);
+                        setSuggestions((prev) =>
+                          prev.filter((x) => x.id !== s.id),
                         );
                       }}
                       className="text-red-400 hover:text-red-600 shrink-0"
