@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ChevronDown, Send } from "lucide-react";
-import { submitSuggestion } from "@/lib/firebaseSuggestions";
-
 const SuggestionsForm = () => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -18,10 +16,18 @@ const SuggestionsForm = () => {
     if (!text.trim()) return;
     setStatus("loading");
     try {
-      await submitSuggestion(text, name);
-      setStatus("success");
-      setText("");
-      setName("");
+      const res = await fetch("/api/game-suggestion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, name }),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setText("");
+        setName("");
+      } else {
+        setStatus("error");
+      }
     } catch {
       setStatus("error");
     }
