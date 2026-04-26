@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ChevronDown, Send } from "lucide-react";
+import { submitSuggestion } from "@/lib/firebaseSuggestions";
 
 const SuggestionsForm = () => {
   const [open, setOpen] = useState(false);
@@ -17,18 +18,10 @@ const SuggestionsForm = () => {
     if (!text.trim()) return;
     setStatus("loading");
     try {
-      const res = await fetch("/api/suggestions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, name }),
-      });
-      if (res.ok) {
-        setStatus("success");
-        setText("");
-        setName("");
-      } else {
-        setStatus("error");
-      }
+      await submitSuggestion(text, name);
+      setStatus("success");
+      setText("");
+      setName("");
     } catch {
       setStatus("error");
     }
