@@ -11,8 +11,13 @@ import { ArrowRight, Play, ArrowLeft, Plus, Send } from "lucide-react";
 import BubbleDigit from "@/components/beer/bubble-digit";
 import QuestionInput from "@/components/shared/question-input";
 import { Card } from "@/components/ui/card";
-import { useSocket } from "@/context/SocketContext";
 import LoadingScreen from "@/components/beer/loading-screen";
+import { ensureFirebaseUser } from "@/lib/firebase";
+import {
+  addChallenge,
+  listenToRoom,
+  startChallengeGame,
+} from "@/lib/firebaseRooms";
 
 const suggestions = [
   "Peikeleik: Peik på personen som {{cursor}}",
@@ -43,9 +48,11 @@ export default function DefaultGamePage({
   const unwrappedParams = use(params);
   const roomCode = unwrappedParams.roomCode;
 
-  const { socket, isConnected } = useSocket();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [error, setError] = useState("");
   const [currentCard, setCurrentCard] = useState(0);
   const [newChallenge, setNewChallenge] = useState("");
   const [oldNumber, setOldNumber] = useState(0);
@@ -64,84 +71,76 @@ export default function DefaultGamePage({
   }, [challengeCount, oldNumber]);
 
   useEffect(() => {
-    if (!socket || !isConnected) return;
+    let unsubscribe: (() => void) | undefined;
+    let isMounted = true;
 
-    socket.emit("join_room", { roomCode });
+    const init = async () => {
+      try {
+        const user = await ensureFirebaseUser();
+        if (!isMounted) return;
 
-    const handleRoomJoined = (data: any) => {
-      setGameStarted(data.gameStarted || false);
+        unsubscribe = listenToRoom(
+          roomCode,
+          (room) => {
+            if (!room) {
+              setError("Fant ikke rommet");
+              setIsConnected(false);
+              return;
+            }
+
+            setIsConnected(true);
+            setIsHost(room.hostUid === user.uid);
+            setGameStarted(room.gameStarted);
+            setChallenges(room.challenges);
+          },
+          (listenError) => {
+            setError(listenError.message);
+            setIsConnected(false);
+          },
+        );
+      } catch (initError) {
+        setError(
+          initError instanceof Error
+            ? initError.message
+            : "Kunne ikke koble til Firebase",
+        );
+        setIsConnected(false);
+      }
     };
 
-    const handleChallengeAdded = (data: any) => {
-      console.log("socket event: challenge_added", data);
-
-      setChallenges((prev) => {
-        const challenge = data.challenge;
-        const challengeId =
-          challenge._id || challenge.id || Date.now().toString();
-        const challengeText =
-          typeof challenge === "string" ? challenge : challenge.text;
-
-        const newChallenge = {
-          _id: challengeId,
-          text: challengeText,
-        };
-        return [...prev, newChallenge];
-      });
-    };
-
-    const handleChallengeAddedMidGame = (data: any) => {
-      console.log("socket event: challenge_added_mid_game", data);
-
-      const newChallenge =
-        typeof data.challenge === "string"
-          ? { _id: Date.now().toString(), text: data.challenge }
-          : data.challenge;
-
-      setChallenges((prev) => {
-        if (prev.some((c) => c._id === newChallenge._id)) {
-          return prev;
-        }
-        return [...prev, newChallenge];
-      });
-    };
-
-    const handleGameStarted = (data: any) => {
-      setGameStarted(true);
-      setChallenges(data.challenges);
-      setCurrentCard(0);
-    };
-
-    socket.on("room_joined", handleRoomJoined);
-    socket.on("challenge_added", handleChallengeAdded);
-    socket.on("challenge_added_mid_game", handleChallengeAddedMidGame);
-    socket.on("game_started", handleGameStarted);
+    init();
 
     return () => {
-      socket.off("room_joined", handleRoomJoined);
-      socket.off("challenge_added", handleChallengeAdded);
-      socket.off("challenge_added_mid_game", handleChallengeAddedMidGame);
-      socket.off("game_started", handleGameStarted);
+      isMounted = false;
+      unsubscribe?.();
     };
-  }, [socket, isConnected, roomCode]);
+  }, [roomCode]);
 
   const handleAddChallenge = useCallback(() => {
-    if (!newChallenge.trim() || !socket) {
+    if (!newChallenge.trim()) {
       return;
     }
 
-    socket.emit("add_challenge", {
-      roomCode,
-      challenge: newChallenge.trim(),
+    addChallenge(roomCode, newChallenge.trim()).catch((addError) => {
+      setError(
+        addError instanceof Error
+          ? addError.message
+          : "Kunne ikke legge til utfordring",
+      );
     });
-
     setNewChallenge("");
-  }, [newChallenge, socket, roomCode]);
+  }, [newChallenge, roomCode]);
 
   const handleStartGame = useCallback(() => {
-    if (!socket || challenges.length === 0) return;
-    socket.emit("start_game", { roomCode });
-  }, [socket, challenges.length, roomCode]);
+    if (challenges.length === 0) return;
+    startChallengeGame(roomCode).catch((startError) => {
+      setError(
+        startError instanceof Error
+          ? startError.message
+          : "Kunne ikke starte spillet",
+      );
+    });
+  }, [challenges.length, roomCode]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -161,6 +160,20 @@ export default function DefaultGamePage({
   const setValidCurrentCard = (card: number) =>
     setCurrentCard(Math.min(Math.max(card, 0), challenges.length - 1));
 
+  if (!isConnected && error) {
+    return (
+      <main className="h-screen overflow-hidden">
+        <BeerContainer color="violet">
+          <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+            <div className="max-w-md rounded-2xl border border-red-300 bg-red-100 p-6 font-semibold text-red-700">
+              {error}
+            </div>
+          </div>
+        </BeerContainer>
+      </main>
+    );
+  }
+
   if (!isConnected) {
     return <LoadingScreen color="violet" />;
   }
@@ -176,7 +189,7 @@ export default function DefaultGamePage({
             >
               Kode: {roomCode.toUpperCase()}
             </h1>
-            {!gameStarted ? (
+            {!gameStarted && isHost ? (
               <Button
                 onClick={handleStartGame}
                 className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -185,6 +198,10 @@ export default function DefaultGamePage({
                 <Play size={22} className="mr-2" />
                 Start spillet
               </Button>
+            ) : !gameStarted ? (
+              <div className="bg-white/80 text-violet-900 rounded-xl p-4 font-semibold">
+                Venter på at hosten starter spillet...
+              </div>
             ) : (
               <Button
                 onClick={toggleView}
@@ -268,6 +285,11 @@ export default function DefaultGamePage({
                         <Send size={20} className="mr-2" />
                         Send inn utfordring
                       </Button>
+                      {error && (
+                        <div className="rounded-xl border border-red-300 bg-red-100 p-3 text-sm font-semibold text-red-700">
+                          {error}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Card>

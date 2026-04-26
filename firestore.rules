@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rooms/{roomCode} {
+      function signedIn() {
+        return request.auth != null;
+      }
+
+      function isHost() {
+        return signedIn() && resource.data.hostUid == request.auth.uid;
+      }
+
+      function isActiveRoom() {
+        return resource.data.expiresAt > request.time;
+      }
+
+      function canJoin() {
+        let diff = request.resource.data.diff(resource.data);
+        let changed = diff.changedKeys();
+        return changed.hasOnly(['players', 'updatedAt'])
+          && request.resource.data.players.size() == resource.data.players.size() + 1
+          && request.resource.data.players.hasAll(resource.data.players)
+          && request.resource.data.players.any(p, p.uid == request.auth.uid && p.score == 0);
+      }
+
+      function canAnswer() {
+        let diff = request.resource.data.diff(resource.data);
+        let changed = diff.changedKeys();
+        let answerDiff = request.resource.data.answers.diff(resource.data.answers);
+        return (changed.hasOnly(['answers', 'updatedAt']) || changed.hasOnly(['answers', 'phase', 'updatedAt']))
+          && answerDiff.addedKeys().size() == 1
+          && answerDiff.changedKeys().size() == 0
+          && answerDiff.removedKeys().size() == 0
+          && resource.data.players.any(p, p.uid == request.auth.uid && answerDiff.addedKeys().hasAll([p.name]))
+          && (changed.contains('phase') ? (resource.data.phase == 2 && request.resource.data.phase == 3) : true);
+      }
+
+      function canAddChallenge() {
+        let diff = request.resource.data.diff(resource.data);
+        let changed = diff.changedKeys();
+        return changed.hasOnly(['challenges', 'updatedAt'])
+          && request.resource.data.challenges.size() == resource.data.challenges.size() + 1
+          && request.resource.data.challenges.hasAll(resource.data.challenges);
+      }
+
+      function canRefreshTtl() {
+        let diff = request.resource.data.diff(resource.data);
+        let changed = diff.changedKeys();
+        return changed.hasOnly(['expiresAt', 'updatedAt'])
+          && request.resource.data.expiresAt >= resource.data.expiresAt;
+      }
+
+      allow read: if signedIn() && isActiveRoom();
+
+      allow create: if signedIn()
+        && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.roomCode == roomCode
+        && request.resource.data.gameType in ["challenges", "guessing", "alias"];
+
+      allow update: if signedIn()
+        && isActiveRoom()
+        && (
+          isHost()
+          || canJoin()
+          || canAnswer()
+          || canAddChallenge()
+          || canRefreshTtl()
+        );
+
+      allow delete: if isHost();
+    }
+  }
+}

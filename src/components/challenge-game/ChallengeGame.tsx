@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use, useCallback } from "react";
-import { Socket } from "socket.io-client";
+import React, { useEffect, useState, useCallback } from "react";
 import { lilita } from "@/lib/fonts";
 import BeerContainer from "@/components/beer/beer-container";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,12 @@ import BubbleDigit from "@/components/beer/bubble-digit";
 import "./ChallengeGame.css";
 import QuestionInput from "@/components/shared/question-input";
 import { Card } from "@/components/ui/card";
+import { ensureFirebaseUser } from "@/lib/firebase";
+import {
+  addChallenge,
+  listenToRoom,
+  startChallengeGame,
+} from "@/lib/firebaseRooms";
 
 const suggestions = [
   "Peikeleik: Pek på personen som {{cursor}}",
@@ -35,10 +40,11 @@ const getDigitContainerWidth = (num: number) => {
 };
 
 const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [error, setError] = useState("");
   const [currentCard, setCurrentCard] = useState(0);
   const [newChallenge, setNewChallenge] = useState("");
   const [oldNumber, setOldNumber] = useState(0);
@@ -57,85 +63,76 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
   }, [challengeCount, oldNumber]);
 
   useEffect(() => {
-    let socketInstance: Socket | null = null;
+    let unsubscribe: (() => void) | undefined;
+    let isMounted = true;
 
-    const initSocket = async () => {
-      const { io } = await import("socket.io-client");
-      const newSocket = io(
-        // "http://localhost:3001",
-        "https://gw000w0kwoogkg0wo0os40wk.coolify.webkom.dev",
-      );
+    const initRoom = async () => {
+      try {
+        const user = await ensureFirebaseUser();
+        if (!isMounted) return;
 
-      socketInstance = newSocket;
+        unsubscribe = listenToRoom(
+          roomCode,
+          (room) => {
+            if (!room) {
+              setError("Fant ikke rommet");
+              setConnected(false);
+              return;
+            }
 
-      newSocket.on("connect", () => {
-        setConnected(true);
-        newSocket.emit("join_room", { roomCode });
-      });
-
-      newSocket.on("disconnect", () => {
+            setConnected(true);
+            setIsHost(room.hostUid === user.uid);
+            setGameStarted(room.gameStarted);
+            setChallenges(room.challenges);
+          },
+          (listenError) => {
+            setError(listenError.message);
+            setConnected(false);
+          },
+        );
+      } catch (initError) {
+        setError(
+          initError instanceof Error
+            ? initError.message
+            : "Kunne ikke koble til Firebase",
+        );
         setConnected(false);
-      });
-
-      newSocket.on("room_joined", (data) => {
-        setGameStarted(data.gameStarted || false);
-      });
-
-      newSocket.on("error", () => {});
-
-      newSocket.on("challenge_added", (data) => {
-        setChallenges((prev) => {
-          if (prev.some((c) => c._id === data.challenge._id)) {
-            return prev;
-          }
-          return [...prev, data.challenge];
-        });
-      });
-
-      newSocket.on("challenge_added_mid_game", (data) => {
-        setChallenges((prev) => {
-          if (prev.some((c) => c._id === data.challenge._id)) {
-            return prev;
-          }
-          return [...prev, data.challenge];
-        });
-      });
-
-      newSocket.on("game_started", (data) => {
-        setGameStarted(true);
-        setChallenges(data.challenges);
-        setCurrentCard(0);
-      });
-
-      setSocket(newSocket);
+      }
     };
 
-    initSocket();
+    initRoom();
 
     return () => {
-      if (socketInstance) {
-        socketInstance.disconnect();
-      }
+      isMounted = false;
+      unsubscribe?.();
     };
   }, [roomCode]);
 
   const handleAddChallenge = useCallback(() => {
-    if (!newChallenge.trim() || !socket) {
+    if (!newChallenge.trim()) {
       return;
     }
 
-    socket.emit("add_challenge", {
-      roomCode,
-      challenge: newChallenge.trim(),
+    addChallenge(roomCode, newChallenge.trim()).catch((addError) => {
+      setError(
+        addError instanceof Error
+          ? addError.message
+          : "Kunne ikke legge til utfordring",
+      );
     });
-
     setNewChallenge("");
-  }, [newChallenge, socket, roomCode]);
+  }, [newChallenge, roomCode]);
 
   const handleStartGame = useCallback(() => {
-    if (!socket || challenges.length === 0) return;
-    socket.emit("start_game", { roomCode });
-  }, [socket, challenges.length, roomCode]);
+    if (challenges.length === 0) return;
+    startChallengeGame(roomCode).catch((startError) => {
+      setError(
+        startError instanceof Error
+          ? startError.message
+          : "Kunne ikke starte spillet",
+      );
+    });
+  }, [challenges.length, roomCode]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -154,6 +151,20 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
 
   const setValidCurrentCard = (card: number) =>
     setCurrentCard(Math.min(Math.max(card, 0), challenges.length - 1));
+
+  if (!connected && error) {
+    return (
+      <main className="h-screen overflow-hidden">
+        <BeerContainer color="violet">
+          <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+            <div className="max-w-md rounded-2xl border border-red-300 bg-red-100 p-6 font-semibold text-red-700">
+              {error}
+            </div>
+          </div>
+        </BeerContainer>
+      </main>
+    );
+  }
 
   if (!connected) {
     return (
@@ -185,7 +196,7 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
             >
               Kode: {roomCode}
             </h1>
-            {!gameStarted ? (
+            {!gameStarted && isHost ? (
               <Button
                 onClick={handleStartGame}
                 className="bg-green-500 hover:bg-green-600 w-full h-16 text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -194,6 +205,10 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
                 <Play size={22} className="mr-2" />
                 Start spillet
               </Button>
+            ) : !gameStarted ? (
+              <div className="bg-white/80 text-violet-900 rounded-xl p-4 font-semibold">
+                Venter på at hosten starter spillet...
+              </div>
             ) : (
               <Button
                 onClick={toggleView}
@@ -277,6 +292,11 @@ const ChallengeGame = ({ roomCode }: { roomCode: string }) => {
                         <Send size={20} className="mr-2" />
                         Send inn utfordring
                       </Button>
+                      {error && (
+                        <div className="rounded-xl border border-red-300 bg-red-100 p-3 text-sm font-semibold text-red-700">
+                          {error}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Card>

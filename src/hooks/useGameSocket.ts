@@ -1,148 +1,163 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useSocket } from "@/context/SocketContext";
-
-interface Player {
-  name: string;
-  score: number;
-}
-
-interface Question {
-  text: string;
-  rangeMin: number;
-  rangeMax: number;
-}
-
-interface Room {
-  roomCode: string;
-  players: Player[];
-  questions: Question[];
-  host: string;
-  gameStarted: boolean;
-  currentQuestionIndex: number;
-  phase: number;
-  answers: Record<string, number>;
-  correctAnswer: number | null;
-  roundStartedAt: number | null;
-}
+import { useCallback, useEffect, useState } from "react";
+import { ensureFirebaseUser } from "@/lib/firebase";
+import {
+  addQuestion as addFirebaseQuestion,
+  joinRoom as joinFirebaseRoom,
+  listenToRoom,
+  nextQuestion as nextFirebaseQuestion,
+  setCorrectAnswer as setFirebaseCorrectAnswer,
+  startGuessingGame,
+  startPhase as startFirebasePhase,
+  submitGuess as submitFirebaseGuess,
+  updateQuestion as updateFirebaseQuestion,
+  type FirebaseRoom,
+  type Question,
+} from "@/lib/firebaseRooms";
 
 export const useGameSocket = (roomCode: string) => {
-  const { socket, isConnected } = useSocket();
-
-  const [room, setRoom] = useState<Room | null>(null);
+  const [room, setRoom] = useState<FirebaseRoom | null>(null);
   const [isHost, setIsHost] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
   const [playerName, setPlayerName] = useState("");
+  const [hostUid, setHostUid] = useState<string | null>(null);
+
+  const setTemporaryError = useCallback((message: string) => {
+    setError(message);
+    window.setTimeout(() => setError(""), 4000);
+  }, []);
 
   useEffect(() => {
-    if (!socket) return;
+    let isMounted = true;
 
-    console.log("useGameSocket: Attempting to join room", roomCode);
-    const storedName = sessionStorage.getItem(`playerName_${roomCode}`);
-    if (storedName) {
-      setPlayerName(storedName);
-      socket.emit("join_room", { roomCode, playerName: storedName });
-    } else {
-      socket.emit("join_room", { roomCode });
-    }
+    const init = async () => {
+      try {
+        const user = await ensureFirebaseUser();
+        if (!isMounted) return;
 
-    const handleRoomJoined = (data: any) => {
-      console.log("Socket event: room_joined", data);
-      if (data.success) {
-        setRoom(data.room);
-        setIsHost(data.isHost || false);
-        if (data.playerName) setPlayerName(data.playerName);
-      } else {
-        setError(data.error || "Failed to join room");
+        setHostUid(user.uid);
+        setIsConnected(true);
+
+        const storedName = sessionStorage.getItem(`playerName_${roomCode}`);
+        if (storedName) {
+          setPlayerName(storedName);
+          await joinFirebaseRoom(roomCode, storedName);
+        }
+      } catch (initError) {
+        if (!isMounted) return;
+        setTemporaryError(
+          initError instanceof Error
+            ? initError.message
+            : "Kunne ikke koble til Firebase",
+        );
+        setIsConnected(false);
       }
     };
 
-    const handleRoomUpdated = (updatedRoom: Room) => {
-      console.log("Socket event: room_updated", updatedRoom);
-      setRoom(updatedRoom);
-      if (socket.id === updatedRoom.host) {
-        setIsHost(true);
-      }
-    };
-
-    const handleError = (data: { message: string }) => {
-      console.error("Socket error:", data.message);
-      setError(data.message);
-      setTimeout(() => setError(""), 4000);
-    };
-
-    socket.on("room_joined", handleRoomJoined);
-    socket.on("room_updated", handleRoomUpdated);
-    socket.on("error", handleError);
+    init();
 
     return () => {
-      console.log("useGameSocket: Cleaning up listeners");
-      socket.off("room_joined", handleRoomJoined);
-      socket.off("room_updated", handleRoomUpdated);
-      socket.off("error", handleError);
+      isMounted = false;
     };
-  }, [socket, roomCode]);
+  }, [roomCode, setTemporaryError]);
 
-  const joinRoom = useCallback(
-    (name: string) => {
-      if (socket) {
-        setPlayerName(name);
-        sessionStorage.setItem(`playerName_${roomCode}`, name);
-        socket.emit("join_room", { roomCode, playerName: name });
+  useEffect(() => {
+    if (!isConnected || !hostUid) return;
+
+    return listenToRoom(
+      roomCode,
+      (updatedRoom) => {
+        setRoom(updatedRoom);
+        setIsHost(updatedRoom?.hostUid === hostUid);
+      },
+      (listenError) => {
+        setTemporaryError(listenError.message);
+      },
+    );
+  }, [hostUid, isConnected, roomCode, setTemporaryError]);
+
+  const runAction = useCallback(
+    async (action: () => Promise<void>) => {
+      try {
+        await action();
+      } catch (actionError) {
+        setTemporaryError(
+          actionError instanceof Error
+            ? actionError.message
+            : "Handlingen feilet",
+        );
       }
     },
-    [socket, roomCode],
+    [setTemporaryError],
+  );
+
+  const joinRoom = useCallback(
+    async (name: string) => {
+      const trimmedName = name.trim();
+      if (!trimmedName) return;
+
+      try {
+        const result = await joinFirebaseRoom(roomCode, trimmedName);
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        setPlayerName(trimmedName);
+        sessionStorage.setItem(`playerName_${roomCode}`, trimmedName);
+      } catch (joinError) {
+        setTemporaryError(
+          joinError instanceof Error ? joinError.message : "Kunne ikke bli med",
+        );
+      }
+    },
+    [roomCode, setTemporaryError],
   );
 
   const addQuestion = useCallback(
-    (question: Omit<Question, "text"> & { text: string }) => {
-      if (socket && isHost) socket.emit("add_question", { roomCode, question });
-    },
-    [socket, roomCode, isHost],
+    (question: Question) =>
+      runAction(() => addFirebaseQuestion(roomCode, question)),
+    [roomCode, runAction],
   );
 
   const updateQuestion = useCallback(
-    (index: number, question: Omit<Question, "text"> & { text: string }) => {
-      if (socket && isHost)
-        socket.emit("update_question", { roomCode, index, question });
-    },
-    [socket, roomCode, isHost],
+    (index: number, question: Question) =>
+      runAction(() => updateFirebaseQuestion(roomCode, index, question)),
+    [roomCode, runAction],
   );
 
-  const startGame = useCallback(() => {
-    if (socket && isHost) socket.emit("start_game", { roomCode });
-  }, [socket, roomCode, isHost]);
+  const startGame = useCallback(
+    () => runAction(() => startGuessingGame(roomCode)),
+    [roomCode, runAction],
+  );
 
   const startPhase = useCallback(
-    (phase: number) => {
-      if (socket && isHost) socket.emit("start_phase", { roomCode, phase });
-    },
-    [socket, roomCode, isHost],
+    (phase: number) => runAction(() => startFirebasePhase(roomCode, phase)),
+    [roomCode, runAction],
   );
 
   const submitGuess = useCallback(
     (guess: number) => {
-      if (socket && playerName)
-        socket.emit("submit_guess", { roomCode, playerName, guess });
+      if (!playerName) return;
+      return runAction(() => submitFirebaseGuess(roomCode, playerName, guess));
     },
-    [socket, roomCode, playerName],
+    [playerName, roomCode, runAction],
   );
 
   const setCorrectAnswer = useCallback(
-    (answer: number) => {
-      if (socket && isHost)
-        socket.emit("set_answer", { roomCode, correctAnswer: answer });
-    },
-    [socket, roomCode, isHost],
+    (answer: number) =>
+      runAction(() => setFirebaseCorrectAnswer(roomCode, answer)),
+    [roomCode, runAction],
   );
 
-  const nextQuestion = useCallback(() => {
-    if (socket && isHost) socket.emit("next_question", { roomCode });
-  }, [socket, roomCode, isHost]);
+  const nextQuestion = useCallback(
+    () => runAction(() => nextFirebaseQuestion(roomCode)),
+    [roomCode, runAction],
+  );
 
   return {
-    socket,
+    socket: null,
     room,
     isHost,
     isConnected,

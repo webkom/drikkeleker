@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SocketProvider } from "@/context/SocketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} scroll-smooth`}>
+    <html
+      lang="en"
+      className={`${inter.className} scroll-smooth`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           defer
@@ -25,7 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-white" suppressHydrationWarning>
-        <SocketProvider>{children}</SocketProvider>
+        {children}
       </body>
     </html>
   );

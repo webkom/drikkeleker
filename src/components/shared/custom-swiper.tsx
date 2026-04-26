@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import type { SwiperProps } from "swiper/react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import {
   EffectCards,
   EffectCoverflow,
@@ -49,6 +50,7 @@ interface CustomSwiperProps {
   currentIndex: number;
   color?: Color;
   slideHeight?: string;
+  onSwiperReady?: (swiper: SwiperType) => void;
 }
 
 const effectModules: Record<string, any> = {
@@ -84,8 +86,9 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
   currentIndex,
   color = "violet",
   slideHeight = "300px",
+  onSwiperReady,
 }) => {
-  const swiperRef = useRef<any>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
   const colorClass = getColorClasses(color);
 
   useEffect(() => {
@@ -105,11 +108,18 @@ const CustomSwiper: React.FC<CustomSwiperProps> = ({
         modules={effectModules[effect] ? [effectModules[effect]] : []}
         className="w-full"
         style={{ height: slideHeight }}
-        onSlideChange={(swiper) => onNavigate && onNavigate(swiper.activeIndex)}
         initialSlide={currentIndex}
-        onSwiper={(swiper) => (swiperRef.current = swiper)}
         watchSlidesProgress={true}
+        observer={true}
+        observeSlideChildren={true}
         {...swiperOptions}
+        onSlideChangeTransitionEnd={(swiper) =>
+          onNavigate?.(swiper.activeIndex)
+        }
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+          onSwiperReady?.(swiper);
+        }}
       >
         {slides.map((slide) => {
           const slideColorClass = slide.color
