@@ -98,17 +98,18 @@
     "group": "games",
     "order": 7,
     "enabled": true,
-    "tag": "Oppe igjen!",
+    "tag": "Oppe!",
     "wide": true
   },
   {
-    "id": "testnysang",
-    "label": "TestNySang",
-    "href": "/song/testnysang",
-    "icon": "MicVocal",
+    "id": "beat-for-beat",
+    "label": "Beat for Beat",
+    "href": "/beat-for-beat",
+    "icon": "Swords",
     "color": "amber",
-    "group": "songs",
-    "order": 3,
-    "enabled": true
+    "group": "games",
+    "order": 8,
+    "enabled": true,
+    "tag": "Nytt!"
   }
 ]

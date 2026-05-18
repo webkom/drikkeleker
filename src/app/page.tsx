@@ -129,6 +129,17 @@ const DEFAULT_GAMES: GameEntry[] = [
     tag: "Oppe igjen!",
     wide: true,
   },
+  {
+    id: "beat-for-beat",
+    label: "Beat for Beat",
+    href: "/beat-for-beat",
+    icon: "Swords",
+    color: "amber",
+    group: "games",
+    order: 8,
+    enabled: true,
+    tag: "Nytt!",
+  },
 ];
 
 type LucideIconComponent = React.ComponentType<{ size?: number }>;

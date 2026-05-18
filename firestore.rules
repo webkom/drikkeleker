@@ -51,12 +51,12 @@ service cloud.firestore {
           && request.resource.data.expiresAt >= resource.data.expiresAt;
       }
 
-      allow read: if signedIn() && isActiveRoom();
+      allow read: if signedIn() && (resource == null || isActiveRoom());
 
       allow create: if signedIn()
         && request.resource.data.hostUid == request.auth.uid
         && request.resource.data.roomCode == roomCode
-        && request.resource.data.gameType in ["challenges", "guessing", "alias"];
+        && request.resource.data.gameType in ["challenges", "guessing", "alias", "beat-for-beat"];
 
       allow update: if signedIn()
         && isActiveRoom()
