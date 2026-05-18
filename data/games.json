@@ -1,0 +1,114 @@
+[
+  {
+    "id": "lambo",
+    "label": "Lambo",
+    "href": "/song/lambo",
+    "icon": "Beer",
+    "color": "red",
+    "group": "songs",
+    "order": 1,
+    "enabled": true
+  },
+  {
+    "id": "lay-all-your-love-on-me",
+    "label": "Lay All Your Love on Me",
+    "href": "/song/lay-all-your-love-on-me",
+    "icon": "MicVocal",
+    "color": "blue",
+    "group": "songs",
+    "order": 2,
+    "enabled": true
+  },
+  {
+    "id": "forever-alone",
+    "label": "Forever Alone",
+    "href": "/song/forever-alone",
+    "icon": "HeartCrack",
+    "color": "green",
+    "group": "songs",
+    "order": 4,
+    "enabled": true
+  },
+  {
+    "id": "questions",
+    "label": "100 Spørsmål",
+    "href": "/questions",
+    "icon": "MessageCircleQuestion",
+    "color": "fuchsia",
+    "group": "games",
+    "order": 1,
+    "enabled": true
+  },
+  {
+    "id": "never-have-i",
+    "label": "Never Have I Ever",
+    "href": "/never-have-i",
+    "icon": "ListChecks",
+    "color": "rose",
+    "group": "games",
+    "order": 2,
+    "enabled": true
+  },
+  {
+    "id": "alias",
+    "label": "Alias",
+    "href": "/alias",
+    "icon": "Tags",
+    "color": "cyan",
+    "group": "games",
+    "order": 3,
+    "enabled": false
+  },
+  {
+    "id": "wavelength",
+    "label": "Bølgelengde",
+    "href": "/wavelength",
+    "icon": "SlidersHorizontal",
+    "color": "violet",
+    "group": "games",
+    "order": 4,
+    "enabled": false
+  },
+  {
+    "id": "dice",
+    "label": "Terningleken",
+    "href": "/dice",
+    "icon": "Dice6",
+    "color": "teal",
+    "group": "games",
+    "order": 5,
+    "enabled": true
+  },
+  {
+    "id": "six-minutes",
+    "label": "6 Minutes",
+    "href": "/six-minutes",
+    "icon": "Timer",
+    "color": "orange",
+    "group": "games",
+    "order": 6,
+    "enabled": true
+  },
+  {
+    "id": "game-room",
+    "label": "Viljens Drikkelek",
+    "href": "/game-room/lobby",
+    "icon": "ScrollText",
+    "color": "violet",
+    "group": "games",
+    "order": 7,
+    "enabled": true,
+    "tag": "Oppe igjen!",
+    "wide": true
+  },
+  {
+    "id": "testnysang",
+    "label": "TestNySang",
+    "href": "/song/testnysang",
+    "icon": "MicVocal",
+    "color": "amber",
+    "group": "songs",
+    "order": 3,
+    "enabled": true
+  }
+]

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Color, getColorClasses } from "@/lib/colors";
 
 interface NavButtonProps {
-  label: string;
+  label: React.ReactNode;
   href: string;
   color?: Color;
   icon?: React.ReactNode;

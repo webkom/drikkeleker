@@ -1,0 +1,20 @@
+{
+  "games": {
+    "questions": true,
+    "never-have-i": true,
+    "alias": true,
+    "wavelength": false,
+    "dice": true,
+    "six-minutes": true,
+    "game-room": true
+  },
+  "tags": {
+    "questions": "",
+    "never-have-i": "",
+    "alias": "",
+    "wavelength": "",
+    "dice": "",
+    "six-minutes": "",
+    "game-room": "Oppe igjen!"
+  }
+}

@@ -11,6 +11,8 @@ const ALLOWED_GAMES = [
   "songs",
   "alias",
   "wavelength",
+  "frontpage",
+  "games",
 ] as const;
 type Game = (typeof ALLOWED_GAMES)[number];
 
