@@ -31,6 +31,7 @@ const buildRound = (
     timerDurationSec: durationSec,
     pausedRemainingMs: null,
     awardedThisRound: false,
+    ...(draft.spotifyTrackId ? { spotifyTrackId: draft.spotifyTrackId } : {}),
   };
 };
 
@@ -96,6 +97,7 @@ export const awardPoints = (state: GameState): GameState => {
     },
     round: {
       ...state.round,
+      words: state.round.words.map((w) => ({ ...w, revealed: true })),
       roundPhase: "round-over",
       timerDeadline: null,
       pausedRemainingMs: null,
@@ -215,6 +217,7 @@ export const addPhrase = (
   state: GameState,
   text: string,
   pointValue?: number,
+  spotifyTrackId?: string,
 ): GameState => {
   const draft: PhraseDraft = {
     id:
@@ -223,6 +226,7 @@ export const addPhrase = (
         : Math.random().toString(36).slice(2),
     text: text.trim(),
     pointValue: pointValue ?? state.defaults.pointValue,
+    ...(spotifyTrackId ? { spotifyTrackId } : {}),
   };
   return stamp({ ...state, queue: [...state.queue, draft] });
 };
@@ -264,3 +268,6 @@ export const adjustScore = (
       [team]: Math.max(0, state.scores[team] + delta),
     },
   });
+
+export const toggleAudienceTimer = (state: GameState): GameState =>
+  stamp({ ...state, showTimerToAudience: !state.showTimerToAudience });

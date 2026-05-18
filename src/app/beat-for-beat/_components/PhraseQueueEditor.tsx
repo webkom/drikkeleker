@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Minus } from "lucide-react";
+import { Minus, Music, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { parsePhrase } from "../_lib/assignColors";
@@ -10,7 +10,8 @@ import {
   removePhrase,
   updatePhrasePoints,
 } from "../_lib/gameActions";
-import { MAX_WORDS, MIN_WORDS, type GameState } from "../_lib/types";
+import { parseSpotifyTrackId } from "../_lib/spotify";
+import { type GameState, MAX_WORDS, MIN_WORDS } from "../_lib/types";
 
 interface Props {
   state: GameState;
@@ -24,7 +25,9 @@ export default function PhraseQueueEditor({
   disabled,
 }: Props) {
   const [draft, setDraft] = useState("");
+  const [spotifyUrl, setSpotifyUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [spotifyError, setSpotifyError] = useState<string | null>(null);
 
   const submit = async () => {
     const wordCount = parsePhrase(draft).length;
@@ -34,21 +37,32 @@ export default function PhraseQueueEditor({
       );
       return;
     }
+    let trackId: string | undefined = undefined;
+    if (spotifyUrl.trim()) {
+      const parsed = parseSpotifyTrackId(spotifyUrl);
+      if (!parsed) {
+        setSpotifyError("Ugyldig Spotify-lenke. Lim inn en track-URL.");
+        return;
+      }
+      trackId = parsed;
+    }
     setError(null);
-    await applyAction((s) => addPhrase(s, draft.trim()));
+    setSpotifyError(null);
+    await applyAction((s) => addPhrase(s, draft.trim(), undefined, trackId));
     setDraft("");
+    setSpotifyUrl("");
   };
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <label className="text-xs uppercase tracking-wide text-gray-500 font-semibold">
-          Frase ({MIN_WORDS}–{MAX_WORDS} ord)
+          Frase ({MIN_WORDS}–{MAX_WORDS} ord, separert av mellomrom)
         </label>
         <div className="flex gap-2">
           <Input
             value={draft}
-            placeholder="F.eks. Vi sitter her i venterommet"
+            placeholder="F.eks. «Never gonna give you up»"
             onChange={(e) => {
               setDraft(e.target.value);
               if (error) setError(null);
@@ -70,6 +84,31 @@ export default function PhraseQueueEditor({
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </div>
 
+      <div className="flex flex-col gap-1">
+        <label className="text-xs uppercase tracking-wide text-gray-500 font-semibold">
+          Spotify-lenke (valgfritt)
+        </label>
+        <Input
+          value={spotifyUrl}
+          placeholder="https://open.spotify.com/track/..."
+          onChange={(e) => {
+            setSpotifyUrl(e.target.value);
+            if (spotifyError) setSpotifyError(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && draft.trim()) submit();
+          }}
+          disabled={disabled}
+          className="bg-white"
+        />
+        <p className="text-xs text-gray-500">
+          Spilles av på publikum-skjermen når laget gjetter riktig. Kun de
+          første 30 sekundene spilles av (med mindre publikum-skjermen er logget
+          inn på Spotify Premium).
+        </p>
+        {spotifyError && <p className="text-red-500 text-sm">{spotifyError}</p>}
+      </div>
+
       {state.queue.length === 0 ? (
         <p className="text-sm text-gray-500 italic">Ingen fraser enda.</p>
       ) : (
@@ -86,7 +125,16 @@ export default function PhraseQueueEditor({
               <span className="text-xs text-gray-400 w-6 text-right">
                 {i + 1}
               </span>
-              <span className="flex-1 text-sm">{p.text}</span>
+              <span className="flex-1 text-sm flex items-center gap-1.5">
+                {p.text}
+                {p.spotifyTrackId && (
+                  <Music
+                    size={14}
+                    className="text-green-600 shrink-0"
+                    aria-label="Har Spotify-lenke"
+                  />
+                )}
+              </span>
               <div className="flex items-center gap-0.5">
                 <button
                   onClick={() =>

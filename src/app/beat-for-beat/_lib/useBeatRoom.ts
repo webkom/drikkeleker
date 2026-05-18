@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  applyBeatAction,
   beatRoomFromSnapshot,
   listenToBeatRoom,
+  writeBeatState,
   type BeatFirebaseRoom,
 } from "@/lib/firebaseBeatRooms";
 import { doc, getDoc } from "firebase/firestore";
@@ -25,6 +25,25 @@ export function useBeatRoom(roomCode: string | null): UseBeatRoomResult {
   const [uid, setUid] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [optimistic, setOptimistic] = useState<GameState | null>(null);
+
+  const optimisticRef = useRef<GameState | null>(null);
+  const roomStateRef = useRef<GameState | null>(null);
+
+  useEffect(() => {
+    optimisticRef.current = optimistic;
+  }, [optimistic]);
+
+  useEffect(() => {
+    roomStateRef.current = room?.state ?? null;
+  }, [room?.state]);
+
+  useEffect(() => {
+    if (!optimistic || !room?.state) return;
+    if (room.state.updatedAt >= optimistic.updatedAt) {
+      setOptimistic(null);
+    }
+  }, [room?.state, optimistic]);
 
   useEffect(() => {
     let cancelled = false;
@@ -77,18 +96,32 @@ export function useBeatRoom(roomCode: string | null): UseBeatRoomResult {
   const applyAction = useCallback(
     async (action: (state: GameState) => GameState) => {
       if (!roomCode) return;
+      const opt = optimisticRef.current;
+      const server = roomStateRef.current;
+      const base =
+        opt && server && opt.updatedAt < server.updatedAt
+          ? server
+          : (opt ?? server);
+      if (!base) return;
+      const next = action(base);
+      optimisticRef.current = next;
+      setOptimistic(next);
       try {
-        await applyBeatAction(roomCode, action);
+        await writeBeatState(roomCode, next);
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
+        optimisticRef.current = null;
+        setOptimistic(null);
       }
     },
     [roomCode],
   );
 
+  const effectiveState = optimistic ?? room?.state ?? null;
+
   return {
     room,
-    state: room?.state ?? null,
+    state: effectiveState,
     isHost: !!room && !!uid && room.hostUid === uid,
     loading,
     error,

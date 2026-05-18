@@ -1,13 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Music } from "lucide-react";
 import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/shared/back-button";
 import Footer from "@/components/shared/footer";
+import { Button } from "@/components/ui/button";
 import { lilita } from "@/lib/fonts";
 import { useBeatRoom } from "../_lib/useBeatRoom";
 import ScoreBoard from "./ScoreBoard";
 import WordTile from "./WordTile";
 import Timer from "./Timer";
+import SpotifyPlayer from "./SpotifyPlayer";
+import GameOverPanel from "./GameOverPanel";
+
+const AUDIO_ARMED_KEY = "beat-for-beat:audio-armed";
 
 interface AudienceViewProps {
   roomCode: string;
@@ -15,6 +22,23 @@ interface AudienceViewProps {
 
 export default function AudienceView({ roomCode }: AudienceViewProps) {
   const { state, loading, error } = useBeatRoom(roomCode);
+  const [audioArmed, setAudioArmed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem(AUDIO_ARMED_KEY) === "1") {
+      setAudioArmed(true);
+    }
+  }, []);
+
+  const armAudio = () => {
+    setAudioArmed(true);
+    try {
+      sessionStorage.setItem(AUDIO_ARMED_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+  };
 
   if (loading) {
     return (
@@ -64,6 +88,18 @@ export default function AudienceView({ roomCode }: AudienceViewProps) {
             </code>
           </div>
 
+          {!audioArmed && (
+            <div className="w-full max-w-md bg-white/90 rounded-2xl p-4 flex flex-col items-center gap-2 text-center">
+              <p className="text-sm text-gray-700">
+                Trykk for å aktivere musikk på denne skjermen, så starter sangen
+                automatisk når et lag gjetter riktig.
+              </p>
+              <Button onClick={armAudio} className="gap-2">
+                <Music size={16} /> Aktiver musikk
+              </Button>
+            </div>
+          )}
+
           <ScoreBoard
             teams={state.teams}
             scores={state.scores}
@@ -97,19 +133,45 @@ export default function AudienceView({ roomCode }: AudienceViewProps) {
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-3 justify-center bg-white/40 rounded-2xl p-6 min-h-[120px] items-center">
+              <div
+                style={{ perspective: "900px" }}
+                className="flex flex-wrap gap-3 justify-center bg-white/40 rounded-2xl p-6 min-h-[120px] items-center"
+              >
                 {state.round.words.map((word, i) => (
-                  <WordTile key={i} word={word} index={i} mode="audience" />
+                  <WordTile
+                    key={`${state.round!.phraseId}-${i}-${word.revealed}`}
+                    word={word}
+                    index={i}
+                    mode="audience"
+                    awarded={state.round!.awardedThisRound}
+                  />
                 ))}
               </div>
 
-              {(state.round.roundPhase === "guessing" ||
-                state.round.pausedRemainingMs != null) && (
-                <div className="w-full max-w-sm">
-                  <Timer
-                    deadline={state.round.timerDeadline}
-                    pausedRemainingMs={state.round.pausedRemainingMs}
-                    durationSec={state.round.timerDurationSec}
+              {state.showTimerToAudience &&
+                (state.round.roundPhase === "guessing" ||
+                  state.round.pausedRemainingMs != null) && (
+                  <div className="w-full max-w-sm">
+                    <Timer
+                      deadline={state.round.timerDeadline}
+                      pausedRemainingMs={state.round.pausedRemainingMs}
+                      durationSec={state.round.timerDurationSec}
+                    />
+                  </div>
+                )}
+
+              {state.round.spotifyTrackId && audioArmed && (
+                <div
+                  aria-hidden={!state.round.awardedThisRound}
+                  className={`w-full max-w-md transition-all duration-500 ease-out ${
+                    state.round.awardedThisRound
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-95 h-0 overflow-hidden pointer-events-none"
+                  }`}
+                >
+                  <SpotifyPlayer
+                    trackId={state.round.spotifyTrackId}
+                    shouldPlay={state.round.awardedThisRound}
                   />
                 </div>
               )}
@@ -117,29 +179,7 @@ export default function AudienceView({ roomCode }: AudienceViewProps) {
           )}
 
           {state.phase === "game-over" && (
-            <div className="bg-white/90 rounded-2xl shadow p-8 text-center flex flex-col gap-3 w-full">
-              <h2 className={`${lilita.className} text-4xl`}>
-                Spillet er ferdig!
-              </h2>
-              {(() => {
-                const a = state.scores.A;
-                const b = state.scores.B;
-                if (a === b) {
-                  return (
-                    <p className="text-lg">
-                      Uavgjort på {a} poeng – alle drikker!
-                    </p>
-                  );
-                }
-                const winner = a > b ? "A" : "B";
-                return (
-                  <p className="text-lg">
-                    <span className="font-bold">{state.teams[winner]}</span>{" "}
-                    vant med {Math.max(a, b)} poeng
-                  </p>
-                );
-              })()}
-            </div>
+            <GameOverPanel teams={state.teams} scores={state.scores} />
           )}
         </div>
         <Footer />

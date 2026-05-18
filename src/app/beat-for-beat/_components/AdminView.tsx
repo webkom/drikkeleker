@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import {
+  Check,
+  Eye,
+  EyeOff,
+  Minus,
   Pause,
   Play,
+  Plus,
+  Repeat,
   RotateCcw,
   SkipForward,
-  Check,
-  Repeat,
-  Minus,
-  Plus,
 } from "lucide-react";
 import BeerContainer from "@/components/beer/beer-container";
 import BackButton from "@/components/shared/back-button";
@@ -19,6 +21,7 @@ import { lilita } from "@/lib/fonts";
 import { useBeatRoom } from "../_lib/useBeatRoom";
 import {
   adjustPointValue,
+  adjustScore,
   awardPoints,
   nextPhrase,
   passTurn,
@@ -27,6 +30,7 @@ import {
   resetTimer,
   resumeTimer,
   revealWord,
+  toggleAudienceTimer,
 } from "../_lib/gameActions";
 import ScoreBoard from "./ScoreBoard";
 import WordTile from "./WordTile";
@@ -83,8 +87,8 @@ export default function AdminView({ roomCode }: AdminViewProps) {
               Bare hosten kan styre
             </h1>
             <p className="text-gray-700">
-              Du er ikke host i dette rommet. Åpne publikum-visningen istedenfor,
-              eller lag et nytt rom.
+              Du er ikke host i dette rommet. Åpne publikum-visningen
+              istedenfor, eller lag et nytt rom.
             </p>
             <Button asChild>
               <a href={`/beat-for-beat/audience/${roomCode}`}>
@@ -111,16 +115,15 @@ export default function AdminView({ roomCode }: AdminViewProps) {
             >
               {roomCode}
             </code>
-            <span className="text-xs text-gray-600">
-              Del koden med publikum: åpne /beat-for-beat og klikk &ldquo;Bli
-              med&rdquo;
-            </span>
           </div>
 
           <ScoreBoard
             teams={state.teams}
             scores={state.scores}
             activeTeam={state.round?.activeTeam ?? null}
+            onAdjust={(team, delta) =>
+              applyAction((s) => adjustScore(s, team, delta))
+            }
           />
 
           {(state.phase === "idle" || state.phase === "setup") && (
@@ -206,10 +209,13 @@ function GameControls({ state, applyAction, onReset }: GameControlsProps) {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3 justify-center bg-white/40 rounded-2xl p-6">
+      <div
+        style={{ perspective: "900px" }}
+        className="flex flex-wrap gap-3 justify-center bg-white/40 rounded-2xl p-6"
+      >
         {round.words.map((word, i) => (
           <WordTile
-            key={i}
+            key={`${round.phraseId}-${i}-${word.revealed}`}
             word={word}
             index={i}
             mode="admin"
@@ -226,6 +232,21 @@ function GameControls({ state, applyAction, onReset }: GameControlsProps) {
             pausedRemainingMs={round.pausedRemainingMs}
             durationSec={round.timerDurationSec}
           />
+          <button
+            type="button"
+            onClick={() => applyAction(toggleAudienceTimer)}
+            className="self-center inline-flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-900 underline-offset-2 hover:underline"
+          >
+            {state.showTimerToAudience ? (
+              <>
+                <Eye size={14} /> Publikum ser timeren
+              </>
+            ) : (
+              <>
+                <EyeOff size={14} /> Publikum ser ikke timeren
+              </>
+            )}
+          </button>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <Button
               size="lg"
@@ -323,7 +344,7 @@ function GameOverPanel({ state, onReset }: GameOverPanelProps) {
   const winnerLabel =
     a === b
       ? "Uavgjort!"
-      : `${state.teams[a > b ? "A" : "B"]} vant med ${Math.max(a, b)} poeng`;
+      : `Gratulerer til ${state.teams[a > b ? "A" : "B"]}!!!`;
 
   return (
     <div className="bg-white/90 rounded-2xl shadow p-8 text-center flex flex-col gap-4 w-full">

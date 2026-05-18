@@ -10,10 +10,7 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { ensureFirebaseUser, getFirebaseDb } from "@/lib/firebase";
-import {
-  defaultState,
-  type GameState,
-} from "@/app/beat-for-beat/_lib/types";
+import { defaultState, type GameState } from "@/app/beat-for-beat/_lib/types";
 
 export interface BeatFirebaseRoom {
   roomCode: string;
@@ -49,10 +46,11 @@ export const beatRoomFromSnapshot = (
   if (!snapshot.exists()) return null;
   const data = snapshot.data();
   if (data.gameType !== GAME_TYPE) return null;
+  const stored = (data.state ?? {}) as Partial<GameState>;
   return {
     roomCode: data.roomCode ?? snapshot.id,
     hostUid: data.hostUid,
-    state: (data.state as GameState) ?? defaultState(),
+    state: { ...defaultState(), ...stored },
   };
 };
 
@@ -123,28 +121,14 @@ export const listenToBeatRoom = (
     onError,
   );
 
-export const applyBeatAction = async (
+export const writeBeatState = async (
   roomCode: string,
-  action: (state: GameState) => GameState,
-  options: { requireHost?: boolean } = { requireHost: true },
+  nextState: GameState,
 ): Promise<void> => {
-  const user = await ensureFirebaseUser();
-
-  await runTransaction(getFirebaseDb(), async (transaction) => {
-    const ref = getRoomRef(roomCode);
-    const snapshot = await transaction.get(ref);
-    const room = beatRoomFromSnapshot(snapshot);
-    if (!room) throw new Error("Fant ikke rommet");
-    if (options.requireHost && room.hostUid !== user.uid) {
-      throw new Error("Bare hosten kan endre spillet");
-    }
-
-    const nextState = action(room.state);
-    transaction.update(ref, {
-      state: nextState,
-      expiresAt: getExpiresAt(),
-      updatedAt: serverTimestamp(),
-    });
+  await updateDoc(getRoomRef(roomCode), {
+    state: nextState,
+    expiresAt: getExpiresAt(),
+    updatedAt: serverTimestamp(),
   });
 };
 
