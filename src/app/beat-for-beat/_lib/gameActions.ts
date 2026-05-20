@@ -301,7 +301,11 @@ export const updatePhraseText = (
 
 export const updateDefaults = (
   state: GameState,
-  defaults: { timerDurationSec: number; pointValue: number; redWordsCount: number },
+  defaults: {
+    timerDurationSec: number;
+    pointValue: number;
+    redWordsCount: number;
+  },
 ): GameState => stamp({ ...state, defaults });
 
 export const adjustScore = (
@@ -333,4 +337,3 @@ export const revealAllWords = (state: GameState): GameState => {
     },
   });
 };
-

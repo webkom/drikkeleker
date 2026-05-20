@@ -10,7 +10,10 @@ export class PhraseTooShortError extends Error {
 export const parsePhrase = (raw: string): string[] =>
   raw.trim().split(/\s+/).filter(Boolean);
 
-export const assignColors = (words: string[], redWordsCount: number = 2): Word[] => {
+export const assignColors = (
+  words: string[],
+  redWordsCount: number = 2,
+): Word[] => {
   if (words.length < 2) throw new PhraseTooShortError();
   const idx = Array.from(words.keys());
   for (let i = idx.length - 1; i > 0; i--) {
