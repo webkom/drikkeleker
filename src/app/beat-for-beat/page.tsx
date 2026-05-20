@@ -45,7 +45,7 @@ export default function BeatForBeatLanding() {
     <main className="overflow-x-hidden">
       <BackButton className="absolute top-4 left-4 z-10" href="/#games" />
       <BeerContainer color="amber" className="min-h-dvh">
-        <div className="pt-16 flex flex-col items-center gap-8 max-w-md w-full">
+        <div className="my-auto flex flex-col items-center gap-8 max-w-md w-full mx-auto">
           <div className="flex items-center justify-center gap-3">
             <h1 className={`${lilita.className} text-5xl text-center`}>
               Beat for Beat
