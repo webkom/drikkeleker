@@ -26,7 +26,7 @@
     "icon": "HeartCrack",
     "color": "green",
     "group": "songs",
-    "order": 4,
+    "order": 3,
     "enabled": true
   },
   {
@@ -47,7 +47,7 @@
     "color": "rose",
     "group": "games",
     "order": 2,
-    "enabled": true
+    "enabled": false
   },
   {
     "id": "alias",
@@ -57,7 +57,7 @@
     "color": "cyan",
     "group": "games",
     "order": 3,
-    "enabled": false
+    "enabled": true
   },
   {
     "id": "wavelength",
@@ -98,7 +98,7 @@
     "group": "games",
     "order": 7,
     "enabled": true,
-    "tag": "Oppe!",
+    "tag": "Oppe igjen!",
     "wide": true
   },
   {

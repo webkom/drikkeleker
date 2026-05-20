@@ -194,6 +194,7 @@ function GameControls({ state, applyAction, onReset }: GameControlsProps) {
   const isPaused =
     round.timerDeadline == null && round.pausedRemainingMs != null;
   const inGuessing = round.roundPhase === "guessing" || isPaused;
+  const inWaitingForReveal = round.roundPhase === "waiting-for-reveal";
   const inRoundOver = round.roundPhase === "round-over";
 
   return (
@@ -221,10 +222,28 @@ function GameControls({ state, applyAction, onReset }: GameControlsProps) {
             index={i}
             mode="admin"
             onClick={() => applyAction((s) => revealWord(s, i))}
-            disabled={inRoundOver}
+            disabled={inRoundOver || inWaitingForReveal}
           />
         ))}
       </div>
+
+      {inWaitingForReveal && (
+        <div className="bg-white/90 border-2 border-amber-400 rounded-2xl p-6 flex flex-col gap-4 items-center animate-in fade-in zoom-in duration-300">
+          <h3 className={`${lilita.className} text-2xl text-amber-900`}>
+            {round.awardedThisRound ? "Riktig svar!" : "Alle ord er valgt!"}
+          </h3>
+          <p className="text-gray-700 text-center">
+            Trykk på knappen under for å avsløre hele frasen og spille sangen.
+          </p>
+          <Button
+            size="lg"
+            onClick={() => applyAction(revealAllWords)}
+            className="w-full gap-2 bg-amber-500 hover:bg-amber-600 text-white py-8 text-2xl h-auto"
+          >
+            <Eye size={28} /> AVSLØR SVAR
+          </Button>
+        </div>
+      )}
 
       {inGuessing && (
         <div className="bg-white/80 rounded-2xl p-4 flex flex-col gap-3">

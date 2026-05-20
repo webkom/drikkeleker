@@ -6,6 +6,7 @@ import { lilita } from "@/lib/fonts";
 import type { Suggestion } from "@/lib/firebaseSuggestions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Plus,
   Trash2,
@@ -26,7 +27,8 @@ type Tab =
   | "alias"
   | "wavelength"
   | "suggestions"
-  | "frontpage";
+  | "frontpage"
+  | "beat-for-beat";
 type NhiCategory = "mild" | "hot" | "spicy" | "abakus";
 type GameGroup = "songs" | "games";
 
@@ -43,6 +45,13 @@ interface SongsData {
 
 interface AliasData {
   words: string[];
+}
+
+interface BeatSong {
+  id: string;
+  title: string;
+  phrase: string;
+  spotifyTrackId?: string;
 }
 
 interface GameEntry {
@@ -75,6 +84,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "never-have-i", label: "Never Have I" },
   { key: "songs", label: "Sanger" },
   { key: "alias", label: "Alias" },
+  { key: "beat-for-beat", label: "Beat for Beat" },
   { key: "wavelength", label: "Bølgelengde" },
   { key: "suggestions", label: "Forslag" },
   { key: "frontpage", label: "Forside" },
@@ -182,6 +192,17 @@ const DEFAULT_GAMES: GameEntry[] = [
     enabled: true,
     tag: "Oppe igjen!",
     wide: true,
+  },
+  {
+    id: "beat-for-beat",
+    label: "Beat for Beat",
+    href: "/beat-for-beat",
+    icon: "Swords",
+    color: "amber",
+    group: "games",
+    order: 8,
+    enabled: true,
+    tag: "Nytt!",
   },
 ];
 
@@ -306,7 +327,14 @@ export default function AdminPage() {
 
   const [aliasData, setAliasData] = useState<AliasData>({ words: [] });
   const [aliasSnapshot, setAliasSnapshot] = useState<AliasData>({ words: [] });
+  const [aliasInput, setAliasInput] = useState("");
   const [aliasStatus, setAliasStatus] = useState<SaveStatus>({
+    state: "idle",
+  });
+
+  const [beatData, setBeatData] = useState<BeatSong[]>([]);
+  const [beatSnapshot, setBeatSnapshot] = useState<BeatSong[]>([]);
+  const [beatStatus, setBeatStatus] = useState<SaveStatus>({
     state: "idle",
   });
 
@@ -339,15 +367,17 @@ export default function AdminPage() {
   }, []);
 
   const loadData = useCallback(async () => {
-    const [q, nhi, songs, alias, wavelength, sug, games] = await Promise.all([
-      fetch("/api/admin/data?game=questions").then((r) => r.json()),
-      fetch("/api/admin/data?game=never-have-i").then((r) => r.json()),
-      fetch("/api/admin/data?game=songs").then((r) => r.json()),
-      fetch("/api/admin/data?game=alias").then((r) => r.json()),
-      fetch("/api/admin/data?game=wavelength").then((r) => r.json()),
-      fetch("/api/admin/suggestions").then((r) => r.json()),
-      fetch("/api/admin/data?game=games").then((r) => r.json()),
-    ]);
+    const [q, nhi, songs, alias, wavelength, sug, games, beat] =
+      await Promise.all([
+        fetch("/api/admin/data?game=questions").then((r) => r.json()),
+        fetch("/api/admin/data?game=never-have-i").then((r) => r.json()),
+        fetch("/api/admin/data?game=songs").then((r) => r.json()),
+        fetch("/api/admin/data?game=alias").then((r) => r.json()),
+        fetch("/api/admin/data?game=wavelength").then((r) => r.json()),
+        fetch("/api/admin/suggestions").then((r) => r.json()),
+        fetch("/api/admin/data?game=games").then((r) => r.json()),
+        fetch("/api/admin/data?game=beat-for-beat").then((r) => r.json()),
+      ]);
     if (Array.isArray(q)) {
       setQuestions(q);
       setQuestionsSnapshot(q);
@@ -363,6 +393,11 @@ export default function AdminPage() {
     if (alias?.words && Array.isArray(alias.words)) {
       setAliasData(alias);
       setAliasSnapshot(alias);
+      setAliasInput(alias.words.join("\n"));
+    }
+    if (Array.isArray(beat)) {
+      setBeatData(beat);
+      setBeatSnapshot(beat);
     }
     const normalizedWavelength = normalizeWavelengthCards(wavelength);
     setWavelengthData(normalizedWavelength);
@@ -423,7 +458,10 @@ export default function AdminPage() {
   const isQuestionsDirty = hasChanges(questions, questionsSnapshot);
   const isNhiDirty = hasChanges(nhiData, nhiSnapshot);
   const isSongsDirty = hasChanges(songsData, songsSnapshot);
-  const isAliasDirty = hasChanges(aliasData, aliasSnapshot);
+  const isAliasDirty =
+    hasChanges(aliasData, aliasSnapshot) ||
+    aliasInput !== aliasSnapshot.words.join("\n");
+  const isBeatDirty = hasChanges(beatData, beatSnapshot);
   const isWavelengthDirty = hasChanges(wavelengthData, wavelengthSnapshot);
   const isGamesDirty = hasChanges(gamesData, gamesSnapshot);
 
@@ -935,8 +973,17 @@ export default function AdminPage() {
                   variant={isAliasDirty ? "default" : "outline"}
                   disabled={!isAliasDirty}
                   onClick={async () => {
-                    const ok = await save("alias", aliasData, setAliasStatus);
-                    if (ok) setAliasSnapshot(aliasData);
+                    const words = aliasInput
+                      .split("\n")
+                      .map((w) => w.trim())
+                      .filter((w) => w.length > 0);
+                    const newData = { words };
+                    const ok = await save("alias", newData, setAliasStatus);
+                    if (ok) {
+                      setAliasSnapshot(newData);
+                      setAliasData(newData);
+                      setAliasInput(words.join("\n"));
+                    }
                   }}
                 >
                   Lagre
@@ -944,43 +991,15 @@ export default function AdminPage() {
               </div>
             </div>
             <p className="text-sm text-gray-500">
-              Legg til ord som spillerne skal beskrive uten å si selve ordet.
+              Legg til ord som spillerne skal beskrive. Skriv ett ord per linje.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="self-start gap-1"
-              onClick={() => setAliasData({ words: [...aliasData.words, ""] })}
-            >
-              <Plus size={14} /> Legg til ord
-            </Button>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {aliasData.words.map((word, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <span className="text-xs text-gray-400 w-6 text-right">
-                    {i + 1}
-                  </span>
-                  <Input
-                    value={word}
-                    onChange={(e) => {
-                      const next = [...aliasData.words];
-                      next[i] = e.target.value;
-                      setAliasData({ words: next });
-                    }}
-                    className="flex-1 bg-white"
-                  />
-                  <button
-                    onClick={() =>
-                      setAliasData({
-                        words: aliasData.words.filter((_, j) => j !== i),
-                      })
-                    }
-                    className="text-red-400 hover:text-red-600"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+            <div className="flex flex-col gap-2">
+              <Textarea
+                value={aliasInput}
+                onChange={(e) => setAliasInput(e.target.value)}
+                placeholder="Skriv inn ord her..."
+                className="min-h-[400px] bg-white font-medium leading-relaxed"
+              />
             </div>
           </div>
         )}
@@ -1059,6 +1078,106 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Beat for Beat ── */}
+        {tab === "beat-for-beat" && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">
+                Beat for Beat ({beatData.length} sanger)
+              </h2>
+              <div className="flex gap-2 items-center">
+                {renderStatus(beatStatus)}
+                <Button
+                  size="sm"
+                  variant={isBeatDirty ? "default" : "outline"}
+                  disabled={!isBeatDirty}
+                  onClick={async () => {
+                    const ok = await save(
+                      "beat-for-beat",
+                      beatData,
+                      setBeatStatus,
+                    );
+                    if (ok) setBeatSnapshot(beatData);
+                  }}
+                >
+                  Lagre
+                </Button>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">
+              Legg til sanger, fraser og Spotify-track-ID (valgfritt).
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start gap-1"
+              onClick={() =>
+                setBeatData([
+                  ...beatData,
+                  { id: `beat-${Date.now()}`, title: "", phrase: "" },
+                ])
+              }
+            >
+              <Plus size={14} /> Legg til sang
+            </Button>
+            <div className="flex flex-col gap-3">
+              {beatData.map((song, i) => (
+                <div
+                  key={song.id}
+                  className="flex gap-2 items-center bg-white rounded-xl p-3 shadow-sm"
+                >
+                  <span className="text-xs text-gray-400 w-6 text-right">
+                    {i + 1}
+                  </span>
+                  <div className="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+                    <Input
+                      placeholder="Artist - Tittel"
+                      value={song.title}
+                      onChange={(e) => {
+                        const next = [...beatData];
+                        next[i] = { ...next[i], title: e.target.value };
+                        setBeatData(next);
+                      }}
+                      className="bg-gray-50"
+                    />
+                    <Input
+                      placeholder="Spotify Track ID (f.eks. 25sn3...)"
+                      value={song.spotifyTrackId ?? ""}
+                      onChange={(e) => {
+                        const next = [...beatData];
+                        next[i] = {
+                          ...next[i],
+                          spotifyTrackId: e.target.value,
+                        };
+                        setBeatData(next);
+                      }}
+                      className="bg-gray-50"
+                    />
+                    <Input
+                      placeholder="Frase som skal gjettes"
+                      value={song.phrase}
+                      onChange={(e) => {
+                        const next = [...beatData];
+                        next[i] = { ...next[i], phrase: e.target.value };
+                        setBeatData(next);
+                      }}
+                      className="bg-gray-50 md:col-span-2"
+                    />
+                  </div>
+                  <button
+                    onClick={() =>
+                      setBeatData(beatData.filter((_, j) => j !== i))
+                    }
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

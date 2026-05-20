@@ -1,7 +1,11 @@
 export type TeamId = "A" | "B";
 export type WordColor = "red" | "black";
 export type Phase = "idle" | "setup" | "playing" | "game-over";
-export type RoundPhase = "awaiting-pick" | "guessing" | "round-over";
+export type RoundPhase =
+  | "awaiting-pick"
+  | "guessing"
+  | "waiting-for-reveal"
+  | "round-over";
 
 export interface Word {
   text: string;

@@ -181,7 +181,7 @@ export default function PhraseQueueEditor({
             </label>
             <Input
               value={songTitle}
-              placeholder="F.eks. «Mods - Tore Tang»"
+              placeholder="Overfladisk - Bausa"
               onChange={(e) => setSongTitle(e.target.value)}
               disabled={disabled}
               className="bg-white"
@@ -194,7 +194,7 @@ export default function PhraseQueueEditor({
             </label>
             <Input
               value={draft}
-              placeholder="F.eks. «Tore Tang en gammel mann»"
+              placeholder="De vet jo hva heter men ikke hvem jeg er"
               onChange={(e) => {
                 setDraft(e.target.value);
                 if (error) setError(null);
