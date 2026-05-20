@@ -70,7 +70,7 @@ export const revealWord = (state: GameState, index: number): GameState => {
         round: {
           ...state.round,
           words,
-          roundPhase: "round-over",
+          roundPhase: "waiting-for-reveal",
           timerDeadline: null,
           pausedRemainingMs: null,
         },
@@ -105,6 +105,28 @@ export const revealWord = (state: GameState, index: number): GameState => {
 export const awardPoints = (state: GameState): GameState => {
   if (!state.round || state.round.awardedThisRound) return state;
   const team = state.round.activeTeam;
+
+  const hasUnrevealedRed = state.round.words.some(
+    (w) => w.color === "red" && !w.revealed,
+  );
+
+  if (hasUnrevealedRed) {
+    return stamp({
+      ...state,
+      scores: {
+        ...state.scores,
+        [team]: state.scores[team] + state.round.pointValue,
+      },
+      round: {
+        ...state.round,
+        roundPhase: "waiting-for-reveal",
+        timerDeadline: null,
+        pausedRemainingMs: null,
+        awardedThisRound: true,
+      },
+    });
+  }
+
   return stamp({
     ...state,
     scores: {

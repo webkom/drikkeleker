@@ -127,9 +127,11 @@ export default function AudienceView({ roomCode }: AudienceViewProps) {
                 <span className="rounded-full bg-white/80 text-amber-900 text-sm font-semibold px-3 py-1">
                   {state.round.roundPhase === "guessing"
                     ? `${state.teams[state.round.activeTeam]} gjetter`
-                    : state.round.roundPhase === "round-over"
-                      ? "Runden er ferdig"
-                      : `${state.teams[state.round.activeTeam]} velger ord`}
+                    : state.round.roundPhase === "waiting-for-reveal"
+                      ? "Venter på avsløring..."
+                      : state.round.roundPhase === "round-over"
+                        ? "Runden er ferdig"
+                        : `${state.teams[state.round.activeTeam]} velger ord`}
                 </span>
               </div>
 

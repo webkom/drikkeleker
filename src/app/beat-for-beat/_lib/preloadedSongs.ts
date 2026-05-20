@@ -40,7 +40,7 @@ export const PRELOADED_SONGS: SavedSong[] = [
   {
     id: "preloaded-overfladisk",
     title: "Bausa - Overfladisk",
-    phrase: "De vet jo hva jeg heter",
+    phrase: "De vet jo hva heter men ikke hvem jeg er",
     spotifyTrackId: "5TrYG1brmOJcqtOFXhLaMm",
   },
   {

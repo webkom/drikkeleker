@@ -13,6 +13,7 @@ const ALLOWED_GAMES = [
   "wavelength",
   "frontpage",
   "games",
+  "beat-for-beat",
 ] as const;
 type Game = (typeof ALLOWED_GAMES)[number];
 
