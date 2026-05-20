@@ -445,10 +445,15 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password, game, data }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Save failed:", errData.error || res.statusText);
+      }
       setStatus({ state: res.ok ? "success" : "error" });
       setTimeout(() => setStatus({ state: "idle" }), 3000);
       return res.ok;
-    } catch {
+    } catch (err) {
+      console.error("Save fetch error:", err);
       setStatus({ state: "error" });
       setTimeout(() => setStatus({ state: "idle" }), 3000);
       return false;

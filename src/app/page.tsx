@@ -80,7 +80,7 @@ const DEFAULT_GAMES: GameEntry[] = [
   {
     id: "alias",
     label: "Alias",
-    href: "/Alias",
+    href: "/alias",
     icon: "Tags",
     color: "cyan",
     group: "games",
