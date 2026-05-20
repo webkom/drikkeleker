@@ -2,8 +2,8 @@ import BeerContainer from "@/components/beer/beer-container";
 import { lilita } from "@/lib/fonts";
 import SuggestionsForm from "@/components/shared/suggestions-form";
 import SnapScroll from "@/components/shared/snap-scroll";
-import { ArrowDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
 import FoamWave from "@/components/foamwave/foamwave";
 import Footer from "@/components/shared/footer";
@@ -80,7 +80,7 @@ const DEFAULT_GAMES: GameEntry[] = [
   {
     id: "alias",
     label: "Alias",
-    href: "/alias",
+    href: "/Alias",
     icon: "Tags",
     color: "cyan",
     group: "games",
