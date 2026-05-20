@@ -30,6 +30,7 @@ import {
   resetTimer,
   resumeTimer,
   revealWord,
+  revealAllWords,
   toggleAudienceTimer,
 } from "../_lib/gameActions";
 import ScoreBoard from "./ScoreBoard";
@@ -291,6 +292,14 @@ function GameControls({ state, applyAction, onReset }: GameControlsProps) {
               <Repeat size={18} /> Bytt lag
             </Button>
           </div>
+          <Button
+            size="lg"
+            variant="secondary"
+            onClick={() => applyAction(revealAllWords)}
+            className="w-full gap-2 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-900 cursor-pointer"
+          >
+            <Eye size={18} /> Avslør hele frasen & spill sang
+          </Button>
         </div>
       )}
 

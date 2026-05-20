@@ -17,9 +17,10 @@ const otherTeam = (team: TeamId): TeamId => (team === "A" ? "B" : "A");
 const buildRound = (
   draft: PhraseDraft,
   durationSec: number,
+  redWordsCount: number,
   activeTeam: TeamId,
 ): Round => {
-  const words = assignColors(parsePhrase(draft.text));
+  const words = assignColors(parsePhrase(draft.text), redWordsCount);
   return {
     phraseId: draft.id,
     phrase: draft.text,
@@ -38,7 +39,12 @@ const buildRound = (
 export const startGame = (state: GameState): GameState => {
   if (state.queue.length === 0) return state;
   const draft = state.queue[0];
-  const round = buildRound(draft, state.defaults.timerDurationSec, "A");
+  const round = buildRound(
+    draft,
+    state.defaults.timerDurationSec,
+    state.defaults.redWordsCount ?? 2,
+    "A",
+  );
   return stamp({
     ...state,
     phase: "playing",
@@ -57,6 +63,19 @@ export const revealWord = (state: GameState, index: number): GameState => {
   );
 
   if (word.color === "red") {
+    const allRevealed = words.every((w) => w.revealed);
+    if (allRevealed) {
+      return stamp({
+        ...state,
+        round: {
+          ...state.round,
+          words,
+          roundPhase: "round-over",
+          timerDeadline: null,
+          pausedRemainingMs: null,
+        },
+      });
+    }
     return stamp({
       ...state,
       round: {
@@ -71,16 +90,13 @@ export const revealWord = (state: GameState, index: number): GameState => {
   }
 
   // black: start timer
-  const allRevealed = words.every((w) => w.revealed);
   return stamp({
     ...state,
     round: {
       ...state.round,
       words,
-      roundPhase: allRevealed ? "round-over" : "guessing",
-      timerDeadline: allRevealed
-        ? null
-        : Date.now() + state.round.timerDurationSec * 1000,
+      roundPhase: "guessing",
+      timerDeadline: Date.now() + state.round.timerDurationSec * 1000,
       pausedRemainingMs: null,
     },
   });
@@ -202,6 +218,7 @@ export const nextPhrase = (state: GameState): GameState => {
   const round = buildRound(
     draft,
     state.defaults.timerDurationSec,
+    state.defaults.redWordsCount ?? 2,
     otherTeam(previousTeam),
   );
   return stamp({
@@ -251,9 +268,40 @@ export const updateTeams = (
   teams: { A: string; B: string },
 ): GameState => stamp({ ...state, teams });
 
+export const reorderPhrase = (
+  state: GameState,
+  id: string,
+  direction: "up" | "down",
+): GameState => {
+  const index = state.queue.findIndex((p) => p.id === id);
+  if (index === -1) return state;
+  const newIndex = direction === "up" ? index - 1 : index + 1;
+  if (newIndex < 0 || newIndex >= state.queue.length) return state;
+
+  const newQueue = [...state.queue];
+  const temp = newQueue[index];
+  newQueue[index] = newQueue[newIndex];
+  newQueue[newIndex] = temp;
+
+  return stamp({ ...state, queue: newQueue });
+};
+
+export const updatePhraseText = (
+  state: GameState,
+  id: string,
+  newText: string,
+): GameState => {
+  return stamp({
+    ...state,
+    queue: state.queue.map((p) =>
+      p.id === id ? { ...p, text: newText.trim() } : p,
+    ),
+  });
+};
+
 export const updateDefaults = (
   state: GameState,
-  defaults: { timerDurationSec: number; pointValue: number },
+  defaults: { timerDurationSec: number; pointValue: number; redWordsCount: number },
 ): GameState => stamp({ ...state, defaults });
 
 export const adjustScore = (
@@ -271,3 +319,18 @@ export const adjustScore = (
 
 export const toggleAudienceTimer = (state: GameState): GameState =>
   stamp({ ...state, showTimerToAudience: !state.showTimerToAudience });
+
+export const revealAllWords = (state: GameState): GameState => {
+  if (!state.round) return state;
+  return stamp({
+    ...state,
+    round: {
+      ...state.round,
+      words: state.round.words.map((w) => ({ ...w, revealed: true })),
+      roundPhase: "round-over",
+      timerDeadline: null,
+      pausedRemainingMs: null,
+    },
+  });
+};
+
