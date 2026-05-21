@@ -149,10 +149,32 @@ export default function AliasPage() {
 
     let finalWords: string[];
     if (customList.length > 0) {
-      finalWords =
-        customMode === "combined" ? [...allWords, ...customList] : customList;
+      if (customMode === "combined") {
+        const shuffledStandard = shuffleArray(allWords);
+        const shuffledCustom = shuffleArray(customList);
+
+        const biasedDeck: string[] = [];
+        let sIdx = 0;
+        let cIdx = 0;
+
+        // Interleave: 4 standard words, then 1 custom word
+        while (sIdx < shuffledStandard.length || cIdx < shuffledCustom.length) {
+          for (let i = 0; i < 4 && sIdx < shuffledStandard.length; i++) {
+            biasedDeck.push(shuffledStandard[sIdx++]);
+          }
+          if (cIdx < shuffledCustom.length) {
+            biasedDeck.push(shuffledCustom[cIdx++]);
+          } else if (sIdx >= shuffledStandard.length) {
+            // Both are finished
+            break;
+          }
+        }
+        finalWords = biasedDeck;
+      } else {
+        finalWords = shuffleArray(customList);
+      }
     } else {
-      finalWords = allWords;
+      finalWords = shuffleArray(allWords);
     }
 
     if (finalWords.length === 0) {
@@ -162,7 +184,7 @@ export default function AliasPage() {
 
     const duration = getRandomDuration();
     setWordPool(finalWords);
-    setActiveDeck(shuffleArray(finalWords));
+    setActiveDeck(finalWords);
     setCurrentIndex(0);
     setCorrectCount(0);
     setSkipCount(0);
