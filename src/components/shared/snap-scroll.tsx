@@ -4,38 +4,47 @@ import { useEffect, useRef } from "react";
 
 export default function SnapScroll() {
   const snapping = useRef(false);
-  const prevScrollY = useRef(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (snapping.current) return;
+    let settleTimer: ReturnType<typeof setTimeout>;
 
-      const y = window.scrollY;
+    const trySnap = () => {
       const gamesEl = document.getElementById("games");
-      if (!gamesEl) {
-        prevScrollY.current = y;
-        return;
-      }
+      if (!gamesEl) return;
+
       const gamesTop = gamesEl.offsetTop;
+      const y = window.scrollY;
 
-      if (y > 0 && y < gamesTop) {
-        const goingDown = y >= prevScrollY.current;
-        snapping.current = true;
-        window.scrollTo({ top: goingDown ? gamesTop : 0, behavior: "smooth" });
-      }
+      // Only snap inside the hero gap between the very top and the games
+      // section; leave the rest of the page alone.
+      if (y <= 0 || y >= gamesTop) return;
 
-      prevScrollY.current = y;
+      // Snap to whichever edge is nearest, independent of scroll direction.
+      const target = y < gamesTop / 2 ? 0 : gamesTop;
+      if (target === y) return;
+
+      snapping.current = true;
+      window.scrollTo({ top: target, behavior: "smooth" });
+
+      // `scrollend` is unreliable on iOS Safari, so release the lock on a timer
+      // safely longer than the smooth scroll instead of listening for it.
+      window.setTimeout(() => {
+        snapping.current = false;
+      }, 700);
     };
 
-    const handleScrollEnd = () => {
-      snapping.current = false;
+    const handleScroll = () => {
+      if (snapping.current) return;
+      // Debounce: only act once scrolling settles, so we never fight the
+      // user's momentum scrolling (the cause of the jittery mobile loop).
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(trySnap, 140);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("scrollend", handleScrollEnd);
     return () => {
+      clearTimeout(settleTimer);
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("scrollend", handleScrollEnd);
     };
   }, []);
 
