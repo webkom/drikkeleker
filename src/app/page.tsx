@@ -8,8 +8,13 @@ import NavButton from "@/components/ui/nav-button";
 import FoamWave from "@/components/foamwave/foamwave";
 import Footer from "@/components/shared/footer";
 import type { Color } from "@/lib/colors";
+import { getGameData } from "@/lib/firebaseAdminData";
 import { readFileSync } from "fs";
 import { join } from "path";
+
+// Read the games catalog from Firestore on every request so admin changes
+// (enabling/disabling games, reordering) take effect without a redeploy.
+export const dynamic = "force-dynamic";
 
 type GameGroup = "songs" | "games";
 
@@ -80,7 +85,7 @@ const DEFAULT_GAMES: GameEntry[] = [
   {
     id: "alias",
     label: "Alias",
-    href: "/Alias",
+    href: "/alias",
     icon: "Tags",
     color: "cyan",
     group: "games",
@@ -162,7 +167,18 @@ const renderGameLabel = (title: string, tag: string) => (
   </span>
 );
 
-const loadGamesCatalog = (): GameEntry[] => {
+const loadGamesCatalog = async (): Promise<GameEntry[]> => {
+  // 1. Firestore is the source of truth (edited via the admin page).
+  try {
+    const data = await getGameData("games");
+    if (Array.isArray(data) && data.length > 0) {
+      return data as GameEntry[];
+    }
+  } catch (err) {
+    console.error("Failed to load games from Firestore:", err);
+  }
+
+  // 2. Fall back to the committed local JSON, then to the hardcoded defaults.
   try {
     const raw = readFileSync(
       join(process.cwd(), "data", "games.json"),
@@ -175,8 +191,8 @@ const loadGamesCatalog = (): GameEntry[] => {
   }
 };
 
-export default function Home() {
-  const gamesCatalog = loadGamesCatalog();
+export default async function Home() {
+  const gamesCatalog = await loadGamesCatalog();
   const songs = gamesCatalog
     .filter((game) => game.group === "songs" && game.enabled)
     .sort((a, b) => a.order - b.order);

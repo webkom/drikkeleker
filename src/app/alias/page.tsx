@@ -84,6 +84,10 @@ const TUTORIAL_STEPS = [
 export default function AliasPage() {
   const [allWords, setAllWords] = useState<string[]>([]);
   const [customWords, setCustomWords] = useState("");
+  const [customMode, setCustomMode] = useState<"standalone" | "combined">(
+    "combined",
+  );
+  const [wordPool, setWordPool] = useState<string[]>([]);
   const [activeDeck, setActiveDeck] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -138,12 +142,17 @@ export default function AliasPage() {
   }, []);
 
   const startRound = useCallback(() => {
-    let finalWords = allWords;
-    if (customWords.trim()) {
-      finalWords = customWords
-        .split(/[,\n]/)
-        .map((w) => w.trim())
-        .filter((w) => w.length > 0);
+    const customList = customWords
+      .split(/[,\n]/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 0);
+
+    let finalWords: string[];
+    if (customList.length > 0) {
+      finalWords =
+        customMode === "combined" ? [...allWords, ...customList] : customList;
+    } else {
+      finalWords = allWords;
     }
 
     if (finalWords.length === 0) {
@@ -152,6 +161,7 @@ export default function AliasPage() {
     }
 
     const duration = getRandomDuration();
+    setWordPool(finalWords);
     setActiveDeck(shuffleArray(finalWords));
     setCurrentIndex(0);
     setCorrectCount(0);
@@ -166,7 +176,7 @@ export default function AliasPage() {
       setExitDirection(null);
       setIsHandingOff(false);
     }, 300);
-  }, [allWords, customWords, restart]);
+  }, [allWords, customWords, customMode, restart]);
   const advanceWord = (direction: "left" | "right") => {
     if (isHandingOff) return;
 
@@ -211,7 +221,7 @@ export default function AliasPage() {
       setSkipCount((prev) => prev + 1);
       setWordsToGuessThisTurn((prev) => prev + 1);
 
-      const sourcePool = allWords.length > 0 ? allWords : activeDeck;
+      const sourcePool = wordPool.length > 0 ? wordPool : activeDeck;
       const penalties = shuffleArray(sourcePool).slice(0, 2);
       setActiveDeck((prev) => [...prev, ...penalties]);
 
@@ -391,6 +401,32 @@ export default function AliasPage() {
                         value={customWords}
                         onChange={(e) => setCustomWords(e.target.value)}
                       />
+                      {customWords.trim() && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setCustomMode("combined")}
+                            className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                              customMode === "combined"
+                                ? "bg-cyan-600 text-white shadow"
+                                : "bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
+                            }`}
+                          >
+                            I tillegg til standardord
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCustomMode("standalone")}
+                            className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
+                              customMode === "standalone"
+                                ? "bg-cyan-600 text-white shadow"
+                                : "bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
+                            }`}
+                          >
+                            Kun egne ord
+                          </button>
+                        </div>
+                      )}
                       <div className="flex items-start gap-2 bg-cyan-50 p-3 rounded-xl border border-cyan-100">
                         <Info
                           size={16}
