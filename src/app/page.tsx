@@ -1,7 +1,6 @@
 import BeerContainer from "@/components/beer/beer-container";
 import { lilita } from "@/lib/fonts";
 import SuggestionsForm from "@/components/shared/suggestions-form";
-import SnapScroll from "@/components/shared/snap-scroll";
 import * as LucideIcons from "lucide-react";
 import { ArrowDown } from "lucide-react";
 import NavButton from "@/components/ui/nav-button";
@@ -168,7 +167,6 @@ const renderGameLabel = (title: string, tag: string) => (
 );
 
 const loadGamesCatalog = async (): Promise<GameEntry[]> => {
-  // 1. Firestore is the source of truth (edited via the admin page).
   try {
     const data = await getGameData("games");
     if (Array.isArray(data) && data.length > 0) {
@@ -178,7 +176,6 @@ const loadGamesCatalog = async (): Promise<GameEntry[]> => {
     console.error("Failed to load games from Firestore:", err);
   }
 
-  // 2. Fall back to the committed local JSON, then to the hardcoded defaults.
   try {
     const raw = readFileSync(
       join(process.cwd(), "data", "games.json"),
@@ -202,9 +199,8 @@ export default async function Home() {
   const shouldSpanWide = games.length % 2 === 1;
 
   return (
-    <main className="min-h-dvh overflow-x-hidden">
-      <SnapScroll />
-      <div className="relative flex flex-col items-center gap-6 p-8 pb-0 text-center min-h-dvh">
+    <main className="h-dvh overflow-y-auto overflow-x-hidden scroll-smooth snap-y snap-mandatory">
+      <div className="relative flex flex-col items-center gap-6 p-8 pb-0 text-center h-dvh shrink-0 snap-start snap-always">
         <h1 className={`${lilita.className} text-6xl mt-12 leading-snug`}>
           Drikkeleker 🍻
         </h1>
@@ -215,9 +211,10 @@ export default async function Home() {
           <span>Dykk ned for å se Abakus sine sanger og drikkeleker!</span>
           <ArrowDown className="animate-bounce" size={48} />
         </a>
-        <FoamWave className="-mb-px w-screen overflow-hidden" />
+        <FoamWave className="-mb-px w-screen overflow-hidden shrink-0" />
       </div>
-      <div id="games">
+
+      <div id="games" className="snap-start min-h-dvh">
         <BeerContainer>
           <h4 className={`${lilita.className} text-gray-800`}>Sanger</h4>
           {songs.map((game) => (
