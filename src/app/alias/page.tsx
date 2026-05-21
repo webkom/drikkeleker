@@ -517,7 +517,7 @@ export default function AliasPage() {
                     style={{ height: slideHeight }}
                     className="relative w-full perspective-1000"
                   >
-                    {isClosingSoon && (
+                    {/* {isClosingSoon && (
                       <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -527,7 +527,7 @@ export default function AliasPage() {
                           💣 BOMBA TICKER FORT!
                         </span>
                       </motion.div>
-                    )}
+                    )} */}
 
                     <AnimatePresence mode="popLayout" initial={false}>
                       {isHandingOff ? (
